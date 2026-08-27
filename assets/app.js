@@ -45,6 +45,11 @@ const el = {
   turno: document.getElementById("turno"),
   ordem: document.getElementById("ordem"),
   limpar: document.getElementById("limpar"),
+  estatisticas: document.getElementById("estatisticas"),
+  statSimAlgum: document.getElementById("stat-sim-algum"),
+  statSimAmbos: document.getElementById("stat-sim-ambos"),
+  statData: document.getElementById("stat-data"),
+  destaqueNumeral: document.getElementById("destaque-numeral"),
 };
 
 function normalizar(texto) {
@@ -195,20 +200,18 @@ function pintarLinhas(visiveis) {
       nSim === 2 ? " deputado--sim-ambos" : nSim === 1 ? " deputado--sim-um" : "";
     const item = criarElemento("li", `deputado${classeIntensidade}`);
 
+    const fotoMoldura = criarElemento("div", "foto-moldura");
     const foto = document.createElement("img");
     foto.className = "foto";
-    foto.width = 54;
-    foto.height = 72;
+    foto.width = 64;
+    foto.height = 64;
     foto.loading = "lazy";
     foto.alt = deputado.nome;
-    foto.src = deputado.urlFoto || FOTO_PADRAO;
-    foto.addEventListener(
-      "error",
-      () => {
-        foto.src = FOTO_PADRAO;
-      },
-      { once: true }
-    );
+    foto.src = `fotos/${deputado.id}.jpg`;
+    foto.addEventListener("error", () => {
+      foto.src = FOTO_PADRAO;
+    });
+    fotoMoldura.append(foto);
 
     const info = criarElemento("div", "info");
     const linkNome = criarElemento("a", "nome", deputado.nome);
@@ -227,7 +230,7 @@ function pintarLinhas(visiveis) {
     const votos = criarElemento("div", "votos");
     votos.append(badge("1º", deputado.turno1), badge("2º", deputado.turno2));
 
-    item.append(foto, info, votos);
+    item.append(fotoMoldura, info, votos);
     fragmento.append(item);
   }
   if (!visiveis.length) {
@@ -293,6 +296,26 @@ function preencherSelectUfs() {
   el.uf.replaceChildren(fragmento);
 }
 
+function renderEstatisticas(dados) {
+  if (el.destaqueNumeral && dados.resumo?.simEmAlgumTurno) {
+    el.destaqueNumeral.textContent = String(dados.resumo.simEmAlgumTurno);
+  }
+  if (el.statSimAlgum && dados.resumo?.simEmAlgumTurno) {
+    el.statSimAlgum.textContent = String(dados.resumo.simEmAlgumTurno);
+  }
+  if (el.statSimAmbos && dados.resumo?.simNosDoisTurnos) {
+    el.statSimAmbos.textContent = String(dados.resumo.simNosDoisTurnos);
+  }
+  if (el.statData) {
+    const rawData = dados.votacoes?.[0]?.data || dados.votacoes?.[0]?.dataHora;
+    if (rawData) {
+      const p = rawData.slice(0, 10).split("-");
+      el.statData.textContent = p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : rawData;
+    }
+  }
+  if (el.estatisticas) el.estatisticas.hidden = false;
+}
+
 async function iniciar() {
   lerUrl();
   try {
@@ -302,6 +325,7 @@ async function iniciar() {
     estado.deputados = dados.deputados;
     estado.pronta = true;
     preencherSelectUfs();
+    renderEstatisticas(dados);
   } catch (erro) {
     mostrarErro(erro);
     return;

@@ -14,6 +14,10 @@ node scripts/fetch-votes.mjs
 
 O script busca as duas votações na API e reescreve tanto o JSON quanto `data/votos-pec-blindagem.csv`. A execução falha se os totais esperados (Sim 353 / Não 134 / Abstenção 1 no 1º turno; Sim 344 / Não 133 no 2º; 356 com pelo menos um Sim) não baterem.
 
+### Fotos
+
+As fotos dos deputados ficam em `fotos/{id}.jpg` — as miniaturas oficiais (bandep) da Câmara, baixadas uma única vez para dentro do repositório. Para gerá-las ou completá-las, rode `node scripts/fetch-fotos.mjs`: ele lê os `urlFoto` de `data/votos-pec-blindagem.json`, pula os arquivos que já existem com conteúdo e baixa o resto limitado a 6 requisições simultâneas para não sobrecarregar o CDN. O site serve essas cópias locais (`assets/app.js` aponta o `<img>` direto para `fotos/{id}.jpg`); o JSON segue carregando o `urlFoto` original como referência upstream.
+
 ## Esquema do JSON
 
 ```json

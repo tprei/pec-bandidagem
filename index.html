@@ -3,29 +3,54 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quem votou a favor da PEC da Blindagem</title>
-  <meta name="description" content="Lista dos 356 deputados federais que votaram Sim na PEC 3/2021 (PEC da Blindagem) em pelo menos um dos dois turnos de 16/09/2025, com filtros por nome, partido, estado e turno.">
-  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 6.2 3.9 10.4 9 12 5.1-1.6 9-5.8 9-12V5l-9-4z" fill="%23241d17"/><path d="M12 3.2 5 6.2v4.8c0 4.9 3 8.4 7 9.9 4-1.5 7-5 7-9.9V6.2l-7-3z" fill="%23f2ecdd"/><path d="M12 5.2 7 7.3v3.7c0 3.7 2.2 6.4 5 7.7V5.2z" fill="%23a02c2c"/></svg>'>
+  <title>Quem votou a favor da PEC da Blindagem — Mural da Vergonha</title>
+  <meta name="description" content="Lista dos deputados federais que votaram Sim na PEC 3/2021 (PEC da Blindagem) na Câmara dos Deputados, com filtros por nome, partido, estado e turno.">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 6.2 3.9 10.4 9 12 5.1-1.6 9-5.8 9-12V5l-9-4z" fill="%231a1512"/><path d="M12 3.2 5 6.2v4.8c0 4.9 3 8.4 7 9.9 4-1.5 7-5 7-9.9V6.2l-7-3z" fill="%23f4efe4"/><path d="M12 5.2 7 7.3v3.7c0 3.7 2.2 6.4 5 7.7V5.2z" fill="%238f1d1d"/></svg>'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Libre+Franklin:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
   <a class="skip-link" href="#lista">Pular para a lista de deputados</a>
 
   <header class="container cabecalho">
-    <p class="kicker">Câmara dos Deputados · PEC 3/2021 · 16 de setembro de 2025</p>
-    <h1>Quem votou a favor da <em>PEC da Blindagem</em></h1>
-    <p class="lede">Em 16 de setembro de 2025, <strong class="destaque-numeral">356 deputados federais</strong> votaram <strong>Sim</strong> à PEC 3/2021 — que tornaria mais difícil abrir processo criminal contra parlamentares — em pelo menos um dos dois turnos de votação.</p>
-    <p class="referencia">Ficha oficial da proposição: <a href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800" target="_blank" rel="noopener">PEC 3/2021 — tramitação na Câmara</a></p>
-    <aside class="nota">
-      <span class="nota__selo" aria-hidden="true">arquivada</span>
-      Em 24 de setembro de 2025, a Comissão de Constituição e Justiça (CCJ) do Senado rejeitou a proposta, que então foi arquivada.
-    </aside>
+    <div class="kicker-faixa">
+      <p class="kicker">Câmara dos Deputados · PEC 3/2021 · Votação Nominal</p>
+    </div>
+    <h1 class="titulo-poster">Quem votou a favor da <span class="pec-vilao">PEC da Blindagem</span></h1>
+    <p class="lede">Em 16 de setembro de 2025, <strong class="destaque-numeral" id="destaque-numeral">—</strong> deputados federais votaram <strong>Sim</strong> à PEC 3/2021 — proposta que tornaria quase impossível abrir processo criminal contra parlamentares — em pelo menos um dos dois turnos.</p>
+    <div class="cartazes-meta">
+      <p class="referencia carimbo-oficial">
+        <span class="carimbo-oficial__selo">Registro Oficial</span>
+        <a href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800" target="_blank" rel="noopener">PEC 3/2021 na íntegra (Câmara) ↗</a>
+      </p>
+      <aside class="nota nota--arquivada">
+        <span class="nota__selo" aria-hidden="true">ARQUIVADA</span>
+        <span>Em 24/09/2025, a CCJ do Senado rejeitou e arquivou a proposta.</span>
+      </aside>
+    </div>
     <noscript>
-      <p class="sem-js">Para usar os filtros desta página, ative o JavaScript — ou consulte diretamente a versão completa em <a href="data/votos-pec-blindagem.csv">data/votos-pec-blindagem.csv</a>.</p>
+      <p class="sem-js">Para usar os filtros interativos, ative o JavaScript — ou consulte a planilha direta em <a href="data/votos-pec-blindagem.csv">data/votos-pec-blindagem.csv</a>.</p>
     </noscript>
   </header>
 
   <main class="container conteudo">
+    <section class="estatisticas" id="estatisticas" aria-label="Estatísticas das votações" hidden>
+      <div class="estatistica">
+        <span class="estatistica__numero" id="stat-sim-algum">—</span>
+        <span class="estatistica__rotulo">Sim em algum turno</span>
+      </div>
+      <div class="estatistica estatistica--alerta">
+        <span class="estatistica__numero" id="stat-sim-ambos">—</span>
+        <span class="estatistica__rotulo">Sim nos dois turnos</span>
+      </div>
+      <div class="estatistica">
+        <span class="estatistica__numero" id="stat-data">—</span>
+        <span class="estatistica__rotulo">Data da votação</span>
+      </div>
+    </section>
+
     <section class="barra" id="barra-filtros" hidden aria-label="Filtros da lista">
       <div class="controle controle--busca">
         <label for="busca">Buscar por nome</label>
