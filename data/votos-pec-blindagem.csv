@@ -1,0 +1,494 @@
+﻿id,nome,partido,uf,turno1,turno2,votou_sim,url_perfil,url_foto
+210989,Bruno Farias,AVANTE,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/210989,https://www.camara.leg.br/internet/deputado/bandep/210989.jpg
+220625,Delegada Ione,AVANTE,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/220625,https://www.camara.leg.br/internet/deputado/bandep/220625.jpg
+198197,Greyce Elias,AVANTE,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/198197,https://www.camara.leg.br/internet/deputado/bandep/198197.jpg
+160510,Luis Tibé,AVANTE,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/160510,https://www.camara.leg.br/internet/deputado/bandep/160510.jpg
+220703,Neto Carletto,AVANTE,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/220703,https://www.camara.leg.br/internet/deputado/bandep/220703.jpg
+204553,Pastor Sargento Isidório,AVANTE,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/204553,https://www.camara.leg.br/internet/deputado/bandep/204553.jpg
+91228,Waldemar Oliveira,AVANTE,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/91228,https://www.camara.leg.br/internet/deputado/bandep/91228.jpg
+178972,Alex Manente,CIDADANIA,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/178972,https://www.camara.leg.br/internet/deputado/bandep/178972.jpg
+220715,Amom Mandel,CIDADANIA,AM,Nao,Nao,false,https://www.camara.leg.br/deputados/220715,https://www.camara.leg.br/internet/deputado/bandep/220715.jpg
+220549,Any Ortiz,CIDADANIA,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/220549,https://www.camara.leg.br/internet/deputado/bandep/220549.jpg
+141391,Arnaldo Jardim,CIDADANIA,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/141391,https://www.camara.leg.br/internet/deputado/bandep/141391.jpg
+204379,Acácio Favacho,MDB,AP,Sim,Sim,true,https://www.camara.leg.br/deputados/204379,https://www.camara.leg.br/internet/deputado/bandep/204379.jpg
+160559,Alceu Moreira,MDB,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/160559,https://www.camara.leg.br/internet/deputado/bandep/160559.jpg
+220542,Alexandre Guimarães,MDB,TO,Sim,Sim,true,https://www.camara.leg.br/deputados/220542,https://www.camara.leg.br/internet/deputado/bandep/220542.jpg
+220676,Andreia Siqueira,MDB,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/220676,https://www.camara.leg.br/internet/deputado/bandep/220676.jpg
+220675,Antônio Doido,MDB,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/220675,https://www.camara.leg.br/internet/deputado/bandep/220675.jpg
+178975,Baleia Rossi,MDB,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/178975,https://www.camara.leg.br/internet/deputado/bandep/178975.jpg
+178876,Célio Silveira,MDB,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/178876,https://www.camara.leg.br/internet/deputado/bandep/178876.jpg
+141408,Cleber Verde,MDB,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/141408,https://www.camara.leg.br/internet/deputado/bandep/141408.jpg
+98148,Cobalchini,MDB,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/98148,https://www.camara.leg.br/internet/deputado/bandep/98148.jpg
+220652,Delegado Palumbo,MDB,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/220652,https://www.camara.leg.br/internet/deputado/bandep/220652.jpg
+220674,Dra. Alessandra Haber,MDB,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/220674,https://www.camara.leg.br/internet/deputado/bandep/220674.jpg
+220540,Duda Ramos,MDB,RR,Sim,Sim,true,https://www.camara.leg.br/deputados/220540,https://www.camara.leg.br/internet/deputado/bandep/220540.jpg
+198783,Emanuel Pinheiro Neto,MDB,MT,Nao,Nao,false,https://www.camara.leg.br/deputados/198783,https://www.camara.leg.br/internet/deputado/bandep/198783.jpg
+220653,Fábio Teruel,MDB,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220653,https://www.camara.leg.br/internet/deputado/bandep/220653.jpg
+204456,Gutemberg Reis,MDB,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/204456,https://www.camara.leg.br/internet/deputado/bandep/204456.jpg
+220537,Helena Lima,MDB,RR,Sim,Sim,true,https://www.camara.leg.br/deputados/220537,https://www.camara.leg.br/internet/deputado/bandep/220537.jpg
+220672,Henderson Pinto,MDB,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/220672,https://www.camara.leg.br/internet/deputado/bandep/220672.jpg
+204539,Hercílio Coelho Diniz,MDB,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204539,https://www.camara.leg.br/internet/deputado/bandep/204539.jpg
+178884,Hildo Rocha,MDB,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/178884,https://www.camara.leg.br/internet/deputado/bandep/178884.jpg
+204436,Isnaldo Bulhões Jr.,MDB,AL,Sim,Sim,true,https://www.camara.leg.br/deputados/204436,https://www.camara.leg.br/internet/deputado/bandep/204436.jpg
+230957,João Cury,MDB,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/230957,https://www.camara.leg.br/internet/deputado/bandep/230957.jpg
+74079,José Priante,MDB,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/74079,https://www.camara.leg.br/internet/deputado/bandep/74079.jpg
+204474,Juarez Costa,MDB,MT,Nao,Nao,false,https://www.camara.leg.br/deputados/204474,https://www.camara.leg.br/internet/deputado/bandep/204474.jpg
+220677,Keniston Braga,MDB,PA,Sim,Ausente,true,https://www.camara.leg.br/deputados/220677,https://www.camara.leg.br/internet/deputado/bandep/220677.jpg
+178954,Lucio Mosquini,MDB,RO,Sim,Ausente,true,https://www.camara.leg.br/deputados/178954,https://www.camara.leg.br/internet/deputado/bandep/178954.jpg
+229432,Luiz Fernando Vampiro,MDB,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/229432,https://www.camara.leg.br/internet/deputado/bandep/229432.jpg
+179001,Márcio Biolchi,MDB,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/179001,https://www.camara.leg.br/internet/deputado/bandep/179001.jpg
+220572,Marussa Boldrin,MDB,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/220572,https://www.camara.leg.br/internet/deputado/bandep/220572.jpg
+233218,Nelinho Freitas,MDB,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/233218,https://www.camara.leg.br/internet/deputado/bandep/233218.jpg
+178896,Newton Cardoso Jr,MDB,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/178896,https://www.camara.leg.br/internet/deputado/bandep/178896.jpg
+204498,Olival Marques,MDB,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/204498,https://www.camara.leg.br/internet/deputado/bandep/204498.jpg
+204441,Otoni de Paula,MDB,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/204441,https://www.camara.leg.br/internet/deputado/bandep/204441.jpg
+161440,Pezenti,MDB,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/161440,https://www.camara.leg.br/internet/deputado/bandep/161440.jpg
+220586,Rafael Brito,MDB,AL,Sim,Ausente,true,https://www.camara.leg.br/deputados/220586,https://www.camara.leg.br/internet/deputado/bandep/220586.jpg
+220532,Rafael Prudente,MDB,DF,Sim,Sim,true,https://www.camara.leg.br/deputados/220532,https://www.camara.leg.br/internet/deputado/bandep/220532.jpg
+153423,Renilce Nicodemos,MDB,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/153423,https://www.camara.leg.br/internet/deputado/bandep/153423.jpg
+220694,Ricardo Maia,MDB,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/220694,https://www.camara.leg.br/internet/deputado/bandep/220694.jpg
+178933,Sergio Souza,MDB,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/178933,https://www.camara.leg.br/internet/deputado/bandep/178933.jpg
+220651,Simone Marquetto,MDB,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220651,https://www.camara.leg.br/internet/deputado/bandep/220651.jpg
+220660,Yury do Paredão,MDB,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/220660,https://www.camara.leg.br/internet/deputado/bandep/220660.jpg
+204528,Adriana Ventura,NOVO,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/204528,https://www.camara.leg.br/internet/deputado/bandep/204528.jpg
+204365,Gilson Marques,NOVO,SC,Nao,Nao,false,https://www.camara.leg.br/deputados/204365,https://www.camara.leg.br/internet/deputado/bandep/204365.jpg
+204455,Luiz Lima,NOVO,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/204455,https://www.camara.leg.br/internet/deputado/bandep/204455.jpg
+156190,Marcel van Hattem,NOVO,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/156190,https://www.camara.leg.br/internet/deputado/bandep/156190.jpg
+74057,Alice Portugal,PCdoB,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/74057,https://www.camara.leg.br/internet/deputado/bandep/74057.jpg
+220555,Daiana Santos,PCdoB,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/220555,https://www.camara.leg.br/internet/deputado/bandep/220555.jpg
+74060,Daniel Almeida,PCdoB,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/74060,https://www.camara.leg.br/internet/deputado/bandep/74060.jpg
+230765,Enfermeira Rejane,PCdoB,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/230765,https://www.camara.leg.br/internet/deputado/bandep/230765.jpg
+74848,Jandira Feghali,PCdoB,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/74848,https://www.camara.leg.br/internet/deputado/bandep/74848.jpg
+81055,Márcio Jerry,PCdoB,MA,Nao,Nao,false,https://www.camara.leg.br/deputados/81055,https://www.camara.leg.br/internet/deputado/bandep/81055.jpg
+178987,Orlando Silva,PCdoB,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/178987,https://www.camara.leg.br/internet/deputado/bandep/178987.jpg
+160641,Professora Marcivania,PCdoB,AP,Nao,Nao,false,https://www.camara.leg.br/deputados/160641,https://www.camara.leg.br/internet/deputado/bandep/160641.jpg
+73801,Renildo Calheiros,PCdoB,PE,Nao,Nao,false,https://www.camara.leg.br/deputados/73801,https://www.camara.leg.br/internet/deputado/bandep/73801.jpg
+178835,Afonso Motta,PDT,RS,Nao,Ausente,false,https://www.camara.leg.br/deputados/178835,https://www.camara.leg.br/internet/deputado/bandep/178835.jpg
+133439,André Figueiredo,PDT,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/133439,https://www.camara.leg.br/internet/deputado/bandep/133439.jpg
+220573,Dorinaldo Malafaia,PDT,AP,Nao,Nao,false,https://www.camara.leg.br/deputados/220573,https://www.camara.leg.br/internet/deputado/bandep/220573.jpg
+220623,Duda Salabert,PDT,MG,Nao,Nao,false,https://www.camara.leg.br/deputados/220623,https://www.camara.leg.br/internet/deputado/bandep/220623.jpg
+160666,Félix Mendonça Júnior,PDT,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/160666,https://www.camara.leg.br/internet/deputado/bandep/160666.jpg
+160598,Flávia Morais,PDT,GO,Nao,Nao,false,https://www.camara.leg.br/deputados/160598,https://www.camara.leg.br/internet/deputado/bandep/160598.jpg
+220578,Josenildo,PDT,AP,Sim,Ausente,true,https://www.camara.leg.br/deputados/220578,https://www.camara.leg.br/internet/deputado/bandep/220578.jpg
+80815,Leo Prates,PDT,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/80815,https://www.camara.leg.br/internet/deputado/bandep/80815.jpg
+220687,Márcio Honaiser,PDT,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/220687,https://www.camara.leg.br/internet/deputado/bandep/220687.jpg
+220604,Marcos Tavares,PDT,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220604,https://www.camara.leg.br/internet/deputado/bandep/220604.jpg
+74158,Mário Heringer,PDT,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/74158,https://www.camara.leg.br/internet/deputado/bandep/74158.jpg
+204486,Mauro Benevides Filho,PDT,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/204486,https://www.camara.leg.br/internet/deputado/bandep/204486.jpg
+220607,Max Lemos,PDT,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220607,https://www.camara.leg.br/internet/deputado/bandep/220607.jpg
+73486,Pompeo de Mattos,PDT,RS,Nao,Ausente,false,https://www.camara.leg.br/deputados/73486,https://www.camara.leg.br/internet/deputado/bandep/73486.jpg
+204489,Robério Monteiro,PDT,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/204489,https://www.camara.leg.br/internet/deputado/bandep/204489.jpg
+221328,Adilson Barroso,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/221328,https://www.camara.leg.br/internet/deputado/bandep/221328.jpg
+73579,Alberto Fraga,PL,DF,Sim,Sim,true,https://www.camara.leg.br/deputados/73579,https://www.camara.leg.br/internet/deputado/bandep/73579.jpg
+178937,Altineu Côrtes,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/178937,https://www.camara.leg.br/internet/deputado/bandep/178937.jpg
+220657,André Fernandes,PL,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/220657,https://www.camara.leg.br/internet/deputado/bandep/220657.jpg
+204423,André Ferreira,PL,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/204423,https://www.camara.leg.br/internet/deputado/bandep/204423.jpg
+220638,Antonio Carlos Rodrigues,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220638,https://www.camara.leg.br/internet/deputado/bandep/220638.jpg
+204374,Bia Kicis,PL,DF,Sim,Sim,true,https://www.camara.leg.br/deputados/204374,https://www.camara.leg.br/internet/deputado/bandep/204374.jpg
+204388,Bibo Nunes,PL,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/204388,https://www.camara.leg.br/internet/deputado/bandep/204388.jpg
+220574,Cabo Gilberto Silva,PL,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/220574,https://www.camara.leg.br/internet/deputado/bandep/220574.jpg
+204572,Capitão Alberto Neto,PL,AM,Sim,Sim,true,https://www.camara.leg.br/deputados/204572,https://www.camara.leg.br/internet/deputado/bandep/204572.jpg
+220690,Capitão Alden,PL,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/220690,https://www.camara.leg.br/internet/deputado/bandep/220690.jpg
+204460,Carlos Jordy,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/204460,https://www.camara.leg.br/internet/deputado/bandep/204460.jpg
+204369,Caroline de Toni,PL,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/204369,https://www.camara.leg.br/internet/deputado/bandep/204369.jpg
+204462,Chris Tonietto,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/204462,https://www.camara.leg.br/internet/deputado/bandep/204462.jpg
+204378,Coronel Chrisóstomo,PL,RO,Sim,Sim,true,https://www.camara.leg.br/deputados/204378,https://www.camara.leg.br/internet/deputado/bandep/204378.jpg
+220595,Coronel Fernanda,PL,MT,Sim,Sim,true,https://www.camara.leg.br/deputados/220595,https://www.camara.leg.br/internet/deputado/bandep/220595.jpg
+220666,Coronel Meira,PL,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/220666,https://www.camara.leg.br/internet/deputado/bandep/220666.jpg
+220571,Daniel Agrobom,PL,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/220571,https://www.camara.leg.br/internet/deputado/bandep/220571.jpg
+204367,Daniel Freitas,PL,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/204367,https://www.camara.leg.br/internet/deputado/bandep/204367.jpg
+220557,Daniela Reinehr,PL,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/220557,https://www.camara.leg.br/internet/deputado/bandep/220557.jpg
+220673,Delegado Caveira,PL,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/220673,https://www.camara.leg.br/internet/deputado/bandep/220673.jpg
+178908,Delegado Éder Mauro,PL,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/178908,https://www.camara.leg.br/internet/deputado/bandep/178908.jpg
+220654,Delegado Paulo Bilynskyj,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220654,https://www.camara.leg.br/internet/deputado/bandep/220654.jpg
+220619,Delegado Ramagem,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220619,https://www.camara.leg.br/internet/deputado/bandep/220619.jpg
+220689,Detinha,PL,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/220689,https://www.camara.leg.br/internet/deputado/bandep/220689.jpg
+160758,Domingos Sávio,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/160758,https://www.camara.leg.br/internet/deputado/bandep/160758.jpg
+204481,Dr. Jaziel,PL,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/204481,https://www.camara.leg.br/internet/deputado/bandep/204481.jpg
+204364,Eli Borges,PL,TO,Sim,Sim,true,https://www.camara.leg.br/deputados/204364,https://www.camara.leg.br/internet/deputado/bandep/204364.jpg
+161550,Emidinho Madeira,PL,MG,Sim,Ausente,true,https://www.camara.leg.br/deputados/161550,https://www.camara.leg.br/internet/deputado/bandep/161550.jpg
+160640,Eros Biondini,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/160640,https://www.camara.leg.br/internet/deputado/bandep/160640.jpg
+204427,Fernando Rodolfo,PL,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/204427,https://www.camara.leg.br/internet/deputado/bandep/204427.jpg
+204411,Filipe Barros,PL,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/204411,https://www.camara.leg.br/internet/deputado/bandep/204411.jpg
+220545,Filipe Martins,PL,TO,Sim,Sim,true,https://www.camara.leg.br/deputados/220545,https://www.camara.leg.br/internet/deputado/bandep/220545.jpg
+204473,General Girão,PL,RN,Sim,Sim,true,https://www.camara.leg.br/deputados/204473,https://www.camara.leg.br/internet/deputado/bandep/204473.jpg
+220611,General Pazuello,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220611,https://www.camara.leg.br/internet/deputado/bandep/220611.jpg
+74383,Giacobo,PL,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/74383,https://www.camara.leg.br/internet/deputado/bandep/74383.jpg
+220526,Gilvan da Federal,PL,ES,Sim,Sim,true,https://www.camara.leg.br/deputados/220526,https://www.camara.leg.br/internet/deputado/bandep/220526.jpg
+160673,Giovani Cherini,PL,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/160673,https://www.camara.leg.br/internet/deputado/bandep/160673.jpg
+220568,Gustavo Gayer,PL,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/220568,https://www.camara.leg.br/internet/deputado/bandep/220568.jpg
+204444,Helio Lopes,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/204444,https://www.camara.leg.br/internet/deputado/bandep/204444.jpg
+74273,Jefferson Campos,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/74273,https://www.camara.leg.br/internet/deputado/bandep/74273.jpg
+178910,Joaquim Passarinho,PL,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/178910,https://www.camara.leg.br/internet/deputado/bandep/178910.jpg
+204472,José Medeiros,PL,MT,Sim,Sim,true,https://www.camara.leg.br/deputados/204472,https://www.camara.leg.br/internet/deputado/bandep/204472.jpg
+204563,Josimar Maranhãozinho,PL,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/204563,https://www.camara.leg.br/internet/deputado/bandep/204563.jpg
+220559,Julia Zanatta,PL,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/220559,https://www.camara.leg.br/internet/deputado/bandep/220559.jpg
+204520,Junio Amaral,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204520,https://www.camara.leg.br/internet/deputado/bandep/204520.jpg
+204574,Junior Lourenço,PL,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/204574,https://www.camara.leg.br/internet/deputado/bandep/204574.jpg
+74585,Lincoln Portela,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/74585,https://www.camara.leg.br/internet/deputado/bandep/74585.jpg
+204485,Luiz Carlos Motta,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/204485,https://www.camara.leg.br/internet/deputado/bandep/204485.jpg
+204526,Luiz Philippe de Orleans e Bragança,PL,SP,Sim,Ausente,true,https://www.camara.leg.br/deputados/204526,https://www.camara.leg.br/internet/deputado/bandep/204526.jpg
+179000,Marcelo Álvaro Antônio,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/179000,https://www.camara.leg.br/internet/deputado/bandep/179000.jpg
+133810,Marcelo Moraes,PL,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/133810,https://www.camara.leg.br/internet/deputado/bandep/133810.jpg
+178983,Marcio Alvino,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/178983,https://www.camara.leg.br/internet/deputado/bandep/178983.jpg
+220547,Marcos Pollon,PL,MS,Sim,Sim,true,https://www.camara.leg.br/deputados/220547,https://www.camara.leg.br/internet/deputado/bandep/220547.jpg
+220655,Mario Frias,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220655,https://www.camara.leg.br/internet/deputado/bandep/220655.jpg
+220661,Matheus Noronha,PL,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/220661,https://www.camara.leg.br/internet/deputado/bandep/220661.jpg
+220628,Mauricio do Vôlei,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/220628,https://www.camara.leg.br/internet/deputado/bandep/220628.jpg
+178985,Miguel Lombardi,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/178985,https://www.camara.leg.br/internet/deputado/bandep/178985.jpg
+160561,Missionário José Olimpio,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/160561,https://www.camara.leg.br/internet/deputado/bandep/160561.jpg
+204449,Nelson Barbudo,PL,MT,Sim,Sim,true,https://www.camara.leg.br/deputados/204449,https://www.camara.leg.br/internet/deputado/bandep/204449.jpg
+209787,Nikolas Ferreira,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/209787,https://www.camara.leg.br/internet/deputado/bandep/209787.jpg
+73692,Osmar Terra,PL,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/73692,https://www.camara.leg.br/internet/deputado/bandep/73692.jpg
+160642,Pastor Eurico,PL,PE,Ausente,Sim,true,https://www.camara.leg.br/deputados/160642,https://www.camara.leg.br/internet/deputado/bandep/160642.jpg
+204570,Pastor Gil,PL,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/204570,https://www.camara.leg.br/internet/deputado/bandep/204570.jpg
+160558,Paulo Freire Costa,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/160558,https://www.camara.leg.br/internet/deputado/bandep/160558.jpg
+160601,Pr. Marco Feliciano,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/160601,https://www.camara.leg.br/internet/deputado/bandep/160601.jpg
+204390,Professor Alcides,PL,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/204390,https://www.camara.leg.br/internet/deputado/bandep/204390.jpg
+204362,Ricardo Guidi,PL,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/204362,https://www.camara.leg.br/internet/deputado/bandep/204362.jpg
+220693,Roberta Roma,PL,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/220693,https://www.camara.leg.br/internet/deputado/bandep/220693.jpg
+220613,Roberto Monteiro Pai,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220613,https://www.camara.leg.br/internet/deputado/bandep/220613.jpg
+220546,Rodolfo Nogueira,PL,MS,Sim,Sim,true,https://www.camara.leg.br/deputados/220546,https://www.camara.leg.br/internet/deputado/bandep/220546.jpg
+230767,Rodrigo da Zaeli,PL,MT,Sim,Sim,true,https://www.camara.leg.br/deputados/230767,https://www.camara.leg.br/internet/deputado/bandep/230767.jpg
+204525,Rosana Valle,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/204525,https://www.camara.leg.br/internet/deputado/bandep/204525.jpg
+220620,Rosângela Reis,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/220620,https://www.camara.leg.br/internet/deputado/bandep/220620.jpg
+204416,Sanderson,PL,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/204416,https://www.camara.leg.br/internet/deputado/bandep/204416.jpg
+220621,Sargento Gonçalves,PL,RN,Sim,Sim,true,https://www.camara.leg.br/deputados/220621,https://www.camara.leg.br/internet/deputado/bandep/220621.jpg
+178946,Soraya Santos,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/178946,https://www.camara.leg.br/internet/deputado/bandep/178946.jpg
+178947,Sóstenes Cavalcante,PL,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/178947,https://www.camara.leg.br/internet/deputado/bandep/178947.jpg
+160976,Tiririca,PL,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/160976,https://www.camara.leg.br/internet/deputado/bandep/160976.jpg
+160591,Vinicius Gurgel,PL,AP,Sim,Sim,true,https://www.camara.leg.br/deputados/160591,https://www.camara.leg.br/internet/deputado/bandep/160591.jpg
+74043,Wellington Roberto,PL,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/74043,https://www.camara.leg.br/internet/deputado/bandep/74043.jpg
+220558,Zé Trovão,PL,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/220558,https://www.camara.leg.br/internet/deputado/bandep/220558.jpg
+204517,Zé Vitor,PL,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204517,https://www.camara.leg.br/internet/deputado/bandep/204517.jpg
+220552,Zucco,PL,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/220552,https://www.camara.leg.br/internet/deputado/bandep/220552.jpg
+220635,Bruno Ganem,PODE,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220635,https://www.camara.leg.br/internet/deputado/bandep/220635.jpg
+220528,Dr. Victor Linhalis,PODE,ES,Sim,Sim,true,https://www.camara.leg.br/deputados/220528,https://www.camara.leg.br/internet/deputado/bandep/220528.jpg
+225730,Enfermeira Ana Paula,PODE,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/225730,https://www.camara.leg.br/internet/deputado/bandep/225730.jpg
+220681,Fábio Macedo,PODE,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/220681,https://www.camara.leg.br/internet/deputado/bandep/220681.jpg
+220529,Gilson Daniel,PODE,ES,Nao,Nao,false,https://www.camara.leg.br/deputados/220529,https://www.camara.leg.br/internet/deputado/bandep/220529.jpg
+73778,Luiz Carlos Hauly,PODE,PR,Nao,Nao,false,https://www.camara.leg.br/deputados/73778,https://www.camara.leg.br/internet/deputado/bandep/73778.jpg
+220550,Mauricio Marcon,PODE,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/220550,https://www.camara.leg.br/internet/deputado/bandep/220550.jpg
+220622,Nely Aquino,PODE,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/220622,https://www.camara.leg.br/internet/deputado/bandep/220622.jpg
+233594,Rafael Fera,PODE,RO,Sim,Sim,true,https://www.camara.leg.br/deputados/233594,https://www.camara.leg.br/internet/deputado/bandep/233594.jpg
+204567,Raimundo Costa,PODE,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/204567,https://www.camara.leg.br/internet/deputado/bandep/204567.jpg
+178989,Renata Abreu,PODE,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/178989,https://www.camara.leg.br/internet/deputado/bandep/178989.jpg
+220641,Rodrigo Gambale,PODE,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220641,https://www.camara.leg.br/internet/deputado/bandep/220641.jpg
+160629,Romero Rodrigues,PODE,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/160629,https://www.camara.leg.br/internet/deputado/bandep/160629.jpg
+160635,Ruy Carneiro,PODE,PB,Nao,Nao,false,https://www.camara.leg.br/deputados/160635,https://www.camara.leg.br/internet/deputado/bandep/160635.jpg
+233598,Samuel Santos,PODE,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/233598,https://www.camara.leg.br/internet/deputado/bandep/233598.jpg
+220618,Sargento Portugal,PODE,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220618,https://www.camara.leg.br/internet/deputado/bandep/220618.jpg
+143084,Tiago Dimas,PODE,TO,Sim,Sim,true,https://www.camara.leg.br/deputados/143084,https://www.camara.leg.br/internet/deputado/bandep/143084.jpg
+121948,Adriano do Baldy,PP,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/121948,https://www.camara.leg.br/internet/deputado/bandep/121948.jpg
+136811,Afonso Hamm,PP,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/136811,https://www.camara.leg.br/internet/deputado/bandep/136811.jpg
+160527,Aguinaldo Ribeiro,PP,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/160527,https://www.camara.leg.br/internet/deputado/bandep/160527.jpg
+204549,AJ Albuquerque,PP,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/204549,https://www.camara.leg.br/internet/deputado/bandep/204549.jpg
+226708,Allan Garcês,PP,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/226708,https://www.camara.leg.br/internet/deputado/bandep/226708.jpg
+220707,Amanda Gentil,PP,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/220707,https://www.camara.leg.br/internet/deputado/bandep/220707.jpg
+107970,Ana Paula Leão,PP,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/107970,https://www.camara.leg.br/internet/deputado/bandep/107970.jpg
+178831,André Abdon,PP,AP,Sim,Sim,true,https://www.camara.leg.br/deputados/178831,https://www.camara.leg.br/internet/deputado/bandep/178831.jpg
+160541,Arthur Lira,PP,AL,Sim,Sim,true,https://www.camara.leg.br/deputados/160541,https://www.camara.leg.br/internet/deputado/bandep/160541.jpg
+123086,Átila Lira,PP,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/123086,https://www.camara.leg.br/internet/deputado/bandep/123086.jpg
+220612,Bebeto,PP,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220612,https://www.camara.leg.br/internet/deputado/bandep/220612.jpg
+220665,Clarissa Tércio,PP,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/220665,https://www.camara.leg.br/internet/deputado/bandep/220665.jpg
+74537,Claudio Cajado,PP,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/74537,https://www.camara.leg.br/internet/deputado/bandep/74537.jpg
+178963,Covatti Filho,PP,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/178963,https://www.camara.leg.br/internet/deputado/bandep/178963.jpg
+204355,Da Vitoria,PP,ES,Sim,Sim,true,https://www.camara.leg.br/deputados/204355,https://www.camara.leg.br/internet/deputado/bandep/204355.jpg
+220582,Daniel Barbosa,PP,AL,Nao,Nao,false,https://www.camara.leg.br/deputados/220582,https://www.camara.leg.br/internet/deputado/bandep/220582.jpg
+220642,Delegado Bruno Lima,PP,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/220642,https://www.camara.leg.br/internet/deputado/bandep/220642.jpg
+220649,Delegado da Cunha,PP,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220649,https://www.camara.leg.br/internet/deputado/bandep/220649.jpg
+220583,Delegado Fabio Costa,PP,AL,Sim,Sim,true,https://www.camara.leg.br/deputados/220583,https://www.camara.leg.br/internet/deputado/bandep/220583.jpg
+73768,Dilceu Sperafico,PP,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/73768,https://www.camara.leg.br/internet/deputado/bandep/73768.jpg
+160599,Dimas Fabiano,PP,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/160599,https://www.camara.leg.br/internet/deputado/bandep/160599.jpg
+204450,Doutor Luizinho,PP,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/204450,https://www.camara.leg.br/internet/deputado/bandep/204450.jpg
+204351,Dr. Luiz Ovando,PP,MS,Sim,Sim,true,https://www.camara.leg.br/deputados/204351,https://www.camara.leg.br/internet/deputado/bandep/204351.jpg
+141421,Eduardo da Fonte,PP,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/141421,https://www.camara.leg.br/internet/deputado/bandep/141421.jpg
+178871,Evair Vieira de Melo,PP,ES,Sim,Sim,true,https://www.camara.leg.br/deputados/178871,https://www.camara.leg.br/internet/deputado/bandep/178871.jpg
+66828,Fausto Pinato,PP,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/66828,https://www.camara.leg.br/internet/deputado/bandep/66828.jpg
+141459,João Maia,PP,RN,Sim,Sim,true,https://www.camara.leg.br/deputados/141459,https://www.camara.leg.br/internet/deputado/bandep/141459.jpg
+66385,Julio Arcoverde,PP,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/66385,https://www.camara.leg.br/internet/deputado/bandep/66385.jpg
+74253,Julio Lopes,PP,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/74253,https://www.camara.leg.br/internet/deputado/bandep/74253.jpg
+204448,Luiz Antônio Corrêa,PP,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/204448,https://www.camara.leg.br/internet/deputado/bandep/204448.jpg
+220669,Lula da Fonte,PP,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/220669,https://www.camara.leg.br/internet/deputado/bandep/220669.jpg
+178858,Mário Negromonte Jr.,PP,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/178858,https://www.camara.leg.br/internet/deputado/bandep/178858.jpg
+178843,Marx Beltrão,PP,AL,Sim,Sim,true,https://www.camara.leg.br/deputados/178843,https://www.camara.leg.br/internet/deputado/bandep/178843.jpg
+220647,Mauricio Neves,PP,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220647,https://www.camara.leg.br/internet/deputado/bandep/220647.jpg
+220585,Mersinho Lucena,PP,PB,Sim,Ausente,true,https://www.camara.leg.br/deputados/220585,https://www.camara.leg.br/internet/deputado/bandep/220585.jpg
+204395,Pedro Lupion,PP,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/204395,https://www.camara.leg.br/internet/deputado/bandep/204395.jpg
+204406,Pedro Westphalen,PP,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/204406,https://www.camara.leg.br/internet/deputado/bandep/204406.jpg
+204524,Pinheirinho,PP,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204524,https://www.camara.leg.br/internet/deputado/bandep/204524.jpg
+73788,Ricardo Barros,PP,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/73788,https://www.camara.leg.br/internet/deputado/bandep/73788.jpg
+220624,Robinson Faria,PP,RN,Sim,Sim,true,https://www.camara.leg.br/deputados/220624,https://www.camara.leg.br/internet/deputado/bandep/220624.jpg
+204360,Silvia Cristina,PP,RO,Sim,Sim,true,https://www.camara.leg.br/deputados/204360,https://www.camara.leg.br/internet/deputado/bandep/204360.jpg
+104552,Socorro Neri,PP,AC,Nao,Nao,false,https://www.camara.leg.br/deputados/104552,https://www.camara.leg.br/internet/deputado/bandep/104552.jpg
+220560,Thiago de Joaldo,PP,SE,Sim,Sim,true,https://www.camara.leg.br/deputados/220560,https://www.camara.leg.br/internet/deputado/bandep/220560.jpg
+220684,Tião Medeiros,PP,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/220684,https://www.camara.leg.br/internet/deputado/bandep/220684.jpg
+178934,Toninho Wandscheer,PP,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/178934,https://www.camara.leg.br/internet/deputado/bandep/178934.jpg
+204396,Vermelho,PP,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/204396,https://www.camara.leg.br/internet/deputado/bandep/204396.jpg
+137070,Vicentinho Júnior,PP,TO,Sim,Sim,true,https://www.camara.leg.br/deputados/137070,https://www.camara.leg.br/internet/deputado/bandep/137070.jpg
+230768,Zé Adriano,PP,AC,Sim,Sim,true,https://www.camara.leg.br/deputados/230768,https://www.camara.leg.br/internet/deputado/bandep/230768.jpg
+220592,Zezinho Barbary,PP,AC,Sim,Sim,true,https://www.camara.leg.br/deputados/220592,https://www.camara.leg.br/internet/deputado/bandep/220592.jpg
+204518,Dr. Frederico,PRD,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204518,https://www.camara.leg.br/internet/deputado/bandep/204518.jpg
+204494,Fred Costa,PRD,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204494,https://www.camara.leg.br/internet/deputado/bandep/204494.jpg
+166402,Magda Mofatto,PRD,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/166402,https://www.camara.leg.br/internet/deputado/bandep/166402.jpg
+204566,Marreca Filho,PRD,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/204566,https://www.camara.leg.br/internet/deputado/bandep/204566.jpg
+220630,Pedro Aihara,PRD,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/220630,https://www.camara.leg.br/internet/deputado/bandep/220630.jpg
+220605,Bandeira de Mello,PSB,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/220605,https://www.camara.leg.br/internet/deputado/bandep/220605.jpg
+220686,Duarte Jr.,PSB,MA,Nao,Nao,false,https://www.camara.leg.br/deputados/220686,https://www.camara.leg.br/internet/deputado/bandep/220686.jpg
+220663,Eriberto Medeiros,PSB,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/220663,https://www.camara.leg.br/internet/deputado/bandep/220663.jpg
+72442,Felipe Carreras,PSB,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/72442,https://www.camara.leg.br/internet/deputado/bandep/72442.jpg
+204394,Gervásio Maia,PSB,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/204394,https://www.camara.leg.br/internet/deputado/bandep/204394.jpg
+220664,Guilherme Uchoa,PSB,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/220664,https://www.camara.leg.br/internet/deputado/bandep/220664.jpg
+160548,Jonas Donizette,PSB,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/160548,https://www.camara.leg.br/internet/deputado/bandep/160548.jpg
+204550,Júnior Mano,PSB,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/204550,https://www.camara.leg.br/internet/deputado/bandep/204550.jpg
+139285,Lídice da Mata,PSB,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/139285,https://www.camara.leg.br/internet/deputado/bandep/139285.jpg
+220662,Lucas Ramos,PSB,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/220662,https://www.camara.leg.br/internet/deputado/bandep/220662.jpg
+178931,Luciano Ducci,PSB,PR,Nao,Nao,false,https://www.camara.leg.br/deputados/178931,https://www.camara.leg.br/internet/deputado/bandep/178931.jpg
+160517,Paulo Folletto,PSB,ES,Sim,Sim,true,https://www.camara.leg.br/deputados/160517,https://www.camara.leg.br/internet/deputado/bandep/160517.jpg
+220667,Pedro Campos,PSB,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/220667,https://www.camara.leg.br/internet/deputado/bandep/220667.jpg
+141533,Rodrigo Rollemberg,PSB,DF,Nao,Nao,false,https://www.camara.leg.br/deputados/141533,https://www.camara.leg.br/internet/deputado/bandep/141533.jpg
+204534,Tabata Amaral,PSB,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/204534,https://www.camara.leg.br/internet/deputado/bandep/204534.jpg
+160553,Antonio Brito,PSD,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/160553,https://www.camara.leg.br/internet/deputado/bandep/160553.jpg
+74090,Átila Lins,PSD,AM,Nao,Nao,false,https://www.camara.leg.br/deputados/74090,https://www.camara.leg.br/internet/deputado/bandep/74090.jpg
+143942,Caio Vianna,PSD,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/143942,https://www.camara.leg.br/internet/deputado/bandep/143942.jpg
+74262,Carlos Sampaio,PSD,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/74262,https://www.camara.leg.br/internet/deputado/bandep/74262.jpg
+220699,Castro Neto,PSD,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/220699,https://www.camara.leg.br/internet/deputado/bandep/220699.jpg
+204488,Célio Studart,PSD,CE,Nao,Nao,false,https://www.camara.leg.br/deputados/204488,https://www.camara.leg.br/internet/deputado/bandep/204488.jpg
+204504,Cezinha de Madureira,PSD,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/204504,https://www.camara.leg.br/internet/deputado/bandep/204504.jpg
+205476,Charles Fernandes,PSD,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/205476,https://www.camara.leg.br/internet/deputado/bandep/205476.jpg
+160552,Danrlei de Deus Hinterholz,PSD,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/160552,https://www.camara.leg.br/internet/deputado/bandep/160552.jpg
+220561,Delegada Katarina,PSD,SE,Nao,Nao,false,https://www.camara.leg.br/deputados/220561,https://www.camara.leg.br/internet/deputado/bandep/220561.jpg
+160588,Diego Andrade,PSD,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/160588,https://www.camara.leg.br/internet/deputado/bandep/160588.jpg
+220691,Diego Coronel,PSD,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/220691,https://www.camara.leg.br/internet/deputado/bandep/220691.jpg
+220570,Dr. Ismael Alexandrino,PSD,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/220570,https://www.camara.leg.br/internet/deputado/bandep/220570.jpg
+171623,Fabio Reis,PSD,SE,Nao,Nao,false,https://www.camara.leg.br/deputados/171623,https://www.camara.leg.br/internet/deputado/bandep/171623.jpg
+220708,Gabriel Nunes,PSD,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/220708,https://www.camara.leg.br/internet/deputado/bandep/220708.jpg
+74270,Gilberto Nascimento,PSD,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/74270,https://www.camara.leg.br/internet/deputado/bandep/74270.jpg
+141450,Hugo Leal,PSD,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/141450,https://www.camara.leg.br/internet/deputado/bandep/141450.jpg
+204508,Igor Timo,PSD,MG,Ausente,Sim,true,https://www.camara.leg.br/deputados/204508,https://www.camara.leg.br/internet/deputado/bandep/204508.jpg
+98615,Ismael,PSD,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/98615,https://www.camara.leg.br/internet/deputado/bandep/98615.jpg
+215043,Josivaldo JP,PSD,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/215043,https://www.camara.leg.br/internet/deputado/bandep/215043.jpg
+74317,Júlio Cesar,PSD,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/74317,https://www.camara.leg.br/internet/deputado/bandep/74317.jpg
+204497,Júnior Ferrari,PSD,PA,Nao,Nao,false,https://www.camara.leg.br/deputados/204497,https://www.camara.leg.br/internet/deputado/bandep/204497.jpg
+74856,Laura Carneiro,PSD,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/74856,https://www.camara.leg.br/internet/deputado/bandep/74856.jpg
+138286,Luciano Alves,PSD,PR,Nao,Nao,false,https://www.camara.leg.br/deputados/138286,https://www.camara.leg.br/internet/deputado/bandep/138286.jpg
+220581,Luciano Amaral,PSD,AL,Sim,Sim,true,https://www.camara.leg.br/deputados/220581,https://www.camara.leg.br/internet/deputado/bandep/220581.jpg
+204410,Luisa Canziani,PSD,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/204410,https://www.camara.leg.br/internet/deputado/bandep/204410.jpg
+141487,Luiz Fernando Faria,PSD,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/141487,https://www.camara.leg.br/internet/deputado/bandep/141487.jpg
+220658,Luiz Gastão,PSD,CE,Nao,Nao,false,https://www.camara.leg.br/deputados/220658,https://www.camara.leg.br/internet/deputado/bandep/220658.jpg
+162332,Luiz Nishimori,PSD,PR,Nao,Nao,false,https://www.camara.leg.br/deputados/162332,https://www.camara.leg.br/internet/deputado/bandep/162332.jpg
+204431,Marcos Aurélio Sampaio,PSD,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/204431,https://www.camara.leg.br/internet/deputado/bandep/204431.jpg
+178895,Misael Varella,PSD,MG,Sim,Ausente,true,https://www.camara.leg.br/deputados/178895,https://www.camara.leg.br/internet/deputado/bandep/178895.jpg
+204573,Otto Alencar Filho,PSD,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/204573,https://www.camara.leg.br/internet/deputado/bandep/204573.jpg
+220685,Paulo Litro,PSD,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/220685,https://www.camara.leg.br/internet/deputado/bandep/220685.jpg
+74574,Paulo Magalhães,PSD,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/74574,https://www.camara.leg.br/internet/deputado/bandep/74574.jpg
+122158,Pedro Paulo,PSD,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/122158,https://www.camara.leg.br/internet/deputado/bandep/122158.jpg
+74084,Raimundo Santos,PSD,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/74084,https://www.camara.leg.br/internet/deputado/bandep/74084.jpg
+205865,Reinhold Stephanes,PSD,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/205865,https://www.camara.leg.br/internet/deputado/bandep/205865.jpg
+175765,Ribamar Silva,PSD,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/175765,https://www.camara.leg.br/internet/deputado/bandep/175765.jpg
+223128,Rodrigo Estacho,PSD,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/223128,https://www.camara.leg.br/internet/deputado/bandep/223128.jpg
+204387,Sargento Fahur,PSD,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/204387,https://www.camara.leg.br/internet/deputado/bandep/204387.jpg
+226837,Saulo Pedroso,PSD,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/226837,https://www.camara.leg.br/internet/deputado/bandep/226837.jpg
+204557,Sidney Leite,PSD,AM,Nao,Nao,false,https://www.camara.leg.br/deputados/204557,https://www.camara.leg.br/internet/deputado/bandep/204557.jpg
+92776,Stefano Aguiar,PSD,MG,Sim,Ausente,true,https://www.camara.leg.br/deputados/92776,https://www.camara.leg.br/internet/deputado/bandep/92776.jpg
+220536,Zé Haroldo Cathedral,PSD,RR,Nao,Nao,false,https://www.camara.leg.br/deputados/220536,https://www.camara.leg.br/internet/deputado/bandep/220536.jpg
+204560,Adolfo Viana,PSDB,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/204560,https://www.camara.leg.br/internet/deputado/bandep/204560.jpg
+74646,Aécio Neves,PSDB,MG,Nao,Nao,false,https://www.camara.leg.br/deputados/74646,https://www.camara.leg.br/internet/deputado/bandep/74646.jpg
+204358,Beto Pereira,PSDB,MS,Sim,Sim,true,https://www.camara.leg.br/deputados/204358,https://www.camara.leg.br/internet/deputado/bandep/204358.jpg
+220683,Beto Richa,PSDB,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/220683,https://www.camara.leg.br/internet/deputado/bandep/220683.jpg
+204409,Daniel Trzeciak,PSDB,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/204409,https://www.camara.leg.br/internet/deputado/bandep/204409.jpg
+178966,Geovania de Sá,PSDB,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/178966,https://www.camara.leg.br/internet/deputado/bandep/178966.jpg
+74374,Geraldo Resende,PSDB,MS,Nao,Nao,false,https://www.camara.leg.br/deputados/74374,https://www.camara.leg.br/internet/deputado/bandep/74374.jpg
+220566,Lêda Borges,PSDB,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/220566,https://www.camara.leg.br/internet/deputado/bandep/220566.jpg
+204404,Lucas Redecker,PSDB,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/204404,https://www.camara.leg.br/internet/deputado/bandep/204404.jpg
+141516,Paulo Abi-Ackel,PSDB,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/141516,https://www.camara.leg.br/internet/deputado/bandep/141516.jpg
+220650,Paulo Alexandre Barbosa,PSDB,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/220650,https://www.camara.leg.br/internet/deputado/bandep/220650.jpg
+178992,Vitor Lippi,PSDB,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/178992,https://www.camara.leg.br/internet/deputado/bandep/178992.jpg
+206018,Célia Xakriabá,PSOL,MG,Nao,Nao,false,https://www.camara.leg.br/deputados/206018,https://www.camara.leg.br/internet/deputado/bandep/206018.jpg
+74171,Chico Alencar,PSOL,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/74171,https://www.camara.leg.br/internet/deputado/bandep/74171.jpg
+220645,Erika Hilton,PSOL,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/220645,https://www.camara.leg.br/internet/deputado/bandep/220645.jpg
+204407,Fernanda Melchionna,PSOL,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/204407,https://www.camara.leg.br/internet/deputado/bandep/204407.jpg
+152605,Glauber Braga,PSOL,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/152605,https://www.camara.leg.br/internet/deputado/bandep/152605.jpg
+220639,Guilherme Boulos,PSOL,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/220639,https://www.camara.leg.br/internet/deputado/bandep/220639.jpg
+73531,Ivan Valente,PSOL,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/73531,https://www.camara.leg.br/internet/deputado/bandep/73531.jpg
+74784,Luiza Erundina,PSOL,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/74784,https://www.camara.leg.br/internet/deputado/bandep/74784.jpg
+220615,Pastor Henrique Vieira,PSOL,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/220615,https://www.camara.leg.br/internet/deputado/bandep/220615.jpg
+233592,Paulo Lemos,PSOL,AP,Nao,Nao,false,https://www.camara.leg.br/deputados/233592,https://www.camara.leg.br/internet/deputado/bandep/233592.jpg
+221338,Professora Luciene Cavalcante,PSOL,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/221338,https://www.camara.leg.br/internet/deputado/bandep/221338.jpg
+204535,Sâmia Bomfim,PSOL,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/204535,https://www.camara.leg.br/internet/deputado/bandep/204535.jpg
+204464,Talíria Petrone,PSOL,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/204464,https://www.camara.leg.br/internet/deputado/bandep/204464.jpg
+220598,Tarcísio Motta,PSOL,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/220598,https://www.camara.leg.br/internet/deputado/bandep/220598.jpg
+204495,Airton Faleiro,PT,PA,Sim,Nao,true,https://www.camara.leg.br/deputados/204495,https://www.camara.leg.br/internet/deputado/bandep/204495.jpg
+204501,Alencar Santana,PT,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/204501,https://www.camara.leg.br/internet/deputado/bandep/204501.jpg
+220554,Alexandre Lindenmeyer,PT,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/220554,https://www.camara.leg.br/internet/deputado/bandep/220554.jpg
+221148,Alfredinho,PT,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/221148,https://www.camara.leg.br/internet/deputado/bandep/221148.jpg
+220556,Ana Paula Lima,PT,SC,Nao,Nao,false,https://www.camara.leg.br/deputados/220556,https://www.camara.leg.br/internet/deputado/bandep/220556.jpg
+220632,Ana Pimentel,PT,MG,Nao,Nao,false,https://www.camara.leg.br/deputados/220632,https://www.camara.leg.br/internet/deputado/bandep/220632.jpg
+73433,Arlindo Chinaglia,PT,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/73433,https://www.camara.leg.br/internet/deputado/bandep/73433.jpg
+73701,Benedita da Silva,PT,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/73701,https://www.camara.leg.br/internet/deputado/bandep/73701.jpg
+160538,Bohn Gass,PT,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/160538,https://www.camara.leg.br/internet/deputado/bandep/160538.jpg
+204426,Carlos Veras,PT,PE,Nao,Nao,false,https://www.camara.leg.br/deputados/204426,https://www.camara.leg.br/internet/deputado/bandep/204426.jpg
+141398,Carlos Zarattini,PT,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/141398,https://www.camara.leg.br/internet/deputado/bandep/141398.jpg
+220704,Carol Dartora,PT,PR,Nao,Ausente,false,https://www.camara.leg.br/deputados/220704,https://www.camara.leg.br/internet/deputado/bandep/220704.jpg
+220629,Dandara,PT,MG,Nao,Ausente,false,https://www.camara.leg.br/deputados/220629,https://www.camara.leg.br/internet/deputado/bandep/220629.jpg
+220565,Delegada Adriana Accorsi,PT,GO,Nao,Nao,false,https://www.camara.leg.br/deputados/220565,https://www.camara.leg.br/internet/deputado/bandep/220565.jpg
+220553,Denise Pessôa,PT,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/220553,https://www.camara.leg.br/internet/deputado/bandep/220553.jpg
+220671,Dilvanda Faro,PT,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/220671,https://www.camara.leg.br/internet/deputado/bandep/220671.jpg
+220602,Dimas Gadelha,PT,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/220602,https://www.camara.leg.br/internet/deputado/bandep/220602.jpg
+220688,Dr. Francisco,PT,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/220688,https://www.camara.leg.br/internet/deputado/bandep/220688.jpg
+160575,Erika Kokay,PT,DF,Nao,Nao,false,https://www.camara.leg.br/deputados/160575,https://www.camara.leg.br/internet/deputado/bandep/160575.jpg
+204445,Fernando Mineiro,PT,RN,Nao,Nao,false,https://www.camara.leg.br/deputados/204445,https://www.camara.leg.br/internet/deputado/bandep/204445.jpg
+191923,Flávio Nogueira,PT,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/191923,https://www.camara.leg.br/internet/deputado/bandep/191923.jpg
+220700,Florentino Neto,PT,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/220700,https://www.camara.leg.br/internet/deputado/bandep/220700.jpg
+178873,Helder Salomão,PT,ES,Nao,Nao,false,https://www.camara.leg.br/deputados/178873,https://www.camara.leg.br/internet/deputado/bandep/178873.jpg
+220696,Ivoneide Caetano,PT,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/220696,https://www.camara.leg.br/internet/deputado/bandep/220696.jpg
+220527,Jack Rocha,PT,ES,Nao,Nao,false,https://www.camara.leg.br/deputados/220527,https://www.camara.leg.br/internet/deputado/bandep/220527.jpg
+141456,Jilmar Tatto,PT,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/141456,https://www.camara.leg.br/internet/deputado/bandep/141456.jpg
+178970,João Daniel,PT,SE,Nao,Nao,false,https://www.camara.leg.br/deputados/178970,https://www.camara.leg.br/internet/deputado/bandep/178970.jpg
+178857,Jorge Solla,PT,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/178857,https://www.camara.leg.br/internet/deputado/bandep/178857.jpg
+141470,José Guimarães,PT,CE,Nao,Ausente,false,https://www.camara.leg.br/deputados/141470,https://www.camara.leg.br/internet/deputado/bandep/141470.jpg
+209189,Joseildo Ramos,PT,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/209189,https://www.camara.leg.br/internet/deputado/bandep/209189.jpg
+74141,Josias Gomes,PT,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/74141,https://www.camara.leg.br/internet/deputado/bandep/74141.jpg
+220640,Juliana Cardoso,PT,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/220640,https://www.camara.leg.br/internet/deputado/bandep/220640.jpg
+162067,Kiko Celeguim,PT,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/162067,https://www.camara.leg.br/internet/deputado/bandep/162067.jpg
+231911,Lenir de Assis,PT,PR,Nao,Nao,false,https://www.camara.leg.br/deputados/231911,https://www.camara.leg.br/internet/deputado/bandep/231911.jpg
+74156,Leonardo Monteiro,PT,MG,Sim,Nao,true,https://www.camara.leg.br/deputados/74156,https://www.camara.leg.br/internet/deputado/bandep/74156.jpg
+74858,Lindbergh Farias,PT,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/74858,https://www.camara.leg.br/internet/deputado/bandep/74858.jpg
+74041,Luiz Couto,PT,PB,Nao,Nao,false,https://www.camara.leg.br/deputados/74041,https://www.camara.leg.br/internet/deputado/bandep/74041.jpg
+178866,Luizianne Lins,PT,CE,Nao,Ausente,false,https://www.camara.leg.br/deputados/178866,https://www.camara.leg.br/internet/deputado/bandep/178866.jpg
+160535,Marcon,PT,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/160535,https://www.camara.leg.br/internet/deputado/bandep/160535.jpg
+74398,Maria do Rosário,PT,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/74398,https://www.camara.leg.br/internet/deputado/bandep/74398.jpg
+188097,Merlong Solano,PT,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/188097,https://www.camara.leg.br/internet/deputado/bandep/188097.jpg
+171786,Miguel Ângelo,PT,MG,Ausente,Nao,false,https://www.camara.leg.br/deputados/171786,https://www.camara.leg.br/internet/deputado/bandep/171786.jpg
+204453,Natália Bonavides,PT,RN,Nao,Nao,false,https://www.camara.leg.br/deputados/204453,https://www.camara.leg.br/internet/deputado/bandep/204453.jpg
+178986,Nilto Tatto,PT,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/178986,https://www.camara.leg.br/internet/deputado/bandep/178986.jpg
+74159,Odair Cunha,PT,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/74159,https://www.camara.leg.br/internet/deputado/bandep/74159.jpg
+160556,Padre João,PT,MG,Nao,Nao,false,https://www.camara.leg.br/deputados/160556,https://www.camara.leg.br/internet/deputado/bandep/160556.jpg
+74160,Patrus Ananias,PT,MG,Nao,Nao,false,https://www.camara.leg.br/deputados/74160,https://www.camara.leg.br/internet/deputado/bandep/74160.jpg
+171617,Paulão,PT,AL,Nao,Nao,false,https://www.camara.leg.br/deputados/171617,https://www.camara.leg.br/internet/deputado/bandep/171617.jpg
+204492,Paulo Guedes,PT,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204492,https://www.camara.leg.br/internet/deputado/bandep/204492.jpg
+74400,Paulo Pimenta,PT,RS,Nao,Nao,false,https://www.camara.leg.br/deputados/74400,https://www.camara.leg.br/internet/deputado/bandep/74400.jpg
+160604,Pedro Uczai,PT,SC,Nao,Nao,false,https://www.camara.leg.br/deputados/160604,https://www.camara.leg.br/internet/deputado/bandep/160604.jpg
+74161,Reginaldo Lopes,PT,MG,Nao,Nao,false,https://www.camara.leg.br/deputados/74161,https://www.camara.leg.br/internet/deputado/bandep/74161.jpg
+220606,Reimont,PT,RJ,Nao,Nao,false,https://www.camara.leg.br/deputados/220606,https://www.camara.leg.br/internet/deputado/bandep/220606.jpg
+204480,Rogério Correia,PT,MG,Nao,Nao,false,https://www.camara.leg.br/deputados/204480,https://www.camara.leg.br/internet/deputado/bandep/204480.jpg
+74371,Rubens Otoni,PT,GO,Nao,Nao,false,https://www.camara.leg.br/deputados/74371,https://www.camara.leg.br/internet/deputado/bandep/74371.jpg
+178887,Rubens Pereira Júnior,PT,MA,Nao,Nao,false,https://www.camara.leg.br/deputados/178887,https://www.camara.leg.br/internet/deputado/bandep/178887.jpg
+73604,Rui Falcão,PT,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/73604,https://www.camara.leg.br/internet/deputado/bandep/73604.jpg
+220682,Tadeu Veneri,PT,PR,Nao,Nao,false,https://www.camara.leg.br/deputados/220682,https://www.camara.leg.br/internet/deputado/bandep/220682.jpg
+160610,Valmir Assunção,PT,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/160610,https://www.camara.leg.br/internet/deputado/bandep/160610.jpg
+74376,Vander Loubet,PT,MS,Nao,Nao,false,https://www.camara.leg.br/deputados/74376,https://www.camara.leg.br/internet/deputado/bandep/74376.jpg
+74283,Vicentinho,PT,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/74283,https://www.camara.leg.br/internet/deputado/bandep/74283.jpg
+160569,Waldenor Pereira,PT,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/160569,https://www.camara.leg.br/internet/deputado/bandep/160569.jpg
+224333,Welter,PT,PR,Nao,Nao,false,https://www.camara.leg.br/deputados/224333,https://www.camara.leg.br/internet/deputado/bandep/224333.jpg
+204559,Zé Neto,PT,BA,Nao,Nao,false,https://www.camara.leg.br/deputados/204559,https://www.camara.leg.br/internet/deputado/bandep/204559.jpg
+178927,Aliel Machado,PV,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/178927,https://www.camara.leg.br/internet/deputado/bandep/178927.jpg
+69871,Bacelar,PV,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/69871,https://www.camara.leg.br/internet/deputado/bandep/69871.jpg
+88256,Clodoaldo Magalhães,PV,PE,Nao,Nao,false,https://www.camara.leg.br/deputados/88256,https://www.camara.leg.br/internet/deputado/bandep/88256.jpg
+220533,Prof. Reginaldo Veras,PV,DF,Nao,Nao,false,https://www.camara.leg.br/deputados/220533,https://www.camara.leg.br/internet/deputado/bandep/220533.jpg
+157130,Túlio Gadêlha,REDE,PE,Nao,Nao,false,https://www.camara.leg.br/deputados/157130,https://www.camara.leg.br/internet/deputado/bandep/157130.jpg
+220714,Adail Filho,REPUBLICANOS,AM,Sim,Sim,true,https://www.camara.leg.br/deputados/220714,https://www.camara.leg.br/internet/deputado/bandep/220714.jpg
+220538,Albuquerque,REPUBLICANOS,RR,Sim,Sim,true,https://www.camara.leg.br/deputados/220538,https://www.camara.leg.br/internet/deputado/bandep/220538.jpg
+204571,Alex Santana,REPUBLICANOS,BA,Abstencao,Ausente,false,https://www.camara.leg.br/deputados/204571,https://www.camara.leg.br/internet/deputado/bandep/204571.jpg
+204353,Aline Gurgel,REPUBLICANOS,AP,Sim,Sim,true,https://www.camara.leg.br/deputados/204353,https://www.camara.leg.br/internet/deputado/bandep/204353.jpg
+178881,Aluisio Mendes,REPUBLICANOS,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/178881,https://www.camara.leg.br/internet/deputado/bandep/178881.jpg
+204356,Amaro Neto,REPUBLICANOS,ES,Sim,Sim,true,https://www.camara.leg.br/deputados/204356,https://www.camara.leg.br/internet/deputado/bandep/204356.jpg
+123756,Antônia Lúcia,REPUBLICANOS,AC,Sim,Sim,true,https://www.camara.leg.br/deputados/123756,https://www.camara.leg.br/internet/deputado/bandep/123756.jpg
+220544,Antonio Andrade,REPUBLICANOS,TO,Sim,Sim,true,https://www.camara.leg.br/deputados/220544,https://www.camara.leg.br/internet/deputado/bandep/220544.jpg
+160665,Augusto Coutinho,REPUBLICANOS,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/160665,https://www.camara.leg.br/internet/deputado/bandep/160665.jpg
+73441,Celso Russomanno,REPUBLICANOS,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/73441,https://www.camara.leg.br/internet/deputado/bandep/73441.jpg
+220539,Defensor Stélio Dener,REPUBLICANOS,RR,Sim,Sim,true,https://www.camara.leg.br/deputados/220539,https://www.camara.leg.br/internet/deputado/bandep/220539.jpg
+178929,Diego Garcia,REPUBLICANOS,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/178929,https://www.camara.leg.br/internet/deputado/bandep/178929.jpg
+218086,Ely Santos,REPUBLICANOS,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/218086,https://www.camara.leg.br/internet/deputado/bandep/218086.jpg
+204482,Euclydes Pettersen,REPUBLICANOS,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204482,https://www.camara.leg.br/internet/deputado/bandep/204482.jpg
+92699,Fernando Monteiro,REPUBLICANOS,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/92699,https://www.camara.leg.br/internet/deputado/bandep/92699.jpg
+220551,Franciane Bayer,REPUBLICANOS,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/220551,https://www.camara.leg.br/internet/deputado/bandep/220551.jpg
+220534,Fred Linhares,REPUBLICANOS,DF,Sim,Sim,true,https://www.camara.leg.br/deputados/220534,https://www.camara.leg.br/internet/deputado/bandep/220534.jpg
+224117,Gabriel Mota,REPUBLICANOS,RR,Sim,Sim,true,https://www.camara.leg.br/deputados/224117,https://www.camara.leg.br/internet/deputado/bandep/224117.jpg
+204491,Gilberto Abramo,REPUBLICANOS,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204491,https://www.camara.leg.br/internet/deputado/bandep/204491.jpg
+204408,Gustinho Ribeiro,REPUBLICANOS,SE,Sim,Sim,true,https://www.camara.leg.br/deputados/204408,https://www.camara.leg.br/internet/deputado/bandep/204408.jpg
+160674,Hugo Motta,REPUBLICANOS,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/160674,https://www.camara.leg.br/internet/deputado/bandep/160674.jpg
+220697,Jadyel Alencar,REPUBLICANOS,PI,Sim,Sim,true,https://www.camara.leg.br/deputados/220697,https://www.camara.leg.br/internet/deputado/bandep/220697.jpg
+220567,Jeferson Rodrigues,REPUBLICANOS,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/220567,https://www.camara.leg.br/internet/deputado/bandep/220567.jpg
+205550,Jorge Braz,REPUBLICANOS,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/205550,https://www.camara.leg.br/internet/deputado/bandep/205550.jpg
+214694,Jorge Goetten,REPUBLICANOS,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/214694,https://www.camara.leg.br/internet/deputado/bandep/214694.jpg
+204372,Julio Cesar Ribeiro,REPUBLICANOS,DF,Sim,Sim,true,https://www.camara.leg.br/deputados/204372,https://www.camara.leg.br/internet/deputado/bandep/204372.jpg
+98057,Lafayette de Andrada,REPUBLICANOS,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/98057,https://www.camara.leg.br/internet/deputado/bandep/98057.jpg
+220616,Luciano Vieira,REPUBLICANOS,RJ,Ausente,Sim,true,https://www.camara.leg.br/deputados/220616,https://www.camara.leg.br/internet/deputado/bandep/220616.jpg
+222429,Luis Carlos Gomes,REPUBLICANOS,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/222429,https://www.camara.leg.br/internet/deputado/bandep/222429.jpg
+220599,Marcelo Crivella,REPUBLICANOS,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220599,https://www.camara.leg.br/internet/deputado/bandep/220599.jpg
+150418,Márcio Marinho,REPUBLICANOS,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/150418,https://www.camara.leg.br/internet/deputado/bandep/150418.jpg
+204506,Marcos Pereira,REPUBLICANOS,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/204506,https://www.camara.leg.br/internet/deputado/bandep/204506.jpg
+204540,Maria Rosas,REPUBLICANOS,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/204540,https://www.camara.leg.br/internet/deputado/bandep/204540.jpg
+220530,Messias Donato,REPUBLICANOS,ES,Sim,Sim,true,https://www.camara.leg.br/deputados/220530,https://www.camara.leg.br/internet/deputado/bandep/220530.jpg
+220584,Murilo Galdino,REPUBLICANOS,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/220584,https://www.camara.leg.br/internet/deputado/bandep/220584.jpg
+204422,Ossesio Silva,REPUBLICANOS,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/204422,https://www.camara.leg.br/internet/deputado/bandep/204422.jpg
+220543,Ricardo Ayres,REPUBLICANOS,TO,Sim,Sim,true,https://www.camara.leg.br/deputados/220543,https://www.camara.leg.br/internet/deputado/bandep/220543.jpg
+220588,Roberto Duarte,REPUBLICANOS,AC,Sim,Sim,true,https://www.camara.leg.br/deputados/220588,https://www.camara.leg.br/internet/deputado/bandep/220588.jpg
+220695,Rogéria Santos,REPUBLICANOS,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/220695,https://www.camara.leg.br/internet/deputado/bandep/220695.jpg
+163321,Ronaldo Nogueira,REPUBLICANOS,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/163321,https://www.camara.leg.br/internet/deputado/bandep/163321.jpg
+220631,Samuel Viana,REPUBLICANOS,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/220631,https://www.camara.leg.br/internet/deputado/bandep/220631.jpg
+74356,Silas Câmara,REPUBLICANOS,AM,Sim,Sim,true,https://www.camara.leg.br/deputados/74356,https://www.camara.leg.br/internet/deputado/bandep/74356.jpg
+141555,Vinicius Carvalho,REPUBLICANOS,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/141555,https://www.camara.leg.br/internet/deputado/bandep/141555.jpg
+74044,Wilson Santiago,REPUBLICANOS,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/74044,https://www.camara.leg.br/internet/deputado/bandep/74044.jpg
+160512,Aureo Ribeiro,SOLIDARIEDADE,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/160512,https://www.camara.leg.br/internet/deputado/bandep/160512.jpg
+220668,Maria Arraes,SOLIDARIEDADE,PE,Nao,Nao,false,https://www.camara.leg.br/deputados/220668,https://www.camara.leg.br/internet/deputado/bandep/220668.jpg
+141518,Paulinho da Força,SOLIDARIEDADE,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/141518,https://www.camara.leg.br/internet/deputado/bandep/141518.jpg
+160518,Weliton Prado,SOLIDARIEDADE,MG,Ausente,Nao,false,https://www.camara.leg.br/deputados/160518,https://www.camara.leg.br/internet/deputado/bandep/160518.jpg
+160600,Arthur Oliveira Maia,UNIÃO,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/160600,https://www.camara.leg.br/internet/deputado/bandep/160600.jpg
+109429,Benes Leocádio,UNIÃO,RN,Sim,Sim,true,https://www.camara.leg.br/deputados/109429,https://www.camara.leg.br/internet/deputado/bandep/109429.jpg
+213762,Carla Dickson,UNIÃO,RN,Sim,Sim,true,https://www.camara.leg.br/deputados/213762,https://www.camara.leg.br/internet/deputado/bandep/213762.jpg
+178993,Carlos Henrique Gaguim,UNIÃO,TO,Sim,Sim,true,https://www.camara.leg.br/deputados/178993,https://www.camara.leg.br/internet/deputado/bandep/178993.jpg
+220594,Coronel Assis,UNIÃO,MT,Sim,Sim,true,https://www.camara.leg.br/deputados/220594,https://www.camara.leg.br/internet/deputado/bandep/220594.jpg
+220590,Coronel Ulysses,UNIÃO,AC,Sim,Sim,true,https://www.camara.leg.br/deputados/220590,https://www.camara.leg.br/internet/deputado/bandep/220590.jpg
+220608,Cristiane Lopes,UNIÃO,RO,Nao,Nao,false,https://www.camara.leg.br/deputados/220608,https://www.camara.leg.br/internet/deputado/bandep/220608.jpg
+220692,Dal Barreto,UNIÃO,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/220692,https://www.camara.leg.br/internet/deputado/bandep/220692.jpg
+74467,Damião Feliciano,UNIÃO,PB,Sim,Sim,true,https://www.camara.leg.br/deputados/74467,https://www.camara.leg.br/internet/deputado/bandep/74467.jpg
+220603,Dani Cunha,UNIÃO,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220603,https://www.camara.leg.br/internet/deputado/bandep/220603.jpg
+204459,Daniela do Waguinho,UNIÃO,RJ,Sim,Nao,true,https://www.camara.leg.br/deputados/204459,https://www.camara.leg.br/internet/deputado/bandep/204459.jpg
+62881,Danilo Forte,UNIÃO,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/62881,https://www.camara.leg.br/internet/deputado/bandep/62881.jpg
+204511,David Soares,UNIÃO,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/204511,https://www.camara.leg.br/internet/deputado/bandep/204511.jpg
+220659,Dayany Bittencourt,UNIÃO,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/220659,https://www.camara.leg.br/internet/deputado/bandep/220659.jpg
+204512,Delegado Marcelo Freitas,UNIÃO,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/204512,https://www.camara.leg.br/internet/deputado/bandep/204512.jpg
+220701,Delegado Matheus Laiola,UNIÃO,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/220701,https://www.camara.leg.br/internet/deputado/bandep/220701.jpg
+227433,Douglas Viegas,UNIÃO,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/227433,https://www.camara.leg.br/internet/deputado/bandep/227433.jpg
+220610,Dr. Fernando Máximo,UNIÃO,RO,Sim,Sim,true,https://www.camara.leg.br/deputados/220610,https://www.camara.leg.br/internet/deputado/bandep/220610.jpg
+204412,Dr. Zacharias Calil,UNIÃO,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/204412,https://www.camara.leg.br/internet/deputado/bandep/204412.jpg
+220589,Eduardo Velloso,UNIÃO,AC,Sim,Sim,true,https://www.camara.leg.br/deputados/220589,https://www.camara.leg.br/internet/deputado/bandep/220589.jpg
+178854,Elmar Nascimento,UNIÃO,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/178854,https://www.camara.leg.br/internet/deputado/bandep/178854.jpg
+204368,Fabio Schiochet,UNIÃO,SC,Sim,Sim,true,https://www.camara.leg.br/deputados/204368,https://www.camara.leg.br/internet/deputado/bandep/204368.jpg
+220712,Fausto Jr.,UNIÃO,AM,Sim,Sim,true,https://www.camara.leg.br/deputados/220712,https://www.camara.leg.br/internet/deputado/bandep/220712.jpg
+220646,Felipe Becari,UNIÃO,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220646,https://www.camara.leg.br/internet/deputado/bandep/220646.jpg
+204398,Felipe Francischini,UNIÃO,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/204398,https://www.camara.leg.br/internet/deputado/bandep/204398.jpg
+220656,Fernanda Pessoa,UNIÃO,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/220656,https://www.camara.leg.br/internet/deputado/bandep/220656.jpg
+141431,Fernando Coelho Filho,UNIÃO,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/141431,https://www.camara.leg.br/internet/deputado/bandep/141431.jpg
+220702,Geraldo Mendes,UNIÃO,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/220702,https://www.camara.leg.br/internet/deputado/bandep/220702.jpg
+226179,Gisela Simona,UNIÃO,MT,Sim,Sim,true,https://www.camara.leg.br/deputados/226179,https://www.camara.leg.br/internet/deputado/bandep/226179.jpg
+204391,José Nelto,UNIÃO,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/204391,https://www.camara.leg.br/internet/deputado/bandep/204391.jpg
+74554,José Rocha,UNIÃO,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/74554,https://www.camara.leg.br/internet/deputado/bandep/74554.jpg
+204457,Juninho do Pneu,UNIÃO,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/204457,https://www.camara.leg.br/internet/deputado/bandep/204457.jpg
+178886,Juscelino Filho,UNIÃO,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/178886,https://www.camara.leg.br/internet/deputado/bandep/178886.jpg
+204536,Kim Kataguiri,UNIÃO,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/204536,https://www.camara.leg.br/internet/deputado/bandep/204536.jpg
+92102,Leur Lomanto Júnior,UNIÃO,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/92102,https://www.camara.leg.br/internet/deputado/bandep/92102.jpg
+74478,Luciano Bivar,UNIÃO,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/74478,https://www.camara.leg.br/internet/deputado/bandep/74478.jpg
+141485,Luiz Carlos Busato,UNIÃO,RS,Sim,Sim,true,https://www.camara.leg.br/deputados/141485,https://www.camara.leg.br/internet/deputado/bandep/141485.jpg
+220648,Marangoni,UNIÃO,SP,Sim,Sim,true,https://www.camara.leg.br/deputados/220648,https://www.camara.leg.br/internet/deputado/bandep/220648.jpg
+178943,Marcos Soares,UNIÃO,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/178943,https://www.camara.leg.br/internet/deputado/bandep/178943.jpg
+220609,Maurício Carvalho,UNIÃO,RO,Sim,Sim,true,https://www.camara.leg.br/deputados/220609,https://www.camara.leg.br/internet/deputado/bandep/220609.jpg
+220591,Meire Serafim,UNIÃO,AC,Sim,Sim,true,https://www.camara.leg.br/deputados/220591,https://www.camara.leg.br/internet/deputado/bandep/220591.jpg
+74428,Mendonça Filho,UNIÃO,PE,Sim,Sim,true,https://www.camara.leg.br/deputados/74428,https://www.camara.leg.br/internet/deputado/bandep/74428.jpg
+178997,Moses Rodrigues,UNIÃO,CE,Sim,Sim,true,https://www.camara.leg.br/deputados/178997,https://www.camara.leg.br/internet/deputado/bandep/178997.jpg
+220617,Murillo Gouvea,UNIÃO,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/220617,https://www.camara.leg.br/internet/deputado/bandep/220617.jpg
+204479,Nicoletti,UNIÃO,RR,Sim,Sim,true,https://www.camara.leg.br/deputados/204479,https://www.camara.leg.br/internet/deputado/bandep/204479.jpg
+220706,Padovani,UNIÃO,PR,Sim,Sim,true,https://www.camara.leg.br/deputados/220706,https://www.camara.leg.br/internet/deputado/bandep/220706.jpg
+230762,Pastor Claudio Mariano,UNIÃO,PA,Sim,Sim,true,https://www.camara.leg.br/deputados/230762,https://www.camara.leg.br/internet/deputado/bandep/230762.jpg
+180214,Pastor Diniz,UNIÃO,RR,Sim,Sim,true,https://www.camara.leg.br/deputados/180214,https://www.camara.leg.br/internet/deputado/bandep/180214.jpg
+74095,Pauderney Avelino,UNIÃO,AM,Sim,Sim,true,https://www.camara.leg.br/deputados/74095,https://www.camara.leg.br/internet/deputado/bandep/74095.jpg
+178860,Paulo Azi,UNIÃO,BA,Sim,Sim,true,https://www.camara.leg.br/deputados/178860,https://www.camara.leg.br/internet/deputado/bandep/178860.jpg
+122974,Pedro Lucas Fernandes,UNIÃO,MA,Sim,Sim,true,https://www.camara.leg.br/deputados/122974,https://www.camara.leg.br/internet/deputado/bandep/122974.jpg
+220626,Rafael Simoes,UNIÃO,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/220626,https://www.camara.leg.br/internet/deputado/bandep/220626.jpg
+221329,Ricardo Abrão,UNIÃO,RJ,Sim,Sim,true,https://www.camara.leg.br/deputados/221329,https://www.camara.leg.br/internet/deputado/bandep/221329.jpg
+141531,Rodrigo de Castro,UNIÃO,MG,Sim,Sim,true,https://www.camara.leg.br/deputados/141531,https://www.camara.leg.br/internet/deputado/bandep/141531.jpg
+165470,Rodrigo Valadares,UNIÃO,SE,Sim,Sim,true,https://www.camara.leg.br/deputados/165470,https://www.camara.leg.br/internet/deputado/bandep/165470.jpg
+220644,Rosangela Moro,UNIÃO,SP,Nao,Nao,false,https://www.camara.leg.br/deputados/220644,https://www.camara.leg.br/internet/deputado/bandep/220644.jpg
+220569,Silvye Alves,UNIÃO,GO,Sim,Sim,true,https://www.camara.leg.br/deputados/220569,https://www.camara.leg.br/internet/deputado/bandep/220569.jpg

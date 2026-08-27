@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quem votou a favor da PEC da Blindagem</title>
+  <meta name="description" content="Lista dos 356 deputados federais que votaram Sim na PEC 3/2021 (PEC da Blindagem) em pelo menos um dos dois turnos de 16/09/2025, com filtros por nome, partido, estado e turno.">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 6.2 3.9 10.4 9 12 5.1-1.6 9-5.8 9-12V5l-9-4z" fill="%23241d17"/><path d="M12 3.2 5 6.2v4.8c0 4.9 3 8.4 7 9.9 4-1.5 7-5 7-9.9V6.2l-7-3z" fill="%23f2ecdd"/><path d="M12 5.2 7 7.3v3.7c0 3.7 2.2 6.4 5 7.7V5.2z" fill="%23a02c2c"/></svg>'>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#lista">Pular para a lista de deputados</a>
+
+  <header class="container cabecalho">
+    <p class="kicker">Câmara dos Deputados · PEC 3/2021 · 16 de setembro de 2025</p>
+    <h1>Quem votou a favor da <em>PEC da Blindagem</em></h1>
+    <p class="lede">Em 16 de setembro de 2025, <strong class="destaque-numeral">356 deputados federais</strong> votaram <strong>Sim</strong> à PEC 3/2021 — que tornaria mais difícil abrir processo criminal contra parlamentares — em pelo menos um dos dois turnos de votação.</p>
+    <p class="referencia">Ficha oficial da proposição: <a href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800" target="_blank" rel="noopener">PEC 3/2021 — tramitação na Câmara</a></p>
+    <aside class="nota">
+      <span class="nota__selo" aria-hidden="true">arquivada</span>
+      Em 24 de setembro de 2025, a Comissão de Constituição e Justiça (CCJ) do Senado rejeitou a proposta, que então foi arquivada.
+    </aside>
+    <noscript>
+      <p class="sem-js">Para usar os filtros desta página, ative o JavaScript — ou consulte diretamente a versão completa em <a href="data/votos-pec-blindagem.csv">data/votos-pec-blindagem.csv</a>.</p>
+    </noscript>
+  </header>
+
+  <main class="container conteudo">
+    <section class="barra" id="barra-filtros" hidden aria-label="Filtros da lista">
+      <div class="controle controle--busca">
+        <label for="busca">Buscar por nome</label>
+        <input type="search" id="busca" autocomplete="off" spellcheck="false" placeholder="Digite o nome do deputado">
+      </div>
+      <div class="controle">
+        <label for="partido">Partido</label>
+        <select id="partido"></select>
+      </div>
+      <div class="controle">
+        <label for="uf">Estado</label>
+        <select id="uf"></select>
+      </div>
+      <div class="controle">
+        <label for="turno">Turno</label>
+        <select id="turno">
+          <option value="qualquer">Sim em algum turno</option>
+          <option value="ambos">Sim nos dois turnos</option>
+          <option value="t1">Sim no 1º turno</option>
+          <option value="t2">Sim no 2º turno</option>
+        </select>
+      </div>
+      <div class="controle">
+        <label for="ordem">Ordenar por</label>
+        <select id="ordem">
+          <option value="partido">Partido</option>
+          <option value="nome">Nome</option>
+          <option value="uf">UF</option>
+        </select>
+      </div>
+      <button type="button" id="limpar" class="botao-limpar">Limpar filtros</button>
+    </section>
+
+    <nav class="chips" id="chips" hidden aria-label="Resumo por partido"></nav>
+
+    <p class="contador" id="contador" role="status" aria-live="polite"></p>
+    <ul class="linhas" id="lista"></ul>
+    <section class="painel-status" id="painel-status" aria-live="polite">
+      <p class="carregando" id="carregando">Carregando os dados das duas votações…</p>
+    </section>
+  </main>
+
+  <footer class="container rodape">
+    <p>Dados públicos obtidos da <a href="https://dadosabertos.camara.leg.br" target="_blank" rel="noopener">API de Dados Abertos da Câmara dos Deputados</a>. Registros nominais das votações de 16/09/2025, conferidos a partir da divulgação feita no <a href="https://www.youtube.com/watch?v=aDjuRLF4cIo" target="_blank" rel="noopener">vídeo “NÃO VOTE neles!”</a>, de Gabriel Salazar.</p>
+  </footer>
+
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>
