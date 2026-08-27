@@ -34,21 +34,36 @@
   </main>
 
   <nav id="abas" class="abas" aria-label="Páginas">
-    <button type="button" data-rota="#/dex" aria-current="page">Dex</button>
-    <button type="button" data-rota="#/votacoes">Votações</button>
-    <button type="button" data-rota="#/inimigos">Inimigos</button>
-    <button type="button" data-rota="#/lista">Lista<span id="minha-lista-n">0</span></button>
+    <button type="button" data-rota="#/dex" aria-current="page">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h6m6 0h6" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg>
+      <span>Dex</span>
+    </button>
+    <button type="button" data-rota="#/votacoes">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 12.5l3 3 5.5-6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Votações</span>
+    </button>
+    <button type="button" data-rota="#/inimigos">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 4.5L21 19.5H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10.5v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/></svg>
+      <span>Inimigos</span>
+    </button>
+    <button type="button" data-rota="#/lista">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 4h10v16l-5-4.2L7 20z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Lista</span><span id="minha-lista-n">0</span>
+    </button>
   </nav>
 
   <dialog id="seletor-uf" class="seletor-uf"></dialog>
   <dialog id="folha-filtros" class="folha-filtros"></dialog>
 
   <footer class="rodape">
-    <p>Candidaturas e números de urna obtidos do <a href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener">portal de Dados Abertos do TSE</a>. Registros de votação nominais obtidos do <a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener">portal de Dados Abertos da Câmara dos Deputados</a>, com link para a votação nominal de cada uma.</p>
-    <p>Fotos das candidaturas: divulgação oficial do TSE.</p>
-    <p>Votações exibidas em “Contexto” foram unânimes e não pontuam em nenhum eixo: quando todo mundo vota igual, o resultado não diz nada sobre cada um.</p>
-    <p>Ausência de registro nunca vira zero por cento: quem não estava na Casa ou não votou aparece como “sem registro”, não como nota baixa.</p>
-    <p>E os conceitos “defende o eleitor” e “contra o eleitor” permanecem opinião editorial declarada deste guia sobre votações reais — você decide se concorda.</p>
+    <p class="rodape-fontes">Dados: <a href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener">TSE</a> · <a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener">Câmara dos Deputados</a> · fotos oficiais de urna do TSE</p>
+    <details class="rodape-metodo">
+      <summary>Como este guia pontua</summary>
+      <p>Cada eixo aponta votações nominais reais, com link para o registro oficial de cada uma.</p>
+      <p>Votações unânimes ficam em “Contexto” e não pontuam: quando todo mundo vota igual, o resultado não diz nada sobre cada um.</p>
+      <p>Ausência de registro nunca vira nota baixa: quem não estava na Casa aparece como “sem registro”.</p>
+      <p>“Defende o eleitor” e “contra o eleitor” são opinião editorial declarada deste guia — você decide se concorda.</p>
+    </details>
   </footer>
 
 </body>

@@ -372,15 +372,13 @@ function aFavorDaBlindagem(arquivo) {
 }
 
 function atualizarContagem() {
-  const arqUf = estado.estados.get(estado.uf);
   const totalBase = paresConcatenados().length;
+  const visiveis = estado.visiveis.length;
   const comFicha = estado.visiveis.filter((par) => campos(par).ficha !== null).length;
-  const nomeUf = arqUf ? arqUf.nome : estado.uf;
-  const partes = [
-    `${plural(estado.visiveis.length, "candidatura", "candidaturas")} de ${numeroBr(totalBase)} em ${nomeUf} + Brasil`,
-    `${numeroBr(comFicha)} com histórico na Câmara`,
-  ];
-  contagem.textContent = partes.join(" · ");
+  contagem.textContent =
+    visiveis === totalBase
+      ? `${plural(totalBase, "candidatura", "candidaturas")} · ${numeroBr(comFicha)} com histórico na Câmara`
+      : `${numeroBr(visiveis)} de ${plural(totalBase, "candidatura", "candidaturas")}`;
 }
 
 function atualizarIndicadorFiltros() {
@@ -649,7 +647,7 @@ function renderizarFicha(sq) {
       criar(
         "p",
         "carta-sem-ficha",
-        "Sem histórico na Câmara dos Deputados entre 2021 e 2026. Isso não é nota baixa: é ausência de registro. Estreantes e quem só teve mandato estadual ou municipal aparecem assim.",
+        "Sem histórico na Câmara entre 2021 e 2026. Não é nota baixa: estreantes e quem só teve mandato estadual ou municipal aparecem assim.",
       ),
     );
     sec.append(historico);
@@ -660,7 +658,7 @@ function renderizarFicha(sq) {
     criar(
       "p",
       "ficha-fonte",
-      "Candidatura e número de urna: Dados Abertos do TSE. Votos nominais: Dados Abertos da Câmara dos Deputados. Os eixos são opinião editorial declarada deste guia sobre votações reais.",
+      "Fontes: Dados Abertos do TSE e da Câmara dos Deputados. Os eixos são opinião editorial deste guia.",
     ),
   );
   sec.append(fonte);
@@ -677,7 +675,7 @@ function renderizarVotacoes() {
     criar(
       "p",
       "pagina-intro",
-      "O que conta como defende ou contra o eleitor é opinião editorial declarada deste guia, aplicada sobre votações nominais reais. Não é uma medida neutra.",
+      "Cada eixo aponta votações nominais reais, com link para o registro oficial de cada uma.",
     ),
   );
   sec.append(cabeca);
@@ -757,7 +755,7 @@ function renderizarInimigos() {
     criar(
       "p",
       "pagina-intro",
-      "Inimigo do povo, neste guia: quem votou contra o eleitor em pelo menos 3 dos 6 eixos. Critério editorial, contado só sobre votações em que a pessoa efetivamente tomou lado.",
+      "Quem votou contra o eleitor em pelo menos 3 dos 6 eixos, contando só as votações em que tomou lado.",
     ),
   );
 

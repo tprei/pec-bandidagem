@@ -130,6 +130,18 @@ button, input {
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
+.topo-marca::after {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff5964;
+  box-shadow: 12px 0 0 #ffb037, 24px 0 0 #3fd68f;
+  margin-right: 24px;
+  opacity: 0.9;
+}
+
 .topo-controles {
   display: flex;
   flex-wrap: wrap;
@@ -444,15 +456,10 @@ button, input {
   border: 1px solid var(--borda-fina);
   background: var(--painel);
   color: var(--tinta);
-  max-width: 140px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
-
 .ponto::before {
   content: "";
   display: inline-block;
@@ -470,19 +477,23 @@ button, input {
 }
 
 .selo-inimigo {
-  font-family: var(--fonte-num);
-  font-weight: 800;
+  font-family: "Haettenschweiler", "Arial Narrow", Impact, var(--fonte-nome);
+  font-stretch: condensed;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.72rem;
-  color: var(--vermelho);
-  border: 2px solid var(--vermelho);
-  border-radius: 4px;
-  padding: 2px 6px;
+  letter-spacing: 0.18em;
+  font-size: 0.85rem;
+  line-height: 1.1;
+  color: #b3122c;
+  border: 2px solid #b3122c;
+  outline: 1px solid #b3122c;
+  outline-offset: 2px;
+  border-radius: 3px;
+  padding: 4px 10px 3px 12px;
   display: inline-block;
   transform: rotate(-3deg);
-  background: var(--cartao);
-  margin: 0.3rem 0 0;
+  mix-blend-mode: multiply;
+  margin: 0.4rem 0 0.2rem 0.2rem;
   align-self: flex-start;
 }
 
@@ -520,21 +531,27 @@ button, input {
 }
 
 .abas button {
+  position: relative;
   flex: 1;
   border: none;
   background: transparent;
-  padding: 0.6rem 0.2rem;
-  min-height: 52px;
+  padding: 0.45rem 0.2rem;
+  min-height: 56px;
   font-family: var(--fonte-base);
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--tinta-fraca);
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   border-top: 3px solid transparent;
+}
+
+.abas button svg {
+  display: block;
 }
 
 .abas button[aria-current="page"] {
@@ -544,12 +561,16 @@ button, input {
 }
 
 #minha-lista-n {
+  position: absolute;
+  top: 5px;
+  right: calc(50% - 24px);
   background: var(--chrome);
   color: #ffffff;
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   font-weight: 800;
-  padding: 1px 6px;
+  line-height: 1;
+  padding: 3px 5px;
 }
 
 dialog {
@@ -1100,15 +1121,34 @@ details summary {
   margin-top: auto;
   background: var(--painel);
   border-top: 1px solid var(--borda-fina);
-  padding: 1.5rem 1rem calc(72px + env(safe-area-inset-bottom));
+  padding: 1rem 1rem calc(76px + env(safe-area-inset-bottom));
   font-size: 0.8rem;
   color: var(--tinta-fraca);
   line-height: 1.5;
 }
 
-.rodape p {
-  margin: 0 0 0.6rem;
+.rodape-fontes {
+  margin: 0;
   max-width: 800px;
+}
+
+.rodape-metodo {
+  max-width: 800px;
+  margin-top: 0.2rem;
+}
+
+.rodape-metodo summary {
+  padding: 0.4rem 0;
+  background: transparent;
+  font-size: 0.8rem;
+  color: var(--tinta-fraca);
+  width: fit-content;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rodape-metodo p {
+  margin: 0 0 0.5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
