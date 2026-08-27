@@ -213,6 +213,30 @@ button, input {
   outline: none;
 }
 
+.secoes-dex {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.55rem 0.8rem 0.1rem;
+  background: var(--painel);
+}
+
+.secoes-dex button {
+  border: 1px solid var(--borda-forte);
+  background: var(--cartao);
+  color: var(--tinta-fraca);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secoes-dex button[aria-pressed="true"] {
+  background: var(--chrome);
+  border-color: var(--chrome-texto);
+  color: #ffffff;
+}
+
 .contagem {
   margin: 0;
   padding: 0.5rem 0.8rem;
@@ -226,6 +250,15 @@ button, input {
   flex: 1;
   padding: 0.8rem;
   padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tem-convite #paginas {
+  padding-bottom: calc(184px + env(safe-area-inset-bottom));
+}
+
 .grade-vazia {
   padding: 2rem 1rem;
   text-align: center;
@@ -238,10 +271,6 @@ button, input {
   height: 1px;
   width: 100%;
   grid-column: 1 / -1;
-}
-  max-width: 960px;
-  margin: 0 auto;
-  width: 100%;
 }
 
 .grade {
@@ -451,38 +480,60 @@ button, input {
 
 .ponto {
   font-size: 0.72rem;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
   border: 1px solid var(--borda-fina);
   background: var(--painel);
-  color: var(--tinta);
+  color: var(--tinta-fraca);
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
+
 .ponto::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
+  font-weight: 800;
   flex-shrink: 0;
 }
 
-.ponto[data-estado="defende"]::before { background: var(--verde); }
-.ponto[data-estado="contra"]::before { background: var(--vermelho); }
-.ponto[data-estado="misto"]::before, .ponto[data-estado="sem-lado"]::before { background: var(--ciano); }
-.ponto[data-estado="sem-registro"]::before {
-  background: repeating-linear-gradient(45deg, #e6e1d2 0 3px, #d8d3c4 3px 6px);
+.ponto[data-estado="defende"] {
+  background: #e3f1e8;
+  border-color: #b7d9c3;
+  color: #185a34;
+}
+
+.ponto[data-estado="defende"]::before {
+  content: "✔";
+}
+
+.ponto[data-estado="contra"] {
+  background: #fbe9ec;
+  border-color: #eec3ca;
+  color: #99182b;
+}
+
+.ponto[data-estado="contra"]::before {
+  content: "✘";
+}
+
+.ponto[data-estado="misto"]::before {
+  content: "±";
+}
+
+.ponto[data-estado="sem-lado"]::before {
+  content: "–";
+}
+
+.pontos:empty {
+  display: none;
 }
 
 .selo-inimigo {
-  font-family: "Haettenschweiler", "Arial Narrow", Impact, var(--fonte-nome);
-  font-stretch: condensed;
-  font-weight: 700;
+  font-family: var(--fonte-nome);
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
   line-height: 1.1;
   color: #b3122c;
   border: 2px solid #b3122c;
@@ -495,6 +546,76 @@ button, input {
   mix-blend-mode: multiply;
   margin: 0.4rem 0 0.2rem 0.2rem;
   align-self: flex-start;
+}
+
+.convite-instalar {
+  position: fixed;
+  left: 0.8rem;
+  right: 0.8rem;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  z-index: 35;
+  background: var(--cartao);
+  border: 2px solid var(--chrome);
+  border-radius: 10px;
+  box-shadow: var(--sombra-janela);
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.convite-titulo {
+  margin: 0;
+  font-family: var(--fonte-nome);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.convite-texto {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--tinta-fraca);
+  line-height: 1.35;
+}
+
+.convite-corpo {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.convite-acoes {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.convite-botao {
+  background: var(--chrome);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--sombra-dura);
+}
+
+.convite-botao:active {
+  transform: translateY(2px);
+  box-shadow: var(--sombra-afunda);
+}
+
+.convite-dispensar {
+  background: transparent;
+  border: none;
+  color: var(--tinta-frouxa);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.3rem 0.4rem;
 }
 
 .carta-salvar {

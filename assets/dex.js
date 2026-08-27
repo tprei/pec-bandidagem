@@ -1,14 +1,39 @@
 const CHAVE_UF = "dex.uf";
 const CHAVE_LISTA = "dex.lista";
+const CHAVE_INSTALAR = "dex.instalarDispensado";
 const LOTE = 24;
 
 const VERBO = {
-  blindagem: { defende: "Votou CONTRA a blindagem", contra: "Votou A FAVOR da blindagem" },
-  jornada: { defende: "Votou pela redução da jornada", contra: "Votou CONTRA a redução da jornada" },
-  anistia: { defende: "Votou CONTRA a anistia golpista", contra: "Votou pela ANISTIA aos golpistas" },
-  trabalhista: { defende: "Votou CONTRA cortar direitos trabalhistas", contra: "Votou para CORTAR direitos trabalhistas" },
-  eletrobras: { defende: "Votou CONTRA privatizar a Eletrobras", contra: "Votou para PRIVATIZAR a Eletrobras" },
-  ricos: { defende: "Votou para TAXAR os super-ricos", contra: "Votou CONTRA taxar os super-ricos" },
+  blindagem: {
+    defende: "Votou CONTRA a blindagem",
+    contra: "Votou A FAVOR da blindagem",
+    curto: { defende: "CONTRA a blindagem", contra: "A FAVOR da blindagem" },
+  },
+  jornada: {
+    defende: "Votou pela redução da jornada",
+    contra: "Votou CONTRA a redução da jornada",
+    curto: { defende: "PELO fim da 6x1", contra: "CONTRA o fim da 6x1" },
+  },
+  anistia: {
+    defende: "Votou CONTRA a anistia golpista",
+    contra: "Votou pela ANISTIA aos golpistas",
+    curto: { defende: "CONTRA a anistia golpista", contra: "PELA anistia golpista" },
+  },
+  trabalhista: {
+    defende: "Votou CONTRA cortar direitos trabalhistas",
+    contra: "Votou para CORTAR direitos trabalhistas",
+    curto: { defende: "CONTRA cortar direitos", contra: "CORTOU direitos trabalhistas" },
+  },
+  eletrobras: {
+    defende: "Votou CONTRA privatizar a Eletrobras",
+    contra: "Votou para PRIVATIZAR a Eletrobras",
+    curto: { defende: "CONTRA privatizar a Eletrobras", contra: "PRIVATIZOU a Eletrobras" },
+  },
+  ricos: {
+    defende: "Votou para TAXAR os super-ricos",
+    contra: "Votou CONTRA taxar os super-ricos",
+    curto: { defende: "TAXOU os super-ricos", contra: "CONTRA taxar os super-ricos" },
+  },
 };
 
 const ROTULO_VOTO = {
@@ -30,6 +55,7 @@ const botaoAbrirFiltros = elemento("abrir-filtros");
 const crachaFiltros = elemento("filtros-n");
 const botaoInstalar = elemento("instalar");
 const navAbas = elemento("abas");
+const secoesDex = elemento("secoes-dex");
 const contadorLista = elemento("minha-lista-n");
 const dialogoUf = elemento("seletor-uf");
 const dialogoFiltros = elemento("folha-filtros");
@@ -52,7 +78,7 @@ const estado = {
   cargos: new Set(),
   partidos: new Set(),
   badges: new Set(),
-  soFicha: false,
+  secao: "reeleicao",
   termo: "",
   salvos: new Map(),
   geracao: 0,
@@ -168,7 +194,16 @@ function resumo(ficha) {
 function fileiraPontos(notas) {
   const ul = criar("ul", "pontos");
   for (const item of notas) {
-    const li = criar("li", "ponto", item.eixo.nome);
+    if (item.nota.estado === "sem-registro") continue;
+    const verbos = VERBO[item.eixo.id];
+    if (verbos === undefined) throw new Error(`eixo ${item.eixo.id} não tem texto em VERBO`);
+    const rotulo =
+      item.nota.estado === "defende" || item.nota.estado === "contra"
+        ? verbos.curto[item.nota.estado]
+        : item.nota.estado === "misto"
+          ? `${item.eixo.nome}: dividido`
+          : `${item.eixo.nome}: sem lado`;
+    const li = criar("li", "ponto", rotulo);
     li.dataset.estado = item.nota.estado;
     const desc = `${item.eixo.nome} — ${textoVerbo(item.eixo, item.nota)}`;
     li.title = desc;
@@ -265,7 +300,12 @@ function montarCarta(par) {
     corpo.append(criar("p", "carta-sem-ficha", "Sem histórico na Câmara"));
   } else {
     const res = resumo(dado.ficha);
-    corpo.append(fileiraPontos(res.notas));
+    const pontos = fileiraPontos(res.notas);
+    if (pontos.childElementCount === 0) {
+      corpo.append(criar("p", "carta-sem-ficha", "Tem mandato, mas sem registro nas votações dos 6 eixos"));
+    } else {
+      corpo.append(pontos);
+    }
     if (res.contra >= 3) {
       corpo.append(criar("p", "selo-inimigo", "INIMIGO DO POVO"));
     }
@@ -332,12 +372,11 @@ function paresConcatenados() {
 }
 
 function filtrar() {
-  const pares = paresConcatenados();
+  const pares = paresDaSecao();
   const termo = achatar(estado.termo.trim());
   const porNumero = /^\d+$/.test(termo);
   estado.visiveis = pares.filter((par) => {
     const dado = campos(par);
-    if (estado.soFicha && dado.ficha === null) return false;
     if (estado.cargos.size > 0 && !estado.cargos.has(String(dado.cargo))) return false;
     if (estado.partidos.size > 0 && !estado.partidos.has(String(dado.partido))) return false;
     if (estado.badges.size > 0 && !estado.badges.has(String(dado.badge))) return false;
@@ -347,6 +386,7 @@ function filtrar() {
   });
   limparSentinela();
   estado.desenhados = 0;
+  grade.replaceChildren();
   if (estado.visiveis.length === 0) {
     grade.append(criar("p", "grade-vazia", "Nenhuma candidatura encontrada com os filtros atuais."));
   } else {
@@ -371,18 +411,31 @@ function aFavorDaBlindagem(arquivo) {
   return total;
 }
 
+function paresDaSecao() {
+  const pares = paresConcatenados();
+  if (estado.secao !== "reeleicao") return pares;
+  return pares.filter((par) => campos(par).ficha !== null);
+}
+
 function atualizarContagem() {
-  const totalBase = paresConcatenados().length;
+  const totalGeral = paresConcatenados().length;
+  const totalSecao = paresDaSecao().length;
   const visiveis = estado.visiveis.length;
-  const comFicha = estado.visiveis.filter((par) => campos(par).ficha !== null).length;
-  contagem.textContent =
-    visiveis === totalBase
-      ? `${plural(totalBase, "candidatura", "candidaturas")} · ${numeroBr(comFicha)} com histórico na Câmara`
-      : `${numeroBr(visiveis)} de ${plural(totalBase, "candidatura", "candidaturas")}`;
+  if (estado.secao === "reeleicao") {
+    contagem.textContent =
+      visiveis === totalSecao
+        ? `${plural(totalSecao, "candidatura", "candidaturas")} com histórico na Câmara · ${numeroBr(totalGeral)} no total`
+        : `${numeroBr(visiveis)} de ${plural(totalSecao, "candidatura", "candidaturas")} com histórico`;
+  } else if (visiveis === totalGeral) {
+    const comFicha = estado.visiveis.filter((par) => campos(par).ficha !== null).length;
+    contagem.textContent = `${plural(totalGeral, "candidatura", "candidaturas")} · ${numeroBr(comFicha)} com histórico na Câmara`;
+  } else {
+    contagem.textContent = `${numeroBr(visiveis)} de ${plural(totalGeral, "candidatura", "candidaturas")}`;
+  }
 }
 
 function atualizarIndicadorFiltros() {
-  const n = estado.cargos.size + estado.partidos.size + estado.badges.size + (estado.soFicha ? 1 : 0);
+  const n = estado.cargos.size + estado.partidos.size + estado.badges.size;
   crachaFiltros.textContent = String(n);
   crachaFiltros.hidden = n === 0;
 }
@@ -411,7 +464,6 @@ function renderizarFolhaFiltros() {
     estado.cargos.clear();
     estado.partidos.clear();
     estado.badges.clear();
-    estado.soFicha = false;
     filtrar();
     renderizarFolhaFiltros();
   });
@@ -425,7 +477,7 @@ function renderizarFolhaFiltros() {
   dialogoFiltros.append(cabeca);
 
   const corpo = criar("div", "folha-corpo");
-  const pares = paresConcatenados();
+  const pares = paresDaSecao();
 
   const contagemPartidos = new Map();
   for (const par of pares) {
@@ -483,19 +535,6 @@ function renderizarFolhaFiltros() {
   }
   secPerfil.append(grupoPerfil);
   corpo.append(secPerfil);
-
-  const secOpcoes = criar("div", "folha-secao");
-  const btnSoFicha = criar("button", "chip-toggle", "Só quem já votou na Câmara");
-  btnSoFicha.id = "so-ficha";
-  btnSoFicha.type = "button";
-  btnSoFicha.setAttribute("aria-pressed", estado.soFicha ? "true" : "false");
-  btnSoFicha.addEventListener("click", () => {
-    estado.soFicha = !estado.soFicha;
-    btnSoFicha.setAttribute("aria-pressed", estado.soFicha ? "true" : "false");
-    filtrar();
-  });
-  secOpcoes.append(btnSoFicha);
-  corpo.append(secOpcoes);
 
   dialogoFiltros.append(corpo);
 }
@@ -985,6 +1024,7 @@ function navegar() {
     busca.hidden = true;
     botaoAbrirFiltros.hidden = true;
     contagem.hidden = true;
+    secoesDex.hidden = true;
     renderizarFicha(sq);
     window.scrollTo({ top: 0, behavior: "instant" });
     return;
@@ -1019,6 +1059,7 @@ function navegar() {
   busca.hidden = !noDex;
   botaoAbrirFiltros.hidden = !noDex;
   contagem.hidden = !noDex;
+  secoesDex.hidden = !noDex;
 
   if (rota === "votacoes") renderizarVotacoes();
   else if (rota === "inimigos") renderizarInimigos();
@@ -1070,6 +1111,16 @@ function ligarEventos() {
     marcarSalvar(salvar, sq, dado.nome);
   });
 
+  secoesDex.addEventListener("click", (evento) => {
+    const btn = evento.target.closest("button[data-secao]");
+    if (btn === null || estado.secao === btn.dataset.secao) return;
+    estado.secao = btn.dataset.secao;
+    for (const b of secoesDex.querySelectorAll("button")) {
+      b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+    }
+    filtrar();
+  });
+
   navAbas.addEventListener("click", (evento) => {
     const btn = evento.target.closest("button[data-rota]");
     if (btn !== null) {
@@ -1094,18 +1145,75 @@ function ligarEventos() {
     if (evento.target === dialogoUf) dialogoUf.close();
   });
 
+  const ehTelefone = /Android.+Mobile|iPhone|iPod/i.test(navigator.userAgent);
+  const ehIos = /iPhone|iPod/i.test(navigator.userAgent);
+  const instalado = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const dispensado = () => localStorage.getItem(CHAVE_INSTALAR) !== null;
+
+  function removerConvite() {
+    const banner = document.querySelector(".convite-instalar");
+    if (banner !== null) banner.remove();
+    document.body.classList.remove("tem-convite");
+  }
+
+  function montarConviteInstalar(texto, acao) {
+    const banner = criar("div", "convite-instalar");
+    banner.setAttribute("role", "region");
+    banner.setAttribute("aria-label", "Instalar o aplicativo");
+    const corpo = criar("div", "convite-corpo");
+    corpo.append(criar("p", "convite-titulo", "Instale o Dex 2026"));
+    corpo.append(criar("p", "convite-texto", texto));
+    banner.append(corpo);
+    const acoes = criar("div", "convite-acoes");
+    if (acao !== null) {
+      const instalar = criar("button", "convite-botao", "Instalar");
+      instalar.type = "button";
+      instalar.addEventListener("click", acao);
+      acoes.append(instalar);
+    }
+    const depois = criar("button", "convite-dispensar", "Agora não");
+    depois.type = "button";
+    depois.addEventListener("click", () => {
+      removerConvite();
+      localStorage.setItem(CHAVE_INSTALAR, new Date().toISOString());
+    });
+    acoes.append(depois);
+    banner.append(acoes);
+    document.body.append(banner);
+    document.body.classList.add("tem-convite");
+    return banner;
+  }
+
   let convite = null;
   window.addEventListener("beforeinstallprompt", (evento) => {
     evento.preventDefault();
     convite = evento;
     botaoInstalar.hidden = false;
+    if (ehTelefone && !instalado && !dispensado() && document.querySelector(".convite-instalar") === null) {
+      montarConviteInstalar("Funciona offline, com as 20.765 candidaturas no bolso.", () => {
+        convite.prompt();
+        convite = null;
+        botaoInstalar.hidden = true;
+        removerConvite();
+      });
+    }
   });
   botaoInstalar.addEventListener("click", () => {
     if (convite === null) return;
     convite.prompt();
     convite = null;
     botaoInstalar.hidden = true;
+    removerConvite();
   });
+  window.addEventListener("appinstalled", () => {
+    convite = null;
+    botaoInstalar.hidden = true;
+    removerConvite();
+  });
+
+  if (ehIos && !instalado && !dispensado()) {
+    montarConviteInstalar("Toque em Compartilhar e depois em “Adicionar à Tela de Início”. Funciona offline.", null);
+  }
 }
 
 async function iniciar() {
