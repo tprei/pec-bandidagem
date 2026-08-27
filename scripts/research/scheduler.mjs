@@ -8,7 +8,7 @@ export function queues() {
     exaSearch: new PQueue({ concurrency: 4, intervalCap: 8, interval: 1000, strict: true }),
     exaContents: new PQueue({ concurrency: 8, intervalCap: 80, interval: 1000, strict: true }),
     brave: new PQueue({ concurrency: 1, intervalCap: 1, interval: 1000, strict: true }),
-    perplexity: new PQueue({ concurrency: 1, intervalCap: 1, interval: 1000, strict: true }),
+    gemini: new PQueue({ concurrency: 1, intervalCap: 1, interval: 1000, strict: true }),
   };
 }
 function delay(error, attempt) {

@@ -121,7 +121,7 @@ Fora esses campos, o JSON reproduz o CSV linha por linha.
 
 ## Pesquisa de vida pública
 
-`scripts/research-candidatos-2026.mjs` coordena a pesquisa das 20.765 candidaturas por `sq`. Exa e Brave fazem a descoberta paralela das fontes; o Perplexity Agent API apenas sintetiza e classifica o registro de fontes fornecido. A pesquisa não roda no navegador.
+`scripts/research-candidatos-2026.mjs` coordena a pesquisa das 20.765 candidaturas por `sq`. Exa e Brave fazem a descoberta paralela das fontes; o Gemini API sintetiza e classifica o registro de fontes fornecido. A pesquisa não roda no navegador.
 
 Instale as dependências uma vez:
 
@@ -129,9 +129,9 @@ Instale as dependências uma vez:
 npm ci
 ```
 
-Configure `.env` com `PERPLEXITY_API_KEY`, `EXA_API_KEY` e/ou `BRAVE_SEARCH_API_KEY` (o alias `BRAVE_API_KEY` também é aceito), além de `PERPLEXITY_MODEL` opcional. A chave do Perplexity é necessária para síntese; pelo menos uma chave Exa/Brave é necessária para descoberta.
+Configure `.env` com `GEMINI_API_KEY`, `EXA_API_KEY` e/ou `BRAVE_SEARCH_API_KEY` (o alias `BRAVE_API_KEY` também é aceito), além de `GEMINI_MODEL` opcional. A chave do Gemini é necessária para síntese; pelo menos uma chave Exa/Brave é necessária para descoberta.
 
-O estado durável fica em `.cache/pesquisa-candidatos-2026/state.sqlite`. O banco é a fonte de verdade; os JSONL antigos são importados uma vez e mantidos apenas como auditoria. Cada candidatura, provedor, operação e payload possui uma chave determinística. Rerodar o mesmo comando reutiliza resultados, fontes e IDs remotos conhecidos. Um POST cujo resultado ficou ambíguo não é repetido automaticamente: use recuperação explícita, porque nenhum dos três serviços documenta uma chave de idempotência/reconciliação para essa operação.
+O estado durável fica em `.cache/pesquisa-candidatos-2026/state.sqlite`. O banco é a fonte de verdade; os JSONL antigos são importados uma vez e mantidos apenas como auditoria. Cada candidatura, provedor, operação e payload possui uma chave determinística. Rerodar o mesmo comando reutiliza resultados, fontes e IDs remotos conhecidos. Um POST cujo resultado ficou ambíguo não é repetido automaticamente: use recuperação explícita, porque os serviços não documentam uma chave de idempotência/reconciliação para essa operação.
 
 Pesquisar uma candidatura ou uma coorte:
 

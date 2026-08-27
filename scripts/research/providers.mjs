@@ -85,23 +85,25 @@ export async function braveNews(query, inputHash, sq, requestKey, freshness = ""
   const items = result.raw.results ?? result.raw.news?.results ?? [];
   return { provider: "brave", headers: result.headers, raw: result.raw, sources: items.map((item) => source("brave", { ...item, page_age: item.page_age }, item.description ?? item.extra_snippets?.join(" "), inputHash, sq, requestKey)) };
 }
-export async function perplexitySubmit(input, schema, requestKey, signal) {
+export async function geminiGenerate(input, schema, requestKey, signal) {
+  const model = process.env.GEMINI_MODEL ?? "gemini-3.1-flash-lite";
+  const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(120_000)]) : AbortSignal.timeout(120_000);
   let response;
   try {
-    const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(120_000)]) : AbortSignal.timeout(120_000);
-    response = await fetch("https://api.perplexity.ai/v1/agent", { method: "POST", headers: { accept: "application/json", "content-type": "application/json", authorization: `Bearer ${process.env.PERPLEXITY_API_KEY}` }, body: JSON.stringify({ model: process.env.PERPLEXITY_MODEL ?? "openai/gpt-5.6-sol", background: true, input, response_format: { type: "json_schema", json_schema: { name: "pesquisa_candidato", schema } } }), signal: requestSignal });
-  } catch (error) { throw new ProviderError(error.message, { provider: "perplexity", retryable: false, uncertain: true }); }
-  if (!response.ok) throw new ProviderError(`${response.status}: ${await response.text()}`, { provider: "perplexity", status: response.status, retryAfterMs: retryAfter(response.headers), retryable: response.status === 429 || response.status >= 500 });
-  return response.json();
-}
-export async function perplexityPoll(id, signal) {
-  let response;
-  try {
-    const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(120_000)]) : AbortSignal.timeout(120_000);
-    response = await fetch(`https://api.perplexity.ai/v1/agent/${id}`, { headers: { accept: "application/json", authorization: `Bearer ${process.env.PERPLEXITY_API_KEY}` }, signal: requestSignal });
-  } catch (error) { throw new ProviderError(error.message, { provider: "perplexity", retryable: true }); }
-  if (!response.ok) throw new ProviderError(`${response.status}: ${await response.text()}`, { provider: "perplexity", status: response.status, retryAfterMs: retryAfter(response.headers), retryable: response.status === 429 || response.status >= 500 });
-  return response.json();
+    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: "POST",
+      headers: { accept: "application/json", "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
+      body: JSON.stringify({ contents: [{ parts: [{ text: `${input}\nReturn JSON matching this schema exactly:\n${JSON.stringify(schema)}` }] }], generationConfig: { responseMimeType: "application/json" } }),
+      signal: requestSignal,
+    });
+  } catch (error) {
+    throw new ProviderError(error.message, { provider: "gemini", uncertain: true });
+  }
+  if (!response.ok) throw new ProviderError(`${response.status}: ${await response.text()}`, { provider: "gemini", status: response.status, retryAfterMs: retryAfter(response.headers), retryable: response.status === 429 || response.status >= 500 });
+  const body = await response.json();
+  const text = body.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("") ?? "";
+  if (!text) throw new ProviderError("Gemini returned an empty response", { provider: "gemini", status: 502, retryable: true });
+  return { id: body.responseId ?? requestKey, model, output_text: text, usage: body.usageMetadata ?? null, raw: body };
 }
 export function mergeSources(sourceLists) {
   const merged = new Map();
