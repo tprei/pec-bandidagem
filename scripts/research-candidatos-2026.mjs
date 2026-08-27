@@ -156,7 +156,9 @@ function project(db) {
 async function pesquisar() {
   if (!process.env.PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY ausente");
   const braveKey = process.env.BRAVE_SEARCH_API_KEY ?? process.env.BRAVE_API_KEY;
-  const selectedProviders = listOption("search-providers"); const providers = selectedProviders.length ? selectedProviders : [process.env.EXA_API_KEY ? "exa" : null, braveKey ? "brave" : null].filter(Boolean);
+  const requestedProviders = listOption("search-providers");
+  const providers = requestedProviders.length > 0 && !requestedProviders.includes("auto") ? requestedProviders : [process.env.EXA_API_KEY ? "exa" : null, braveKey ? "brave" : null].filter(Boolean);
+  if (providers.some((provider) => !["exa", "brave"].includes(provider))) throw new Error(`provedor de busca desconhecido: ${providers.join(",")}`);
   if (!providers.length) throw new Error("configure EXA_API_KEY ou BRAVE_SEARCH_API_KEY/BRAVE_API_KEY");
   const maxRounds = Number(option("max-search-rounds", 2)); if (![1, 2].includes(maxRounds)) throw new Error("--max-search-rounds deve ser 1 ou 2");
   const budgetLimit = Number(option("max-cost-usd")); if (!Number.isFinite(budgetLimit) || budgetLimit <= 0) throw new Error("--max-cost-usd deve ser positivo");

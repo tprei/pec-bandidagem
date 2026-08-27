@@ -1,7 +1,9 @@
 {
-  "schema": 1,
-  "candidatos": {
-    "190002534687": {
+  "schema": 2,
+  "rubrica": "trabalhador-v1",
+  "geradoEm": "2026-08-27T18:46:25.668Z",
+  "candidatos": [
+    {
       "sq": 190002534687,
       "identidade": {
         "sq": 190002534687,
@@ -34,7 +36,13 @@
           "tema": "Trajetória profissional e eventual exercício anterior de função pública na educação",
           "tipo": "semantica"
         }
-      ]
+      ],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-sol",
+        "responseId": "resp_0cd05897-0c24-4715-afe0-7502b6ed963b",
+        "pesquisadoEm": "2026-08-27T18:46:25.647Z"
+      }
     }
-  }
+  ]
 }
