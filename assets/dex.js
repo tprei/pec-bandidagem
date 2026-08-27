@@ -2,12 +2,14 @@ const CHAVE_UF = "dex.uf";
 const CHAVE_LISTA = "dex.lista";
 const CHAVE_INSTALAR = "dex.instalarDispensado";
 const LOTE = 24;
+const LOTE_VOTACOES = 50;
+const LIMIAR_SELO = 3;
 
 const VERBO = {
   blindagem: {
     defende: "Votou CONTRA a blindagem",
     contra: "Votou A FAVOR da blindagem",
-    curto: { defende: "CONTRA a blindagem", contra: "A FAVOR da blindagem" },
+    curto: { defende: "CONTRA a blindagem", contra: "PELA blindagem" },
   },
   jornada: {
     defende: "Votou pela redução da jornada",
@@ -22,17 +24,27 @@ const VERBO = {
   trabalhista: {
     defende: "Votou CONTRA cortar direitos trabalhistas",
     contra: "Votou para CORTAR direitos trabalhistas",
-    curto: { defende: "CONTRA cortar direitos", contra: "CORTOU direitos trabalhistas" },
+    curto: { defende: "CONTRA o corte de direitos", contra: "PELO corte de direitos trabalhistas" },
+  },
+  clt: {
+    defende: "Votou CONTRA a reforma trabalhista de 2017",
+    contra: "Votou A FAVOR da reforma trabalhista de 2017",
+    curto: { defende: "CONTRA a reforma da CLT", contra: "PELA reforma da CLT" },
+  },
+  previdencia: {
+    defende: "Votou CONTRA a reforma da Previdência",
+    contra: "Votou A FAVOR da reforma da Previdência",
+    curto: { defende: "CONTRA a reforma da Previdência", contra: "PELA reforma da Previdência" },
   },
   eletrobras: {
     defende: "Votou CONTRA privatizar a Eletrobras",
     contra: "Votou para PRIVATIZAR a Eletrobras",
-    curto: { defende: "CONTRA privatizar a Eletrobras", contra: "PRIVATIZOU a Eletrobras" },
+    curto: { defende: "CONTRA a privatização da Eletrobras", contra: "PELA privatização da Eletrobras" },
   },
   ricos: {
     defende: "Votou para TAXAR os super-ricos",
     contra: "Votou CONTRA taxar os super-ricos",
-    curto: { defende: "TAXOU os super-ricos", contra: "CONTRA taxar os super-ricos" },
+    curto: { defende: "PELA taxação dos super-ricos", contra: "CONTRA a taxação dos super-ricos" },
   },
 };
 
@@ -83,6 +95,14 @@ const estado = {
   salvos: new Map(),
   geracao: 0,
   votacoesRenderizadas: false,
+  catalogoVotacoes: null,
+  votosPorCamaraId: new Map(),
+  sentinelaVotacoes: null,
+  todasColunas: null,
+  todasRegistros: null,
+  todasExibidas: 0,
+  todasLista: null,
+  todasBotaoMais: null,
 };
 
 function achatar(texto) {
@@ -191,7 +211,108 @@ function resumo(ficha) {
   return { notas, contra, defende };
 }
 
-function fileiraPontos(notas) {
+let elementoDica = null;
+let alvoDica = null;
+
+function obterDica() {
+  if (elementoDica !== null) return elementoDica;
+  elementoDica = document.createElement("div");
+  elementoDica.id = "dica-ponto";
+  elementoDica.className = "dica-ponto";
+  elementoDica.setAttribute("role", "tooltip");
+  elementoDica.setAttribute("aria-hidden", "true");
+  document.body.append(elementoDica);
+  return elementoDica;
+}
+
+function posicionarDica(ponto, dica) {
+  const rect = ponto.getBoundingClientRect();
+  const dicaRect = dica.getBoundingClientRect();
+  const espacoMargem = 8;
+  const gap = 6;
+
+  let left = rect.left + (rect.width - dicaRect.width) / 2;
+  left = Math.max(espacoMargem, Math.min(window.innerWidth - dicaRect.width - espacoMargem, left));
+
+  let top;
+  const cabeAbaixo = rect.bottom + gap + dicaRect.height <= window.innerHeight - espacoMargem;
+  const cabeAcima = rect.top - gap - dicaRect.height >= espacoMargem;
+
+  if (!cabeAbaixo && cabeAcima) {
+    top = rect.top - gap - dicaRect.height;
+  } else if (cabeAbaixo) {
+    top = rect.bottom + gap;
+  } else {
+    const espacoAcima = rect.top;
+    const espacoAbaixo = window.innerHeight - rect.bottom;
+    if (espacoAcima > espacoAbaixo) {
+      top = Math.max(espacoMargem, rect.top - gap - dicaRect.height);
+    } else {
+      top = Math.min(window.innerHeight - dicaRect.height - espacoMargem, rect.bottom + gap);
+    }
+  }
+
+  dica.style.left = `${Math.round(left)}px`;
+  dica.style.top = `${Math.round(top)}px`;
+}
+
+function mostrarDica(ponto) {
+  if (!ponto || !ponto._eixo || !ponto._nota) return;
+  const dica = obterDica();
+  alvoDica = ponto;
+  dica.replaceChildren();
+
+  const eixo = ponto._eixo;
+  const nota = ponto._nota;
+  const ficha = ponto._ficha;
+
+  dica.append(criar("h4", "dica-titulo", eixo.nome));
+
+  const veredito =
+    nota.estado === "defende"
+      ? " (defende o eleitor)"
+      : nota.estado === "contra"
+        ? " (contra o eleitor)"
+        : "";
+  const textoVoto = `${textoVerbo(eixo, nota)}${veredito}`;
+  const paragrafoVoto = criar("p", "dica-voto", textoVoto);
+  paragrafoVoto.dataset.estado = nota.estado;
+  dica.append(paragrafoVoto);
+
+  dica.append(criar("p", "dica-pergunta", eixo.pergunta));
+  dica.append(criar("p", "dica-posicao", eixo.posicao));
+
+  if (eixo.votacoes && eixo.votacoes.length > 0) {
+    const listaVotacoes = criar("div", "dica-votacoes");
+    for (const votacao of eixo.votacoes) {
+      const itemVotacao = criar("div", "dica-votacao");
+      const placarPartes = [`${votacao.sim} Sim`, `${votacao.nao} Não`];
+      if (votacao.outros > 0) placarPartes.push(`${votacao.outros} sem lado`);
+      const textoPlacar = `${votacao.rotulo} · ${dataBr(votacao.data)} · ${placarPartes.join(" x ")}`;
+      itemVotacao.append(criar("span", "dica-votacao-placar", textoPlacar));
+
+      const codigo = ficha && ficha.votos ? ficha.votos[votacao.id] : 0;
+      const rotuloVoto = ROTULO_VOTO[codigo] ?? "sem registro";
+      const votoLinha = criar("span", "dica-votacao-voto", `Voto: ${rotuloVoto}`);
+      votoLinha.dataset.alinhamento = alinhamento(codigo, eixo);
+      itemVotacao.append(votoLinha);
+
+      listaVotacoes.append(itemVotacao);
+    }
+    dica.append(listaVotacoes);
+  }
+
+  dica.setAttribute("aria-hidden", "false");
+  posicionarDica(ponto, dica);
+}
+
+function esconderDica() {
+  if (elementoDica === null || elementoDica.getAttribute("aria-hidden") === "true") return;
+  elementoDica.setAttribute("aria-hidden", "true");
+  alvoDica = null;
+}
+
+function fileiraPontos(notas, ficha = null) {
   const ul = criar("ul", "pontos");
   for (const item of notas) {
     if (item.nota.estado === "sem-registro") continue;
@@ -205,9 +326,19 @@ function fileiraPontos(notas) {
           : `${item.eixo.nome}: sem lado`;
     const li = criar("li", "ponto", rotulo);
     li.dataset.estado = item.nota.estado;
-    const desc = `${item.eixo.nome} — ${textoVerbo(item.eixo, item.nota)}`;
-    li.title = desc;
+    li.tabIndex = 0;
+    li.setAttribute("aria-describedby", "dica-ponto");
+    const veredito =
+      item.nota.estado === "defende"
+        ? " (defende o eleitor)"
+        : item.nota.estado === "contra"
+          ? " (contra o eleitor)"
+          : "";
+    const desc = `${item.eixo.nome} — ${textoVerbo(item.eixo, item.nota)}${veredito}`;
     li.setAttribute("aria-label", desc);
+    li._eixo = item.eixo;
+    li._nota = item.nota;
+    li._ficha = ficha;
     ul.append(li);
   }
   return ul;
@@ -300,13 +431,13 @@ function montarCarta(par) {
     corpo.append(criar("p", "carta-sem-ficha", "Sem histórico na Câmara"));
   } else {
     const res = resumo(dado.ficha);
-    const pontos = fileiraPontos(res.notas);
+    const pontos = fileiraPontos(res.notas, dado.ficha);
     if (pontos.childElementCount === 0) {
-      corpo.append(criar("p", "carta-sem-ficha", "Tem mandato, mas sem registro nas votações dos 6 eixos"));
+      corpo.append(criar("p", "carta-sem-ficha", `Tem mandato, mas sem registro nas votações dos ${estado.indice.eixos.length} eixos`));
     } else {
       corpo.append(pontos);
     }
-    if (res.contra >= 3) {
+    if (res.contra >= LIMIAR_SELO) {
       corpo.append(criar("p", "selo-inimigo", "INIMIGO DO POVO"));
     }
   }
@@ -348,6 +479,24 @@ const observador = new IntersectionObserver(
       if (!entrada.isIntersecting) continue;
       if (entrada.target !== estado.sentinela) continue;
       desenharLote();
+    }
+  },
+  { rootMargin: "600px" },
+);
+
+function limparSentinelaVotacoes() {
+  if (estado.sentinelaVotacoes === null) return;
+  observadorVotacoes.unobserve(estado.sentinelaVotacoes);
+  estado.sentinelaVotacoes.remove();
+  estado.sentinelaVotacoes = null;
+}
+
+const observadorVotacoes = new IntersectionObserver(
+  (entradas) => {
+    for (const entrada of entradas) {
+      if (!entrada.isIntersecting) continue;
+      if (entrada.target !== estado.sentinelaVotacoes) continue;
+      desenharLoteVotacoes();
     }
   },
   { rootMargin: "600px" },
@@ -569,9 +718,180 @@ function alinhamento(codigo, eixo) {
   return "neutro";
 }
 
+function partesDaComposicao(texto) {
+  const partes = [];
+  let atual = "";
+  let profundidade = 0;
+  for (let i = 0; i < texto.length; i += 1) {
+    const caractere = texto[i];
+    if (caractere === "(") profundidade += 1;
+    if (caractere === ")") profundidade = Math.max(0, profundidade - 1);
+    if (profundidade === 0 && caractere === "/" && texto[i - 1] === " " && texto[i + 1] === " ") {
+      partes.push(atual.trim());
+      atual = "";
+      i += 1;
+      continue;
+    }
+    atual += caractere;
+  }
+  const ultima = atual.trim();
+  if (ultima !== "") partes.push(ultima);
+  return partes;
+}
+
+function catalogoVotacoes() {
+  if (estado.catalogoVotacoes === null) {
+    estado.catalogoVotacoes = carregarJson("data/dex/votacoes.json").catch((erro) => {
+      estado.catalogoVotacoes = null;
+      throw new Error(`data/dex/votacoes.json: ${erro.message}`);
+    });
+  }
+  return estado.catalogoVotacoes;
+}
+
+function votosDeCamaraId(camaraId) {
+  let promessa = estado.votosPorCamaraId.get(camaraId);
+  if (promessa === undefined) {
+    promessa = carregarJson(`data/dex/votos/${camaraId}.json`)
+      .then((arquivo) => {
+        if (typeof arquivo.votos !== "string") {
+          throw new Error(`data/dex/votos/${camaraId}.json não tem o campo votos`);
+        }
+        return arquivo.votos;
+      })
+      .catch((erro) => {
+        estado.votosPorCamaraId.delete(camaraId);
+        throw new Error(`data/dex/votos/${camaraId}.json: ${erro.message}`);
+      });
+    estado.votosPorCamaraId.set(camaraId, promessa);
+  }
+  return promessa;
+}
+
+function linhaVotacaoToda(votacao, codigo, coluna) {
+  const linha = criar("div", "ficha-todas-linha");
+  const topo = criar("p", "ficha-todas-topo");
+  topo.append(criar("span", "ficha-todas-data", dataBr(votacao[coluna.data])));
+  const voto = criar("span", "voto-neutro", ROTULO_VOTO[codigo]);
+  voto.dataset.voto = String(codigo);
+  topo.append(voto);
+  const aprovada = votacao[coluna.aprovada];
+  topo.append(
+    criar("span", "ficha-todas-aprovada", aprovada === true ? "Aprovada" : aprovada === false ? "Rejeitada" : "Sem resultado"),
+  );
+  linha.append(topo);
+  linha.append(criar("p", "ficha-todas-descricao", votacao[coluna.descricao]));
+  const placar = [`${numeroBr(votacao[coluna.sim])} Sim`, `${numeroBr(votacao[coluna.nao])} Não`];
+  if (votacao[coluna.abstencao] > 0) placar.push(`${numeroBr(votacao[coluna.abstencao])} Abstenção`);
+  if (votacao[coluna.obstrucao] > 0) placar.push(`${numeroBr(votacao[coluna.obstrucao])} Obstrução`);
+  linha.append(criar("p", "ficha-todas-placar", `Placar: ${placar.join(" x ")}`));
+  const links = criar("p", "ficha-todas-links");
+  const nominal = criar("a", undefined, "votação nominal ↗");
+  nominal.href = `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${votacao[coluna.id]}`;
+  nominal.target = "_blank";
+  nominal.rel = "noopener";
+  links.append(nominal);
+  const materia = criar("a", undefined, "proposição ↗");
+  materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${votacao[coluna.proposicao]}`;
+  materia.target = "_blank";
+  materia.rel = "noopener";
+  links.append(materia);
+  linha.append(links);
+  return linha;
+}
+
+function desenharLoteVotacoes() {
+  limparSentinelaVotacoes();
+  const registros = estado.todasRegistros;
+  const fim = Math.min(estado.todasExibidas + LOTE_VOTACOES, registros.length);
+  const fragmento = document.createDocumentFragment();
+  for (let i = estado.todasExibidas; i < fim; i += 1) {
+    fragmento.append(linhaVotacaoToda(registros[i].votacao, registros[i].codigo, estado.todasColunas));
+  }
+  estado.todasLista.append(fragmento);
+  estado.todasExibidas = fim;
+  if (estado.todasExibidas < registros.length) {
+    estado.sentinelaVotacoes = criar("div", "sentinela");
+    estado.todasLista.append(estado.sentinelaVotacoes);
+    observadorVotacoes.observe(estado.sentinelaVotacoes);
+  }
+  const restantes = registros.length - estado.todasExibidas;
+  estado.todasBotaoMais.hidden = restantes === 0;
+  if (restantes > 0) {
+    estado.todasBotaoMais.textContent = `Carregar mais ${plural(restantes, "votação", "votações")}`;
+  }
+}
+
+function montarTodasVotacoes(ficha) {
+  const details = document.createElement("details");
+  details.className = "ficha-todas";
+  const summary = document.createElement("summary");
+  summary.textContent = "Todas as votações";
+  details.append(summary);
+
+  const corpo = criar("div", "ficha-todas-corpo");
+  details.append(corpo);
+
+  const lista = criar("div", "ficha-todas-lista");
+  const botaoMais = criar("button", "ficha-todas-mais");
+  botaoMais.type = "button";
+  botaoMais.hidden = true;
+  botaoMais.addEventListener("click", desenharLoteVotacoes);
+
+  let carregado = false;
+
+  async function carregar() {
+    if (carregado) return;
+    carregado = true;
+    corpo.replaceChildren(criar("p", "ficha-todas-status", "Carregando votações…"));
+    try {
+      const catalogo = await catalogoVotacoes();
+      if (!details.isConnected) return;
+      const votoTexto = await votosDeCamaraId(ficha.camaraId);
+      if (!details.isConnected) return;
+      if (votoTexto.length !== catalogo.votacoes.length) {
+        throw new Error(
+          `o registro de votos tem ${numeroBr(votoTexto.length)} posições para ${numeroBr(catalogo.votacoes.length)} votações do catálogo`,
+        );
+      }
+      const coluna = Object.fromEntries(catalogo.colunas.map((nome, i) => [nome, i]));
+      const registros = [];
+      for (let i = catalogo.votacoes.length - 1; i >= 0; i -= 1) {
+        const codigo = Number(votoTexto[i]);
+        if (codigo === 0) continue;
+        registros.push({ votacao: catalogo.votacoes[i], codigo });
+      }
+      estado.todasColunas = coluna;
+      estado.todasRegistros = registros;
+      estado.todasExibidas = 0;
+      estado.todasLista = lista;
+      estado.todasBotaoMais = botaoMais;
+      const contagem = criar(
+        "p",
+        "ficha-todas-contagem",
+        `${plural(registros.length, "votação com voto registrado", "votações com voto registrado")}, de ${numeroBr(catalogo.votacoes.length)} realizadas entre ${catalogo.periodo.de} e ${catalogo.periodo.ate}.`,
+      );
+      corpo.replaceChildren(contagem, lista, botaoMais);
+      desenharLoteVotacoes();
+    } catch (erro) {
+      carregado = false;
+      if (!details.isConnected) return;
+      const aviso = criar("p", "ficha-todas-erro", `Falha ao carregar as votações: ${erro.message}`);
+      aviso.setAttribute("role", "alert");
+      corpo.replaceChildren(aviso);
+    }
+  }
+
+  details.addEventListener("toggle", () => {
+    if (details.open) carregar();
+  });
+  return details;
+}
+
 function renderizarFicha(sq) {
   const sec = secoes.ficha;
   sec.replaceChildren();
+  limparSentinelaVotacoes();
   const pares = paresConcatenados();
   const par = pares.find((p) => campos(p).sq === sq);
 
@@ -612,11 +932,32 @@ function renderizarFicha(sq) {
 
   const coligacao = par.arquivo.coligacoes[dado.coligacao];
   if (coligacao) {
-    const bloco = criar("p", "ficha-coligacao");
-    bloco.textContent =
-      coligacao.tipo === "PARTIDO ISOLADO"
-        ? `Concorre por partido isolado (${coligacao.composicao}). O voto de legenda fica só com esse partido.`
-        : `${coligacao.tipo}: ${coligacao.nome}. Votar aqui também ajuda a eleger ${coligacao.composicao}.`;
+    const bloco = criar("div", "ficha-coligacao");
+    const isolado = coligacao.tipo === "PARTIDO ISOLADO";
+    const federacao = coligacao.tipo === "FEDERAÇÃO";
+    bloco.append(criar("p", "ficha-coligacao-rotulo", isolado ? "Partido isolado" : federacao ? "Federação" : "Coligação"));
+    if (!isolado && !federacao && coligacao.nome) {
+      bloco.append(criar("p", "ficha-coligacao-nome", coligacao.nome));
+    }
+    const membros = partesDaComposicao(coligacao.composicao);
+    if (membros.length === 1) {
+      bloco.append(criar("p", "ficha-coligacao-composicao", membros[0]));
+    } else {
+      const lista = criar("ul", "ficha-coligacao-membros");
+      for (const membro of membros) {
+        lista.append(criar("li", "ficha-coligacao-membro", membro));
+      }
+      bloco.append(lista);
+    }
+    bloco.append(
+      criar(
+        "p",
+        "ficha-coligacao-nota",
+        isolado
+          ? "O voto de legenda fica só com esse partido."
+          : "Votar aqui também ajuda a eleger os outros partidos desta lista.",
+      ),
+    );
     info.append(bloco);
   }
   cabeca.append(info);
@@ -624,10 +965,21 @@ function renderizarFicha(sq) {
 
   if (dado.ficha !== null) {
     const resumoBox = criar("div", "ficha-resumo-box");
-    if (res.contra >= 3) {
+    if (res.contra >= LIMIAR_SELO) {
       resumoBox.append(criar("p", "selo-inimigo", "INIMIGO DO POVO"));
     }
-    resumoBox.append(fileiraPontos(res.notas));
+    const pontos = fileiraPontos(res.notas, dado.ficha);
+    resumoBox.append(pontos);
+    if (pontos.childElementCount > 0) {
+      const legenda = criar("p", "pontos-legenda");
+      const marcaDefende = criar("span", undefined, "defende o eleitor");
+      marcaDefende.dataset.estado = "defende";
+      const marcaContra = criar("span", undefined, "contra o eleitor");
+      marcaContra.dataset.estado = "contra";
+      legenda.append(marcaDefende);
+      legenda.append(marcaContra);
+      resumoBox.append(legenda);
+    }
     sec.append(resumoBox);
 
     const historico = criar("div", "ficha-secao");
@@ -679,6 +1031,7 @@ function renderizarFicha(sq) {
       details.append(corpoDetalhe);
       historico.append(details);
     }
+    historico.append(montarTodasVotacoes(ficha));
     sec.append(historico);
   } else {
     const historico = criar("div", "ficha-secao");
@@ -686,7 +1039,7 @@ function renderizarFicha(sq) {
       criar(
         "p",
         "carta-sem-ficha",
-        "Sem histórico na Câmara entre 2021 e 2026. Não é nota baixa: estreantes e quem só teve mandato estadual ou municipal aparecem assim.",
+        "Sem histórico na Câmara entre 2017 e 2026. Não é nota baixa: estreantes e quem só teve mandato estadual ou municipal aparecem assim.",
       ),
     );
     sec.append(historico);
@@ -794,7 +1147,7 @@ function renderizarInimigos() {
     criar(
       "p",
       "pagina-intro",
-      "Quem votou contra o eleitor em pelo menos 3 dos 6 eixos, contando só as votações em que tomou lado.",
+      `Quem votou contra o eleitor em pelo menos ${LIMIAR_SELO} dos ${estado.indice.eixos.length} eixos, contando só as votações em que tomou lado.`,
     ),
   );
 
@@ -853,9 +1206,9 @@ function renderizarInimigos() {
     const placar = criar("p", "inimigo-placar", `contra o eleitor em ${item.res.contra} de ${totalEixos} eixos`);
     corpo.append(placar);
 
-    corpo.append(fileiraPontos(item.res.notas));
+    corpo.append(fileiraPontos(item.res.notas, item.dado.ficha));
 
-    if (item.res.contra >= 3) {
+    if (item.res.contra >= LIMIAR_SELO) {
       corpo.append(criar("p", "selo-inimigo", "INIMIGO DO POVO"));
     }
     linha.append(corpo);
@@ -1010,6 +1363,7 @@ async function trocarUf(sigla) {
 }
 
 function navegar() {
+  esconderDica();
   const hash = location.hash || "#/dex";
 
   const matchFicha = /^#\/ficha\/(\d+)$/.exec(hash);
@@ -1144,6 +1498,35 @@ function ligarEventos() {
   dialogoUf.addEventListener("click", (evento) => {
     if (evento.target === dialogoUf) dialogoUf.close();
   });
+  const suportaHover = () => window.matchMedia("(hover: hover)").matches;
+
+  document.addEventListener("pointerover", (evento) => {
+    if (!suportaHover()) return;
+    const ponto = evento.target.closest(".ponto");
+    if (ponto) mostrarDica(ponto);
+  });
+
+  document.addEventListener("pointerout", (evento) => {
+    if (!suportaHover()) return;
+    const ponto = evento.target.closest(".ponto");
+    if (ponto && ponto === alvoDica) esconderDica();
+  });
+
+  document.addEventListener("focusin", (evento) => {
+    const ponto = evento.target.closest(".ponto");
+    if (ponto) mostrarDica(ponto);
+  });
+
+  document.addEventListener("focusout", (evento) => {
+    const ponto = evento.target.closest(".ponto");
+    if (ponto && ponto === alvoDica) esconderDica();
+  });
+
+  window.addEventListener("keydown", (evento) => {
+    if (evento.key === "Escape") esconderDica();
+  });
+
+  window.addEventListener("scroll", esconderDica, { passive: true });
 
   const ehTelefone = /Android.+Mobile|iPhone|iPod/i.test(navigator.userAgent);
   const ehIos = /iPhone|iPod/i.test(navigator.userAgent);
