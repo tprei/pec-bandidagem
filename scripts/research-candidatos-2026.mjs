@@ -21,11 +21,39 @@ const ACTION_TYPES = ["voto", "legislacao", "politica_publica", "gestao_publica"
 const ROLES = ["autor", "coautor", "votou", "sancionou", "regulamentou", "executou", "administrou", "financiou", "anunciou", "defendeu", "beneficiario", "alvo_de_apuracao"];
 const RESULTS = ["proposto", "aprovado", "implementado", "concluido", "revertido", "suspenso", "nao_realizado", "em_apuracao", "nao_se_aplica"];
 const SENSITIVE = new Set(["licitacao_contrato", "corrupcao_improbidade", "processo_investigacao", "conflito_interesses_familia", "conduta_pessoal"]);
+let stopping = false;
+let activeQueues = null;
+const shutdown = new AbortController();
+let forceExitTimer = null;
+process.on("SIGINT", () => {
+  if (stopping) return;
+  stopping = true;
+  process.exitCode = 130;
+  shutdown.abort();
+  if (activeQueues) for (const queue of Object.values(activeQueues)) queue.start();
+  emit({ event: "shutdown_requested", signal: "SIGINT" });
+  forceExitTimer = setTimeout(() => { emit({ event: "watchdog_forced_exit", signal: "SIGINT", segundos: 30 }); process.exit(130); }, 30000);
+  forceExitTimer.unref();
+});
+process.on("SIGTERM", () => {
+  stopping = true;
+  process.exitCode = 143;
+  shutdown.abort();
+  if (activeQueues) for (const queue of Object.values(activeQueues)) queue.start();
+  forceExitTimer = setTimeout(() => { emit({ event: "watchdog_forced_exit", signal: "SIGTERM", segundos: 30 }); process.exit(143); }, 30000);
+  forceExitTimer.unref();
+});
 
 function json(path, fallback = null) { return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : fallback; }
 function hash(value) { return createHash("sha256").update(JSON.stringify(value)).digest("hex"); }
 function emit(event) { console.log(JSON.stringify({ ...event, em: new Date().toISOString() })); }
-function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+function sleep(ms, signal) {
+  if (signal?.aborted) return Promise.resolve();
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => { clearTimeout(timer); resolve(); }, { once: true });
+  });
+}
 function option(name, fallback = undefined) { return parsed.values[name] ?? fallback; }
 function listOption(name) { const value = option(name); return value ? String(value).split(",").map((item) => item.trim()).filter(Boolean) : []; }
 function identity(candidato) {
@@ -79,16 +107,16 @@ function normalizeOutput(text, sources, candidate, response) {
   const desfavoraveis = parsed.desfavoraveis.map((item) => normalize(item, "desfavoravel")).filter(Boolean).slice(0, 5);
   return { sq: candidate.sq, identidade: candidate, estado: favoraveis.length || desfavoraveis.length ? "concluida" : "insuficiente", cobertura: { favoraveis: favoraveis.length === 5 ? "completa" : "insuficiente", desfavoraveis: desfavoraveis.length === 5 ? "completa" : "insuficiente" }, favoraveis, desfavoraveis, followUps: parsed.followUps, execucao: { schema: SCHEMA_VERSION, modelo: response.model ?? MODEL, responseId: response.id, pesquisadoEm: new Date().toISOString() } };
 }
-async function discover(candidate, inputHash, selectedProviders, queuesByProvider) {
+async function discover(candidate, inputHash, selectedProviders, queuesByProvider, signal) {
   const query = `${candidate.nomeUrna} ${candidate.nome}, ${candidate.cargo}, ${candidate.uf}, ${candidate.partido}, ${candidate.nascimento} direitos trabalhistas obras públicas privatização corrupção investigação família`;
   const jobs = [];
-  if (selectedProviders.includes("exa")) { const key = hash({ provider: "exa", operation: "search", query, inputHash }); jobs.push(request(queuesByProvider.exaSearch, () => exaSearch(makeExa(), query, inputHash, candidate.sq, key)).then((result) => ({ ...result, key })).catch((error) => ({ error, provider: "exa", key }))); }
-  if (selectedProviders.includes("brave")) { const key = hash({ provider: "brave", operation: "context", query, inputHash }); jobs.push(request(queuesByProvider.brave, () => braveContext(query, inputHash, candidate.sq, key)).then((result) => ({ ...result, key })).catch((error) => ({ error, provider: "brave", key }))); }
+  if (selectedProviders.includes("exa")) { const key = hash({ provider: "exa", operation: "search", query, inputHash }); jobs.push(request(queuesByProvider.exaSearch, () => exaSearch(makeExa(), query, inputHash, candidate.sq, key, signal), { signal }).then((result) => ({ ...result, key })).catch((error) => ({ error, provider: "exa", key }))); }
+  if (selectedProviders.includes("brave")) { const key = hash({ provider: "brave", operation: "context", query, inputHash }); jobs.push(request(queuesByProvider.brave, () => braveContext(query, inputHash, candidate.sq, key, signal), { signal }).then((result) => ({ ...result, key })).catch((error) => ({ error, provider: "brave", key }))); }
   const results = await Promise.all(jobs);
   for (const result of results) emit({ event: "discovery", provider: result.provider, sources: result.error ? 0 : result.sources.length, erro: result.error?.message ?? null });
   return { query, results, sources: mergeSources(results.filter((result) => !result.error).map((result) => result.sources)) };
 }
-async function processCandidate(db, candidate, configHash, selectedProviders, queuesByProvider, maxRounds, runId, budgetLimit) {
+async function processCandidate(db, candidate, configHash, selectedProviders, queuesByProvider, maxRounds, runId, budgetLimit, signal) {
   const current = getJob(db, candidate.sq, configHash);
   if (!option("refresh") && current && ["complete", "insufficient"].includes(current.status)) return;
   ensureJob(db, candidate.sq, configHash);
@@ -96,7 +124,7 @@ async function processCandidate(db, candidate, configHash, selectedProviders, qu
   let response;
   let registry = [];
   const reserved = open ? 0 : 0.225;
-  if (open) { emit({ event: "resume_poll", sq: candidate.sq, responseId: open.remote_id }); response = await pollWithRetry(queuesByProvider.perplexity, open.remote_id); }
+  if (open) { emit({ event: "resume_poll", sq: candidate.sq, responseId: open.remote_id }); response = await pollWithRetry(queuesByProvider.perplexity, open.remote_id, signal); }
   if (open) registry = responseSources(response, candidate, configHash);
   if (open && registry.length === 0) {
     const shard = (candidate.sq % 256).toString(16).padStart(2, "0");
@@ -109,15 +137,14 @@ async function processCandidate(db, candidate, configHash, selectedProviders, qu
     }
   }
   if (!open) {
-    const discovery = await discover(candidate, configHash, selectedProviders, queuesByProvider); registry = discovery.sources;
+    const discovery = await discover(candidate, configHash, selectedProviders, queuesByProvider, signal); registry = discovery.sources;
     for (const source of registry) saveSources(db, [source]);
     if (!registry.length) throw new ProviderError("nenhuma fonte encontrada", { provider: selectedProviders.join(","), retryable: true });
     if (!reserveBudget(db, runId, reserved, budgetLimit)) throw new ProviderError("budget_exhausted", { provider: "scheduler", retryable: false });
     const payload = prompt(candidate, registry, 1); const requestKey = hash({ provider: "perplexity", operation: "synthesis", payload, configHash }); const saved = upsertRequest(db, { requestKey, sq: candidate.sq, inputHash: configHash, provider: "perplexity", operation: "synthesis", payload, status: "pending", reservedCost: reserved });
     if (saved.status === "completed" && saved.response_json) response = JSON.parse(saved.response_json);
-    else { const submitted = await request(queuesByProvider.perplexity, () => perplexitySubmit(payload, actionSchema(), requestKey)); updateRequest(db, requestKey, { status: "synthesis_polling", remote_id: submitted.id, attempt_count: 1 }); emit({ event: "submitted", sq: candidate.sq, responseId: submitted.id, requestKey }); response = await pollWithRetry(queuesByProvider.perplexity, submitted.id); updateRequest(db, requestKey, { status: "completed", response_json: response, actual_cost_usd: response.usage?.cost?.total_cost ?? null }); }
+    else { const submitted = await request(queuesByProvider.perplexity, () => perplexitySubmit(payload, actionSchema(), requestKey, signal), { signal }); updateRequest(db, requestKey, { status: "synthesis_polling", remote_id: submitted.id, attempt_count: 1 }); emit({ event: "submitted", sq: candidate.sq, responseId: submitted.id, requestKey }); response = await pollWithRetry(queuesByProvider.perplexity, submitted.id, signal); updateRequest(db, requestKey, { status: "completed", response_json: response, actual_cost_usd: response.usage?.cost?.total_cost ?? null }); }
   }
-  let record = normalizeOutput(response.output_text ?? modelText(response), registry, candidate, response);
   if (open && record.favoraveis.length === 0 && record.desfavoraveis.length === 0) {
     const shard = (candidate.sq % 256).toString(16).padStart(2, "0");
     const previous = json(join(ROOT, "data", "dex", "pesquisa", `${shard}.json`))?.candidatos?.[String(candidate.sq)];
@@ -125,12 +152,13 @@ async function processCandidate(db, candidate, configHash, selectedProviders, qu
   }
   saveResult(db, { resultId: hash({ sq: candidate.sq, inputHash: configHash, responseId: response.id }), sq: candidate.sq, inputHash: configHash, state: record.estado === "concluida" ? "complete" : "insufficient", record }); if (reserved) settleBudget(db, runId, reserved, response.usage?.cost?.total_cost ?? null); emit({ event: "completed", sq: candidate.sq, responseId: response.id, status: record.estado, favoraveis: record.favoraveis.length, desfavoraveis: record.desfavoraveis.length });
 }
-async function pollWithRetry(queue, id) {
+async function pollWithRetry(queue, id, signal) {
   let wait = 5000;
   while (true) {
-    const response = await request(queue, () => perplexityPoll(id));
+    const response = await request(queue, () => perplexityPoll(id, signal), { signal });
     if (["completed", "failed", "cancelled", "incomplete"].includes(response.status)) return response;
-    await sleep(wait);
+    await sleep(wait, signal);
+    if (signal?.aborted) throw new Error("interrompido");
     wait = Math.min(30000, wait * 2);
   }
 }
@@ -163,8 +191,8 @@ async function pesquisar() {
   const maxRounds = Number(option("max-search-rounds", 2)); if (![1, 2].includes(maxRounds)) throw new Error("--max-search-rounds deve ser 1 ou 2");
   const budgetLimit = Number(option("max-cost-usd")); if (!Number.isFinite(budgetLimit) || budgetLimit <= 0) throw new Error("--max-cost-usd deve ser positivo");
   const db = openState(); migrateLegacy(db); const release = await lockfile.lock(join(CACHE_DIR, "run"), { realpath: false, stale: 60000, update: 20000, retries: 0 });
-  const queuesByProvider = queues(); const selected = candidates(); const configBase = { rubric: RUBRIC, schema: actionSchema(), providers, model: MODEL, adapter: "providers-v2" }; const runId = stableHash({ configBase, pid: process.pid, started: new Date().toISOString() }); beginRun(db, runId); let completed = 0; let failed = 0;
-  try { let next = 0; const workers = Array.from({ length: Math.max(1, Number(option("candidate-concurrency", option("concurrency", 8)))) }, async () => { while (next < selected.length) { const candidate = selected[next++]; const configHash = stableHash({ ...configBase, candidate }); try { await processCandidate(db, candidate, configHash, providers, queuesByProvider, maxRounds, runId, budgetLimit); completed += 1; } catch (error) { failed += 1; emit({ event: error.message === "budget_exhausted" ? "budget_exhausted" : "retryable", sq: candidate.sq, provider: error.provider ?? null, status: error.status ?? null, erro: error.message }); } } }); await Promise.all(workers); await idle(queuesByProvider); project(db); emit({ event: "finished", candidatos: selected.length, completed, failed, providers }); } finally { await release(); closeState(db); }
+  const queuesByProvider = queues(); activeQueues = queuesByProvider; const selected = candidates(); const configBase = { rubric: RUBRIC, schema: actionSchema(), providers, model: MODEL, adapter: "providers-v2" }; const runId = stableHash({ configBase, pid: process.pid, started: new Date().toISOString() }); beginRun(db, runId); let completed = 0; let failed = 0;
+  try { let next = 0; const workers = Array.from({ length: Math.max(1, Number(option("candidate-concurrency", option("concurrency", 8)))) }, async () => { while (next < selected.length) { if (stopping || shutdown.signal.aborted) return; const candidate = selected[next++]; const configHash = stableHash({ ...configBase, candidate }); try { await processCandidate(db, candidate, configHash, providers, queuesByProvider, maxRounds, runId, budgetLimit, shutdown.signal); completed += 1; } catch (error) { if (stopping || shutdown.signal.aborted) return; failed += 1; emit({ event: error.message === "budget_exhausted" ? "budget_exhausted" : "retryable", sq: candidate.sq, provider: error.provider ?? null, status: error.status ?? null, erro: error.message }); } } }); await Promise.all(workers); await idle(queuesByProvider); project(db); emit({ event: "finished", candidatos: selected.length, completed, failed, providers }); } finally { activeQueues = null; await release(); closeState(db); if (forceExitTimer) { clearTimeout(forceExitTimer); forceExitTimer = null; } }
 }
 async function reviewCommand() {
   const reviewer = option("reviewer");

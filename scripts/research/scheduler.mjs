@@ -16,20 +16,26 @@ function delay(error, attempt) {
   if (Number.isFinite(server)) return Math.min(300_000, Math.max(0, server));
   return Math.min(300_000, 500 * 2 ** (attempt - 1) + Math.random() * 500);
 }
-export async function request(queue, operation, { onRetry } = {}) {
+export async function request(queue, operation, { onRetry, signal } = {}) {
   return queue.add(() => pRetry(operation, {
     retries: 3,
     factor: 2,
     minTimeout: 500,
     maxTimeout: 5000,
     maxRetryTime: 30_000,
+    signal,
     shouldRetry: ({ error }) => error instanceof ProviderError && error.retryable,
     onFailedAttempt: async ({ error, attemptNumber }) => {
+      if (signal?.aborted) throw new AbortError("interrompido");
       if (error instanceof ProviderError && error.uncertain) throw new AbortError(error.message);
       const wait = delay(error, attemptNumber);
       await onRetry?.({ error, attemptNumber, wait });
-      await new Promise((resolve) => setTimeout(resolve, wait));
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(resolve, wait);
+        signal?.addEventListener("abort", () => { clearTimeout(timer); reject(new AbortError("interrompido")); }, { once: true });
+      });
     },
-  }));
+  }), { signal });
 }
+export function stopQueues(allQueues) { for (const queue of Object.values(allQueues)) queue.start(); }
 export async function idle(allQueues) { await Promise.all(Object.values(allQueues).map((queue) => queue.onIdle())); }
