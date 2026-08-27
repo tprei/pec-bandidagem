@@ -6,7 +6,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const API = "https://dadosabertos.camara.leg.br/api/v2";
 const CACHE = join(ROOT, ".cache", "camara");
 const SAIDA = join(ROOT, "data", "dex");
-const SIMULTANEAS = 16;
+const SIMULTANEAS = 8;
 
 const BADGES = {
   politico: "Político de carreira",
@@ -59,6 +59,18 @@ function badge(ocupacao) {
   for (const [nome, regra] of REGRAS_BADGE) if (regra.test(ocupacao)) return nome;
   return null;
 }
+function limparDescricao(texto) {
+  if (!texto || typeof texto !== "string") return texto;
+  const limpo = texto
+    .replace(/\s*(?:(?:resultado(?:\s+final)?\s*[:\.]\s*|\.?\s*votaram\s+)?(?:sim|n[aã]o|abstenç[oõ]es?|total)\s*[:,\d-]|Resultado\s*[:\.]\s*\d+\s+votos?\b)[^]*$/i, "")
+    .trim();
+  return limpo.length > 0 ? limpo : texto;
+}
+
+function formatarBytes(bytes) {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / 1024).toFixed(1)} KB`;
+}
 
 const TIPOS_PESQUISA_SENSIVEIS = new Set(["licitacao_contrato", "corrupcao_improbidade", "processo_investigacao", "conflito_interesses_familia", "conduta_pessoal"]);
 
@@ -90,7 +102,7 @@ function carregarPesquisas(candidatos) {
 async function comRepeticao(endereco) {
   for (let tentativa = 1; tentativa <= 5; tentativa += 1) {
     try {
-      const resposta = await fetch(endereco, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(60_000) });
+      const resposta = await fetch(endereco, { headers: { accept: "application/json", "user-agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(60_000) });
       if (resposta.ok) return resposta.json();
       if (resposta.status === 404) return null;
       throw new Error(`respondeu ${resposta.status}`);
@@ -205,7 +217,8 @@ for (const candidato of candidatos.candidatos) {
 }
 
 const COLUNAS = ["sq", "numero", "nome", "nomeCompleto", "cargo", "partido", "coligacao", "badge", "foto", "ficha"];
-const totalVotacoes = votacoes.votacoes.length;
+const votacoesOrdenadas = [...votacoes.votacoes].sort((a, b) => (a[iv.dataHora] < b[iv.dataHora] ? -1 : a[iv.dataHora] > b[iv.dataHora] ? 1 : 0));
+const totalVotacoes = votacoesOrdenadas.length;
 const ufs = [];
 let totalFotoTse = 0;
 let totalFotoCamara = 0;
@@ -340,10 +353,85 @@ const indice = {
 };
 escreverAtomico(join(SAIDA, "indice.json"), indice);
 
+const linhasVotacoes = votacoesOrdenadas.map((votacao) => [
+  votacao[iv.id],
+  votacao[iv.dataHora].slice(0, 10),
+  votacao[iv.orgao],
+  Number(votacao[iv.id].split("-")[0]),
+  limparDescricao(votacao[iv.descricao]),
+  votacao[iv.aprovada],
+  votacao[iv.sim],
+  votacao[iv.nao],
+  votacao[iv.abstencao],
+  votacao[iv.obstrucao],
+]);
+
+const primeiroAno = Number(votacoesOrdenadas[0][iv.dataHora].slice(0, 4));
+const ultimoAno = Number(votacoesOrdenadas[totalVotacoes - 1][iv.dataHora].slice(0, 4));
+
+const catalogoVotacoes = {
+  sobre: "Catálogo completo de votações nominais da Câmara dos Deputados",
+  periodo: { de: primeiroAno, ate: ultimoAno },
+  colunas: ["id", "data", "orgao", "proposicao", "descricao", "aprovada", "sim", "nao", "abstencao", "obstrucao"],
+  votacoes: linhasVotacoes,
+};
+
+const conteudoCatalogo = `${JSON.stringify(catalogoVotacoes)}\n`;
+writeFileSync(join(SAIDA, "votacoes.json"), conteudoCatalogo);
+const tamanhoCatalogo = Buffer.byteLength(conteudoCatalogo, "utf8");
+
+const deputadosComFicha = new Map();
+for (const [sq, indice] of sqParaDeputado) {
+  if (indice < 0 || indice >= votacoes.deputados.length) {
+    throw new Error(`Índice ${indice} fora dos limites de deputados (tamanho ${votacoes.deputados.length})`);
+  }
+  const dep = votacoes.deputados[indice];
+  if (dep === undefined) throw new Error(`Deputado indefinido no índice ${indice}`);
+  deputadosComFicha.set(dep[id.id], indice);
+}
+
+const PASTA_VOTOS = join(SAIDA, "votos");
+mkdirSync(PASTA_VOTOS, { recursive: true });
+
+const votosPorCamaraId = new Map();
+for (const [camaraId, indice] of deputadosComFicha) {
+  votosPorCamaraId.set(camaraId, new Array(totalVotacoes));
+}
+
+for (let i = 0; i < totalVotacoes; i++) {
+  const votacao = votacoesOrdenadas[i];
+  const stringVotos = votacao[iv.votos];
+  if (stringVotos.length !== votacoes.deputados.length) {
+    throw new Error(`Votação ${votacao[iv.id]} tem ${stringVotos.length} votos, esperado ${votacoes.deputados.length}`);
+  }
+  for (const [camaraId, indice] of deputadosComFicha) {
+    const votoChar = stringVotos[indice];
+    if (votoChar === undefined) {
+      throw new Error(`Voto indefinido para deputado ${camaraId} (índice ${indice}) na votação ${votacao[iv.id]}`);
+    }
+    votosPorCamaraId.get(camaraId)[i] = votoChar;
+  }
+}
+
+let bytesTotaisVotos = 0;
+for (const [camaraId, arrayVotos] of votosPorCamaraId) {
+  const stringVotos = arrayVotos.join("");
+  if (stringVotos.length !== totalVotacoes) {
+    throw new Error(`Tamanho de votos para deputado ${camaraId} (${stringVotos.length}) difere do total de votações (${totalVotacoes})`);
+  }
+  const conteudoVotos = `${JSON.stringify({ camaraId, votos: stringVotos })}\n`;
+  bytesTotaisVotos += Buffer.byteLength(conteudoVotos, "utf8");
+  writeFileSync(join(PASTA_VOTOS, `${camaraId}.json`), conteudoVotos);
+}
+const totalArquivosVoto = votosPorCamaraId.size;
+const tamanhoMedioVoto = totalArquivosVoto > 0 ? Math.round(bytesTotaisVotos / totalArquivosVoto) : 0;
+
 console.log(`\nCatálogo gerado em data/dex/`);
 console.log(`Candidaturas: ${candidatos.candidatos.length} em ${ufs.length} unidades eleitorais`);
 console.log(`Com ficha de votação: ${indice.totalComFicha}`);
 console.log(`Com foto: ${totalFotoTse} do TSE, ${totalFotoCamara} da Câmara`);
+console.log(`Votações no catálogo: ${totalVotacoes} (${formatarBytes(tamanhoCatalogo)})`);
+console.log(`Históricos de voto: ${totalArquivosVoto} arquivos em data/dex/votos/ (média ${formatarBytes(tamanhoMedioVoto)}/deputado)`);
 console.log(`Eixos: ${eixos.map((eixo) => `${eixo.nome} (${eixo.votacoes.length} votações)`).join(", ")}`);
 for (const uf of [...ufs].sort((a, b) => b.candidatos - a.candidatos).slice(0, 5)) {
   console.log(`  ${uf.sigla} ${String(uf.candidatos).padStart(5)} candidaturas, ${uf.comFicha} com ficha`);

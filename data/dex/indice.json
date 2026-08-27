@@ -2,7 +2,7 @@
   "fonte": {
     "candidaturas": "https://dadosabertos.tse.jus.br/dataset/candidatos-2026",
     "votacoes": "https://dadosabertos.camara.leg.br/arquivos",
-    "geradoEm": "2026-08-27T18:11:54.136Z"
+    "geradoEm": "2026-08-27T18:16:49.726Z"
   },
   "eleicao": {
     "ano": 2026,
@@ -11,8 +11,8 @@
     "data": "2026-10-04"
   },
   "totalCandidatos": 20765,
-  "totalComFicha": 708,
-  "votacoesNoHistorico": 3138,
+  "totalComFicha": 791,
+  "votacoesNoHistorico": 4241,
   "cargos": {
     "1": "PRESIDENTE",
     "2": "VICE-PRESIDENTE",
@@ -285,6 +285,53 @@
       ]
     },
     {
+      "id": "clt",
+      "nome": "Reforma trabalhista de 2017",
+      "pergunta": "Votou a favor da reforma trabalhista de 2017?",
+      "posicao": "O PL 6.787/2016 fez o negociado valer mais que o legislado, criou o trabalho intermitente e pôs pedágio no acesso à Justiça do Trabalho. Quem votou Sim votou para tirar da CLT o que levou décadas para entrar.",
+      "defendeOEleitor": 2,
+      "contraOEleitor": 1,
+      "votacoes": [
+        {
+          "id": "2122076-348",
+          "rotulo": "Reforma trabalhista (PL 6.787/2016)",
+          "data": "2017-04-26",
+          "sim": 296,
+          "nao": 177,
+          "outros": 1,
+          "proposicao": 2122076
+        }
+      ]
+    },
+    {
+      "id": "previdencia",
+      "nome": "Reforma da Previdência",
+      "pergunta": "Votou a favor da reforma da Previdência de 2019?",
+      "posicao": "A PEC 6/2019 elevou a idade mínima, endureceu a transição e cortou o cálculo dos benefícios, e a conta mais pesada caiu sobre mulheres e professoras. Quem votou Sim votou para trabalhar mais anos e receber menos. Fica o registro: o NOVO votou Não por achar o corte insuficiente, não por defender quem trabalha.",
+      "defendeOEleitor": 2,
+      "contraOEleitor": 1,
+      "votacoes": [
+        {
+          "id": "2192459-636",
+          "rotulo": "Reforma da Previdência (PEC 6/2019), 1º turno",
+          "data": "2019-07-10",
+          "sim": 379,
+          "nao": 131,
+          "outros": 0,
+          "proposicao": 2192459
+        },
+        {
+          "id": "2192459-786",
+          "rotulo": "Reforma da Previdência (PEC 6/2019), 2º turno",
+          "data": "2019-08-07",
+          "sim": 370,
+          "nao": 124,
+          "outros": 1,
+          "proposicao": 2192459
+        }
+      ]
+    },
+    {
       "id": "eletrobras",
       "nome": "Privatização da Eletrobras",
       "pergunta": "Votou para privatizar a Eletrobras?",
@@ -333,6 +380,16 @@
       "nao": 0,
       "outros": 1,
       "proposicao": 2487436
+    },
+    {
+      "id": "2422697-69",
+      "rotulo": "Taxa das blusinhas: manutenção do imposto de 20% (PL 914/2024)",
+      "nota": "Este placar não separa ninguém pela régua deste guia: mantiveram a taxa o governo, PT, PSOL, União e MDB; votaram para derrubá-la o PL e a oposição. Dá para ler dos dois lados — imposto regressivo sobre a compra de quem tem menos, ou defesa do emprego têxtil contra a importação isenta. Como as duas leituras se sustentam, fica como contexto e não vale ponto em nenhum eixo.",
+      "data": "2024-05-28",
+      "sim": 266,
+      "nao": 139,
+      "outros": 2,
+      "proposicao": 2422697
     }
   ],
   "pesquisa": {
@@ -343,38 +400,38 @@
     "totalPesquisados": 9,
     "totalComPublicacao": 2,
     "totalAguardandoRevisao": 8,
-    "geradoEm": "2026-08-27T18:11:54.136Z"
+    "geradoEm": "2026-08-27T18:16:49.726Z"
   },
   "ufs": [
     {
       "sigla": "AC",
       "nome": "ACRE",
       "candidatos": 385,
-      "comFicha": 14
+      "comFicha": 15
     },
     {
       "sigla": "AL",
       "nome": "ALAGOAS",
       "candidatos": 283,
-      "comFicha": 10
+      "comFicha": 12
     },
     {
       "sigla": "AM",
       "nome": "AMAZONAS",
       "candidatos": 468,
-      "comFicha": 13
+      "comFicha": 17
     },
     {
       "sigla": "AP",
       "nome": "AMAPÁ",
       "candidatos": 318,
-      "comFicha": 16
+      "comFicha": 18
     },
     {
       "sigla": "BA",
       "nome": "BAHIA",
       "candidatos": 1222,
-      "comFicha": 45
+      "comFicha": 48
     },
     {
       "sigla": "BR",
@@ -386,133 +443,133 @@
       "sigla": "CE",
       "nome": "CEARÁ",
       "candidatos": 708,
-      "comFicha": 34
+      "comFicha": 35
     },
     {
       "sigla": "DF",
       "nome": "DISTRITO FEDERAL",
       "candidatos": 657,
-      "comFicha": 13
+      "comFicha": 18
     },
     {
       "sigla": "ES",
       "nome": "ESPÍRITO SANTO",
       "candidatos": 588,
-      "comFicha": 13
+      "comFicha": 15
     },
     {
       "sigla": "GO",
       "nome": "GOIÁS",
       "candidatos": 895,
-      "comFicha": 22
+      "comFicha": 27
     },
     {
       "sigla": "MA",
       "nome": "MARANHÃO",
       "candidatos": 604,
-      "comFicha": 31
+      "comFicha": 36
     },
     {
       "sigla": "MG",
       "nome": "MINAS GERAIS",
       "candidatos": 1822,
-      "comFicha": 67
+      "comFicha": 72
     },
     {
       "sigla": "MS",
       "nome": "MATO GROSSO DO SUL",
       "candidatos": 421,
-      "comFicha": 11
+      "comFicha": 12
     },
     {
       "sigla": "MT",
       "nome": "MATO GROSSO",
       "candidatos": 445,
-      "comFicha": 15
+      "comFicha": 18
     },
     {
       "sigla": "PA",
       "nome": "PARÁ",
       "candidatos": 729,
-      "comFicha": 23
+      "comFicha": 25
     },
     {
       "sigla": "PB",
       "nome": "PARAÍBA",
       "candidatos": 443,
-      "comFicha": 18
+      "comFicha": 21
     },
     {
       "sigla": "PE",
       "nome": "PERNAMBUCO",
       "candidatos": 957,
-      "comFicha": 31
+      "comFicha": 34
     },
     {
       "sigla": "PI",
       "nome": "PIAUÍ",
       "candidatos": 397,
-      "comFicha": 11
+      "comFicha": 12
     },
     {
       "sigla": "PR",
       "nome": "PARANÁ",
       "candidatos": 1079,
-      "comFicha": 45
+      "comFicha": 48
     },
     {
       "sigla": "RJ",
       "nome": "RIO DE JANEIRO",
       "candidatos": 2029,
-      "comFicha": 65
+      "comFicha": 72
     },
     {
       "sigla": "RN",
       "nome": "RIO GRANDE DO NORTE",
       "candidatos": 325,
-      "comFicha": 10
+      "comFicha": 12
     },
     {
       "sigla": "RO",
       "nome": "RONDÔNIA",
       "candidatos": 435,
-      "comFicha": 13
+      "comFicha": 15
     },
     {
       "sigla": "RR",
       "nome": "RORAIMA",
       "candidatos": 401,
-      "comFicha": 13
+      "comFicha": 14
     },
     {
       "sigla": "RS",
       "nome": "RIO GRANDE DO SUL",
       "candidatos": 1051,
-      "comFicha": 39
+      "comFicha": 40
     },
     {
       "sigla": "SC",
       "nome": "SANTA CATARINA",
       "candidatos": 695,
-      "comFicha": 21
+      "comFicha": 27
     },
     {
       "sigla": "SE",
       "nome": "SERGIPE",
       "candidatos": 406,
-      "comFicha": 13
+      "comFicha": 14
     },
     {
       "sigla": "SP",
       "nome": "SÃO PAULO",
       "candidatos": 2618,
-      "comFicha": 86
+      "comFicha": 96
     },
     {
       "sigla": "TO",
       "nome": "TOCANTINS",
       "candidatos": 358,
-      "comFicha": 14
+      "comFicha": 16
     }
   ]
 }

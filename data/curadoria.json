@@ -44,6 +44,27 @@
       "votacoes": [{ "id": "2279513-64", "rotulo": "Minirreforma trabalhista (MP 1.045/2021)" }]
     },
     {
+      "id": "clt",
+      "nome": "Reforma trabalhista de 2017",
+      "pergunta": "Votou a favor da reforma trabalhista de 2017?",
+      "posicao": "O PL 6.787/2016 fez o negociado valer mais que o legislado, criou o trabalho intermitente e pôs pedágio no acesso à Justiça do Trabalho. Quem votou Sim votou para tirar da CLT o que levou décadas para entrar.",
+      "defendeOEleitor": 2,
+      "contraOEleitor": 1,
+      "votacoes": [{ "id": "2122076-348", "rotulo": "Reforma trabalhista (PL 6.787/2016)" }]
+    },
+    {
+      "id": "previdencia",
+      "nome": "Reforma da Previdência",
+      "pergunta": "Votou a favor da reforma da Previdência de 2019?",
+      "posicao": "A PEC 6/2019 elevou a idade mínima, endureceu a transição e cortou o cálculo dos benefícios, e a conta mais pesada caiu sobre mulheres e professoras. Quem votou Sim votou para trabalhar mais anos e receber menos. Fica o registro: o NOVO votou Não por achar o corte insuficiente, não por defender quem trabalha.",
+      "defendeOEleitor": 2,
+      "contraOEleitor": 1,
+      "votacoes": [
+        { "id": "2192459-636", "rotulo": "Reforma da Previdência (PEC 6/2019), 1º turno" },
+        { "id": "2192459-786", "rotulo": "Reforma da Previdência (PEC 6/2019), 2º turno" }
+      ]
+    },
+    {
       "id": "eletrobras",
       "nome": "Privatização da Eletrobras",
       "pergunta": "Votou para privatizar a Eletrobras?",
@@ -67,6 +88,11 @@
       "id": "2487436-169",
       "rotulo": "Isenção do IR até R$ 5 mil e tributação de altas rendas",
       "nota": "Aprovado por unanimidade, sem um único voto contrário. Não separa ninguém de ninguém: todo mundo quis o crédito. Fica aqui como contexto, e de propósito não vale ponto em nenhum eixo."
+    },
+    {
+      "id": "2422697-69",
+      "rotulo": "Taxa das blusinhas: manutenção do imposto de 20% (PL 914/2024)",
+      "nota": "Este placar não separa ninguém pela régua deste guia: mantiveram a taxa o governo, PT, PSOL, União e MDB; votaram para derrubá-la o PL e a oposição. Dá para ler dos dois lados — imposto regressivo sobre a compra de quem tem menos, ou defesa do emprego têxtil contra a importação isenta. Como as duas leituras se sustentam, fica como contexto e não vale ponto em nenhum eixo."
     }
   ],
   "pesquisa": {

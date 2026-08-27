@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CACHE = join(ROOT, ".cache", "camara");
 const PORTAL = "https://dadosabertos.camara.leg.br/arquivos";
-const ANOS = [2021, 2022, 2023, 2024, 2025, 2026];
+const ANOS = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
 const TENTATIVAS = 8;
 const MINIMO_BANCADA = 5;
 
