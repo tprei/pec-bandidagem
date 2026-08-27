@@ -85,11 +85,10 @@ O CSV do TSE tem 50 colunas e 10,8 MB; o JSON tem 2,7 MB. A compactação vem de
     "instrucao": { "8": "SUPERIOR COMPLETO" },
     "estadoCivil": { "3": "CASADO(A)" },
     "corRaca": { "1": "BRANCA" },
-    "ocupacao": { "999": "OUTROS" },
-    "situacao": { "-3": "#NE" }
+    "ocupacao": { "999": "OUTROS" }
   },
-  "colunas": ["sq", "cargo", "ue", "numero", "nome", "nomeUrna", "nomeSocial", "partido", "federacao", "coligacao", "ufNascimento", "nascimento", "genero", "instrucao", "estadoCivil", "corRaca", "ocupacao", "situacao"],
-  "candidatos": [[280002542548, 1, 5, 13, "LUIZ INÁCIO LULA DA SILVA", "LULA", null, 13, 101, 1293, 15, "1945-10-06", 2, 4, 3, 1, 249, -3]]
+  "colunas": ["sq", "cargo", "ue", "numero", "nome", "nomeUrna", "nomeSocial", "partido", "federacao", "coligacao", "ufNascimento", "nascimento", "genero", "instrucao", "estadoCivil", "corRaca", "ocupacao"],
+  "candidatos": [[280002542548, 1, 5, 13, "LUIZ INÁCIO LULA DA SILVA", "LULA", null, 13, 101, 1293, 15, "1945-10-06", 2, 4, 3, 1, 249]]
 }
 ```
 
@@ -102,9 +101,17 @@ const senadores = dados.candidatos.filter((c) => dados.dicionarios.cargo[c[col.c
 const [sigla, nome] = dados.dicionarios.unidadeEleitoral[senadores[0][col.ue]];
 ```
 
-`sq` é o `SQ_CANDIDATO`, chave de junção com os outros datasets do TSE (bens declarados, prestação de contas, certidões). `cargo`, `partido`, `federacao`, `genero`, `instrucao`, `estadoCivil`, `corRaca`, `ocupacao` e `situacao` são os códigos originais do TSE e indexam `dicionarios` pelo próprio código; `ue`, `ufNascimento` e `coligacao` são índices posicionais nos arrays de mesmo nome. `federacao` e `nomeSocial` são `null` quando o TSE manda `-1`/`#NULO`. As linhas estão ordenadas por `sq`.
+`sq` é o `SQ_CANDIDATO`, chave de junção com os outros datasets do TSE (bens declarados, prestação de contas, certidões). `cargo`, `partido`, `federacao`, `genero`, `instrucao`, `estadoCivil`, `corRaca` e `ocupacao` são os códigos originais do TSE e indexam `dicionarios` pelo próprio código; `ue`, `ufNascimento` e `coligacao` são índices posicionais nos arrays de mesmo nome. `federacao` e `nomeSocial` são `null` quando o TSE manda `-1`/`#NULO`. As linhas estão ordenadas por `sq`.
 
-Ficaram fora do JSON: `NR_CPF_CANDIDATO` e `NR_TITULO_ELEITORAL_CANDIDATO` (dados pessoais sem uso analítico aqui — `sq` já serve de chave), `DS_EMAIL` (o TSE devolve "NÃO DIVULGÁVEL" para todos) e `CD_SIT_TOT_TURNO`/`DS_SIT_TOT_TURNO` (resultado da eleição, que vem de outro dataset). Fora esses campos, o JSON reproduz o CSV linha por linha.
+Ficaram fora do JSON:
+
+- `NR_CPF_CANDIDATO` e `NR_TITULO_ELEITORAL_CANDIDATO` — dados pessoais sem uso analítico aqui, e `sq` já serve de chave;
+- `DS_EMAIL` — o TSE devolve "NÃO DIVULGÁVEL" para todas as linhas;
+- `CD_TIPO_ELEICAO` — constante `2`, redundante com `eleicao.tipo`;
+- `CD_SITUACAO_CANDIDATURA`/`DS_SITUACAO_CANDIDATURA` — `-3`/`#NE` em todas as linhas enquanto os registros não são julgados;
+- `CD_SIT_TOT_TURNO`/`DS_SIT_TOT_TURNO` — resultado da eleição, que vem de outro dataset.
+
+Fora esses campos, o JSON reproduz o CSV linha por linha.
 
 ## Rodando localmente
 
