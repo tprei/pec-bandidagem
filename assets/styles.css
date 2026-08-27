@@ -230,6 +230,13 @@ h1 em {
   color: var(--papel);
 }
 
+.legenda {
+  margin: 0 0 0.4rem;
+  font-size: 0.82rem;
+  color: var(--tinta-fraca);
+  line-height: 1.4;
+}
+
 .contador {
   margin: 0 0 0.55rem;
   font-size: 0.9rem;
@@ -250,12 +257,28 @@ h1 em {
   grid-template-columns: 54px minmax(0, 1fr) auto auto auto;
   gap: 0.4rem 1.1rem;
   align-items: center;
-  padding: 0.62rem 0.4rem;
+  padding: 0.62rem 0.65rem;
   border-bottom: 1px solid var(--linha);
+  border-left: 4px solid transparent;
   transition: background-color 110ms ease;
 }
 .deputado:hover { background: var(--papel-alta); }
 
+.deputado--sim-ambos {
+  background: #f6e2de;
+  border-left-color: #8f1d1d;
+}
+.deputado--sim-ambos:hover {
+  background: #f0d4ce;
+}
+
+.deputado--sim-um {
+  background: #faf0ee;
+  border-left-color: #d64545;
+}
+.deputado--sim-um:hover {
+  background: #f4e4e0;
+}
 .foto {
   width: 54px;
   height: 72px;
@@ -303,14 +326,34 @@ h1 em {
   font-size: 0.66rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  opacity: 0.72;
+  opacity: 0.85;
 }
 .badge__voto { font-weight: 700; }
 
-.badge--sim       { background: var(--sim-fundo);       color: var(--sim-tinta);       border-color: color-mix(in srgb, var(--sim-tinta) 38%, transparent); }
-.badge--nao       { background: var(--nao-fundo);       color: var(--nao-tinta);       border-color: color-mix(in srgb, var(--nao-tinta) 38%, transparent); }
-.badge--abstencao { background: var(--abstencao-fundo); color: var(--abstencao-tinta); border-color: color-mix(in srgb, var(--abstencao-tinta) 38%, transparent); }
-.badge--ausente   { background: var(--ausente-fundo);   color: var(--ausente-tinta);   border-color: color-mix(in srgb, var(--ausente-tinta) 30%, transparent); }
+.badge--sim {
+  background: #d64545;
+  color: #ffffff;
+}
+.deputado--sim-ambos .badge--sim {
+  background: #8f1d1d;
+  color: #ffffff;
+}
+.deputado--sim-um .badge--sim {
+  background: #d64545;
+  color: #ffffff;
+}
+.badge--nao {
+  background: #1e7d46;
+  color: #ffffff;
+}
+.badge--abstencao {
+  background: #b07d2b;
+  color: #ffffff;
+}
+.badge--ausente {
+  background: #6b6459;
+  color: #ffffff;
+}
 
 .vazia {
   padding: 2.4rem 1rem;
@@ -379,10 +422,19 @@ h1 em {
     row-gap: 0.55rem;
     background: var(--papel-alta);
     border: 1px solid var(--linha);
+    border-left-width: 4px;
     border-radius: 4px;
     box-shadow: var(--sombra);
     margin-block: 0.6rem;
     padding: 0.75rem 0.85rem;
+  }
+  .deputado--sim-ambos {
+    background: #f6e2de;
+    border-left-color: #8f1d1d;
+  }
+  .deputado--sim-um {
+    background: #faf0ee;
+    border-left-color: #d64545;
   }
   .foto {
     grid-area: foto;
@@ -423,4 +475,16 @@ h1 em {
       radial-gradient(120% 60% at 50% -10%, var(--papel-alta) 0%, var(--papel) 58%);
   }
   .foto { filter: saturate(0.85) brightness(0.96); }
+  .deputado--sim-ambos {
+    background: #341a18;
+  }
+  .deputado--sim-ambos:hover {
+    background: #3e1f1c;
+  }
+  .deputado--sim-um {
+    background: #2b1d1b;
+  }
+  .deputado--sim-um:hover {
+    background: #352320;
+  }
 }

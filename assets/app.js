@@ -34,6 +34,7 @@ const estado = {
 const el = {
   barra: document.getElementById("barra-filtros"),
   chips: document.getElementById("chips"),
+  legenda: document.getElementById("legenda"),
   contador: document.getElementById("contador"),
   lista: document.getElementById("lista"),
   painelStatus: document.getElementById("painel-status"),
@@ -91,10 +92,13 @@ function passaFiltros(deputado) {
   return true;
 }
 
-function ordenar(lista) {
+function ordenar(lista, contagem) {
   const porNome = (a, b) => colacao.compare(a.nome, b.nome);
   const comparadores = {
-    partido: (a, b) => colacao.compare(a.partido, b.partido) || porNome(a, b),
+    partido: (a, b) =>
+      (contagem?.get(b.partido) ?? 0) - (contagem?.get(a.partido) ?? 0) ||
+      colacao.compare(a.partido, b.partido) ||
+      porNome(a, b),
     nome: porNome,
     uf: (a, b) => colacao.compare(a.uf, b.uf) || porNome(a, b),
   };
@@ -139,7 +143,10 @@ function contagemPorPartido(pool) {
 function pintarSelectPartidos(contagem) {
   const fragmento = document.createDocumentFragment();
   fragmento.append(new Option("Todos os partidos", ""));
-  for (const partido of [...contagem.keys()].sort(colacao.compare)) {
+  const partidos = [...contagem.keys()].sort(
+    (a, b) => (contagem.get(b) ?? 0) - (contagem.get(a) ?? 0) || colacao.compare(a, b)
+  );
+  for (const partido of partidos) {
     fragmento.append(new Option(`${partido} (${contagem.get(partido)})`, partido));
   }
   el.partido.replaceChildren(fragmento);
@@ -147,7 +154,10 @@ function pintarSelectPartidos(contagem) {
 
 function pintarChips(contagem) {
   const fragmento = document.createDocumentFragment();
-  for (const partido of [...contagem.keys()].sort(colacao.compare)) {
+  const partidos = [...contagem.keys()].sort(
+    (a, b) => (contagem.get(b) ?? 0) - (contagem.get(a) ?? 0) || colacao.compare(a, b)
+  );
+  for (const partido of partidos) {
     const chip = criarElemento("button", "chip", `${partido} ${contagem.get(partido)}`);
     chip.type = "button";
     chip.setAttribute("aria-pressed", String(partido === estado.partido));
@@ -180,7 +190,10 @@ function badge(rotuloTurno, voto) {
 function pintarLinhas(visiveis) {
   const fragmento = document.createDocumentFragment();
   for (const deputado of visiveis) {
-    const item = criarElemento("li", "deputado");
+    const nSim = (deputado.turno1 === "Sim" ? 1 : 0) + (deputado.turno2 === "Sim" ? 1 : 0);
+    const classeIntensidade =
+      nSim === 2 ? " deputado--sim-ambos" : nSim === 1 ? " deputado--sim-um" : "";
+    const item = criarElemento("li", `deputado${classeIntensidade}`);
 
     const foto = document.createElement("img");
     foto.className = "foto";
@@ -231,10 +244,11 @@ function render() {
   if (estado.uf && !poolTurno.some((d) => d.uf === estado.uf)) estado.uf = "";
 
   const contagem = contagemPorPartido(poolTurno);
-  const visiveis = ordenar(poolTurno.filter(passaFiltros));
+  const visiveis = ordenar(poolTurno.filter(passaFiltros), contagem);
 
   el.barra.hidden = false;
   el.chips.hidden = false;
+  if (el.legenda) el.legenda.hidden = false;
   el.carregando.remove();
 
   pintarSelectPartidos(contagem);
