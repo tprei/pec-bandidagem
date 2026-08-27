@@ -58,7 +58,7 @@ export function ensureJob(db, sq, inputHash, status = "pending_discovery") {
   db.prepare("INSERT OR IGNORE INTO candidate_jobs(sq,input_hash,status,created_at,updated_at) VALUES(?,?,?,?,?)").run(sq, inputHash, status, stamp, stamp);
 }
 export function getJob(db, sq, inputHash) { return db.prepare("SELECT * FROM candidate_jobs WHERE sq = ? AND input_hash = ?").get(sq, inputHash); }
-export function findOpenRemote(db, sq) { return db.prepare("SELECT * FROM provider_requests WHERE sq = ? AND remote_id IS NOT NULL AND status IN ('synthesis_submitted','synthesis_polling','submitted') ORDER BY updated_at DESC LIMIT 1").get(sq); }
+export function findOpenRemote(db, sq, inputHash) { return db.prepare("SELECT * FROM provider_requests WHERE sq = ? AND input_hash = ? AND remote_id IS NOT NULL AND status IN ('synthesis_submitted','synthesis_polling','submitted') ORDER BY updated_at DESC LIMIT 1").get(sq, inputHash); }
 export function claimJob(db, sq, inputHash, owner, status) {
   const lease = new Date(Date.now() + 600_000).toISOString();
   const result = db.prepare("UPDATE candidate_jobs SET status=?,lease_owner=?,lease_expires_at=?,updated_at=? WHERE sq=? AND input_hash=? AND (lease_expires_at IS NULL OR lease_expires_at < ? OR lease_owner=?)").run(status, owner, lease, now(), sq, inputHash, now(), owner);
@@ -80,6 +80,25 @@ export function saveSources(db, sources) { for (const source of sources) db.prep
 export function saveResult(db, result) { db.prepare("INSERT OR REPLACE INTO results(result_id,sq,input_hash,state,record_json,created_at) VALUES(?,?,?,?,?,?)").run(result.resultId, result.sq, result.inputHash, result.state, JSON.stringify(result.record), now()); db.prepare("UPDATE candidate_jobs SET status=?,active_result_id=?,lease_owner=NULL,lease_expires_at=NULL,updated_at=? WHERE sq=? AND input_hash=?").run(result.state, result.resultId, now(), result.sq, result.inputHash); }
 export function listRecords(db, sq = null) { const filter = sq === null ? "" : "WHERE sq=?"; const args = sq === null ? [] : [sq]; const rows = db.prepare(`WITH latest AS (SELECT candidate_jobs.*,ROW_NUMBER() OVER (PARTITION BY candidate_jobs.sq ORDER BY candidate_jobs.updated_at DESC) AS rank FROM candidate_jobs ${filter}) SELECT results.* FROM results JOIN latest ON latest.active_result_id=results.result_id WHERE latest.rank=1 ORDER BY results.sq`).all(...args); return rows.map((row) => ({ ...row, record: JSON.parse(row.record_json) })); }
 export function status(db, sq = null) { const jobs = sq === null ? db.prepare("SELECT * FROM candidate_jobs ORDER BY sq").all() : db.prepare("SELECT * FROM candidate_jobs WHERE sq=? ORDER BY input_hash").all(sq); return jobs.map((job) => ({ ...job, requests: db.prepare("SELECT request_key,provider,operation,status,remote_id,attempt_count,next_attempt_at,reserved_cost_usd,actual_cost_usd,error_json FROM provider_requests WHERE sq=? ORDER BY created_at").all(job.sq), results: db.prepare("SELECT result_id,state,created_at FROM results WHERE sq=? ORDER BY created_at").all(job.sq) })); }
+export function runState(db, selected) {
+  const counts = { selected: selected.length, cached_before_run: 0, newly_complete: 0, newly_insufficient: 0, retryable: 0, permanent_error: 0, synthesis_polling: 0, pending: 0, in_flight: 0 };
+  for (const { sq, inputHash, before } of selected) {
+    const job = getJob(db, sq, inputHash);
+    if (before) counts.cached_before_run += 1;
+    if (job?.status === "complete") {
+      if (!before) counts.newly_complete += 1;
+    } else if (job?.status === "insufficient") {
+      if (!before) counts.newly_insufficient += 1;
+    } else if (job?.status === "retryable") counts.retryable += 1;
+    else if (job?.status === "permanent_error") counts.permanent_error += 1;
+    else if (job?.status === "synthesis_polling") counts.synthesis_polling += 1;
+    else if (job?.lease_owner) counts.in_flight += 1;
+    else counts.pending += 1;
+  }
+  counts.remaining = counts.retryable + counts.permanent_error + counts.synthesis_polling + counts.pending + counts.in_flight;
+  return counts;
+}
+export function runCosts(db, runId) { return db.prepare("SELECT actual_cost_usd,reserved_cost_usd FROM runs WHERE run_id=?").get(runId) ?? { actual_cost_usd: 0, reserved_cost_usd: 0 }; }
 export function stableHash(value) { return sha(value); }
 export function beginRun(db, runId) {
   db.prepare("INSERT OR IGNORE INTO runs(run_id,summary_json,created_at) VALUES(?,?,?)").run(runId, JSON.stringify({}), new Date().toISOString());

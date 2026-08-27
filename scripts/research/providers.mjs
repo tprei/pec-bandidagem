@@ -34,10 +34,16 @@ function source(provider, result, excerpt, inputHash, sq, requestKey) {
 }
 
 export function makeExa() { return process.env.EXA_API_KEY ? new Exa(process.env.EXA_API_KEY) : null; }
+// Exa has no request-signal API; abortable only releases the scheduler wait.
 function abortable(promise, signal) {
   if (!signal) return promise;
   if (signal.aborted) return Promise.reject(new ProviderError("interrompido", { provider: "exa", uncertain: true }));
-  return Promise.race([promise, new Promise((_, reject) => signal.addEventListener("abort", () => reject(new ProviderError("interrompido", { provider: "exa", uncertain: true })), { once: true }))]);
+  let onAbort;
+  const interrupted = new Promise((_, reject) => {
+    onAbort = () => reject(new ProviderError("interrompido", { provider: "exa", uncertain: true }));
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+  return Promise.race([promise, interrupted]).finally(() => signal.removeEventListener("abort", onAbort));
 }
 export async function exaSearch(exa, query, inputHash, sq, requestKey, signal) {
   try {

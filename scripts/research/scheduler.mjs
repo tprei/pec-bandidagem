@@ -31,11 +31,11 @@ export async function request(queue, operation, { onRetry, signal } = {}) {
       const wait = delay(error, attemptNumber);
       await onRetry?.({ error, attemptNumber, wait });
       await new Promise((resolve, reject) => {
-        const timer = setTimeout(resolve, wait);
-        signal?.addEventListener("abort", () => { clearTimeout(timer); reject(new AbortError("interrompido")); }, { once: true });
+        const timer = setTimeout(() => { signal?.removeEventListener("abort", onAbort); resolve(); }, wait);
+        const onAbort = () => { clearTimeout(timer); signal?.removeEventListener("abort", onAbort); reject(new AbortError("interrompido")); };
+        signal?.addEventListener("abort", onAbort, { once: true });
       });
     },
   }), { signal });
 }
-export function stopQueues(allQueues) { for (const queue of Object.values(allQueues)) queue.start(); }
 export async function idle(allQueues) { await Promise.all(Object.values(allQueues).map((queue) => queue.onIdle())); }
