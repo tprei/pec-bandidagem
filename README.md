@@ -119,6 +119,49 @@ Ficaram fora do JSON:
 
 Fora esses campos, o JSON reproduz o CSV linha por linha.
 
+## Pesquisa de vida pública
+
+`scripts/research-candidatos-2026.mjs` coordena a pesquisa das 20.765 candidaturas por `sq`. Exa e Brave fazem a descoberta paralela das fontes; o Perplexity Agent API apenas sintetiza e classifica o registro de fontes fornecido. A pesquisa não roda no navegador.
+
+Instale as dependências uma vez:
+
+```
+npm ci
+```
+
+Configure `.env` com `PERPLEXITY_API_KEY`, `EXA_API_KEY` e/ou `BRAVE_SEARCH_API_KEY` (o alias `BRAVE_API_KEY` também é aceito), além de `PERPLEXITY_MODEL` opcional. A chave do Perplexity é necessária para síntese; pelo menos uma chave Exa/Brave é necessária para descoberta.
+
+O estado durável fica em `.cache/pesquisa-candidatos-2026/state.sqlite`. O banco é a fonte de verdade; os JSONL antigos são importados uma vez e mantidos apenas como auditoria. Cada candidatura, provedor, operação e payload possui uma chave determinística. Rerodar o mesmo comando reutiliza resultados, fontes e IDs remotos conhecidos. Um POST cujo resultado ficou ambíguo não é repetido automaticamente: use recuperação explícita, porque nenhum dos três serviços documenta uma chave de idempotência/reconciliação para essa operação.
+
+Pesquisar uma candidatura ou uma coorte:
+
+```
+node scripts/research-candidatos-2026.mjs pesquisar --sq 280002551933 --max-cost-usd 1
+node scripts/research-candidatos-2026.mjs pesquisar --uf SP --limit 10 --search-providers exa,brave --candidate-concurrency 8 --max-cost-usd 2
+```
+
+Sem seletor, o comando percorre toda a lista em ordem de `sq`. `--max-cost-usd` é sempre obrigatório e reserva custo antes de iniciar síntese; o processo para novas reservas ao atingir o limite, sem cancelar requisições já iniciadas. `p-queue` separa as filas dos provedores e `p-retry` aplica backoff limitado; 429 pausa apenas a fila afetada e respeita `Retry-After`/janelas de rate limit disponíveis.
+
+Comandos operacionais:
+
+```
+node scripts/research-candidatos-2026.mjs migrate
+node scripts/research-candidatos-2026.mjs status --sq 280002551933
+node scripts/research-candidatos-2026.mjs retry --sq 280002551933
+node scripts/research-candidatos-2026.mjs recover --sq 280002551933 --resubmit-uncertain
+```
+
+A rubrica `trabalhador-v1` é uma lente editorial de esquerda com prioridade para o efeito material sobre quem trabalha. Direitos trabalhistas, redistribuição, serviços públicos e propriedade pública podem ser favoráveis; privatização, austeridade, repressão trabalhista, corrupção, sobrepreço e conflitos familiares de interesse podem ser desfavoráveis. O texto separa fato, trecho de evidência, papel da pessoa, resultado e leitura editorial. Obra anunciada, verba federal ou conclusão herdada não é mérito sem autoria, financiamento, entrega e contexto comprovados.
+
+Itens de licitação, corrupção, investigação, conflito familiar, conduta pessoal ou evidência contestada aguardam revisão:
+
+```
+node scripts/research-candidatos-2026.mjs revisar --reviewer NOME --sq 280002551933
+node scripts/build-pokedex.mjs
+```
+
+Os resultados publicados vão para 256 shards em `data/dex/pesquisa/` e são carregados apenas ao abrir uma ficha. A ausência de pesquisa ou de evidência não é nota, absolvição nem condenação.
+
 ## Votações nominais da Câmara (2021-2026)
 
 `data/votacoes-camara.json` traz as **3.138 votações nominais** do plenário e das comissões da Câmara entre 2021 e 2026, com o voto individual de 887 cadastros de deputado — 990.153 registros de voto. É a base do histórico exibido no Catálogo 2026 (`dex.html`).

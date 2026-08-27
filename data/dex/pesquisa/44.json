@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "candidatos": {
+    "10002532420": {
+      "sq": 10002532420,
+      "identidade": {
+        "sq": 10002532420,
+        "nome": "MINORU MARTINS KINPARA",
+        "nomeUrna": "MINORU KINPARA",
+        "nascimento": "1968-12-02",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1500,
+        "ocupacao": "PROFESSOR DE ENSINO SUPERIOR"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": []
+    }
+  }
+}

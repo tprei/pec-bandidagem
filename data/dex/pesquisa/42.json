@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "candidatos": {
+    "10002532418": {
+      "sq": 10002532418,
+      "identidade": {
+        "sq": 10002532418,
+        "nome": "JOZINEY ALVES AMORIM",
+        "nomeUrna": "NEY AMORIM",
+        "nascimento": "1977-01-24",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1577,
+        "ocupacao": "EMPRESÁRIO"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": []
+    }
+  }
+}

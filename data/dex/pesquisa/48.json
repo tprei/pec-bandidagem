@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "candidatos": {
+    "10002532424": {
+      "sq": 10002532424,
+      "identidade": {
+        "sq": 10002532424,
+        "nome": "SIRLENE PEREIRA LUZ",
+        "nomeUrna": "PROFESSORA SIRLENE LUZ",
+        "nascimento": "1978-11-02",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1512,
+        "ocupacao": "PROFESSOR DE ENSINO MÉDIO"
+      },
+      "estado": "concluida",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [],
+      "followUps": [
+        {
+          "consulta": "site:tre-ac.jus.br OR site:pje1g.tse.jus.br \"Sirlene Pereira Luz\" impugnação registro 2026 quitação eleitoral prestação de contas",
+          "lado": "desfavoravel",
+          "tema": "Petição, defesa e decisão na impugnação do registro de 2026",
+          "tipo": "oficial"
+        },
+        {
+          "consulta": "site:tre-ac.jus.br OR site:tse.jus.br \"Sirlene Pereira Luz\" 2024 prestação de contas indeferido Rio Branco",
+          "lado": "desfavoravel",
+          "tema": "Fundamento oficial do indeferimento de 2024 e processo de prestação de contas relacionado",
+          "tipo": "oficial"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "candidatos": {
+    "10002532421": {
+      "sq": 10002532421,
+      "identidade": {
+        "sq": 10002532421,
+        "nome": "VAGNER JOSÉ SALES",
+        "nomeUrna": "VAGNER SALES",
+        "nascimento": "1959-05-18",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1522,
+        "ocupacao": "PRODUTOR AGROPECUÁRIO"
+      },
+      "estado": "concluida",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "completa"
+      },
+      "favoraveis": [
+        {
+          "id": "8f2ec13f99287d5ab226adcb8ebfda11bd0c344fe312d014b256924e7cd7a96a",
+          "polaridade": "favoravel",
+          "conflito": "confirmado",
+          "contexto": "Ao anunciar a candidatura à Câmara e ao assumir a presidência estadual do MDB, Sales afirmou que pretende priorizar o Juruá, municípios e comunidades afastadas, investimentos públicos e pessoas em situação de vulnerabilidade ou insegurança alimentar. As fontes não apresentam programa detalhado, financiamento ou resultado material correspondente.",
+          "fato": "Vagner Sales declarou que sua atuação política e eventual mandato federal priorizariam comunidades carentes, municípios afastados e investimentos para o Acre, especialmente no Juruá.",
+          "leituraEditorial": "A prioridade declarada a populações vulneráveis e regiões com menor acesso a serviços é compatível com a lente editorial, mas vale somente como compromisso político, não como política executada ou benefício comprovado.",
+          "ocorridoEm": "2026-07-22",
+          "papel": {
+            "descricao": "Anunciou e defendeu essas prioridades como candidato e dirigente partidário.",
+            "tipo": "defendeu"
+          },
+          "referenciasFontes": [
+            "src:1",
+            "src:5",
+            "src:17"
+          ],
+          "resultado": {
+            "descricao": "Compromisso declarado sem metas, orçamento, legislação ou implementação demonstrada nas fontes.",
+            "estado": "proposto"
+          },
+          "tipo": "declaracao",
+          "titulo": "Compromisso declarado com comunidades vulneráveis e o Juruá",
+          "trecho": "Sales afirmou que pretende defender investimentos e políticas públicas para o Acre, priorizar o Juruá e cuidar de pessoas que muitas vezes não têm o que comer.",
+          "fontes": [
+            {
+              "id": "src:1",
+              "titulo": "Vagner Sales confirma pré-candidatura à Câmara dos Deputados e reafirma compromisso de representar o Acre em Brasília - 3 de Julho Notícias",
+              "url": "https://3dejulhonoticias.com.br/politica/vagner-sales-confirma-pre-candidatura-a-camara-dos-deputados-e-reafirma-compromisso-de-representar-o-acre-em-brasilia",
+              "publicadoEm": "2026-07-22T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "3dejulhonoticias.com.br"
+            },
+            {
+              "id": "src:5",
+              "titulo": "Vagner Sales confirma pré-candidatura a deputado federal pelo MDB - DEU NOTÍCIA",
+              "url": "https://deunoticia.com/2026/07/vagner-sales-confirma-pre-candidatura-a-deputado-federal-pelo-mdb",
+              "publicadoEm": "2026-07-21T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.176Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "deunoticia.com"
+            },
+            {
+              "id": "src:17",
+              "titulo": "Vagner Sales assume presidência do MDB no Acre e defende união interna – O RIO BRANCO",
+              "url": "https://oriobranco.net/vagner-sales-assume-presidencia-do-mdb-no-acre-e-defende-uniao-interna",
+              "publicadoEm": "2025-08-29T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "oriobranco.net"
+            }
+          ]
+        }
+      ],
+      "desfavoraveis": [],
+      "followUps": [
+        {
+          "consulta": "Consultar no TSE/TRE-AC a íntegra e a situação atual da Ação de Impugnação de Registro de Candidatura de Vagner José Sales nas eleições de 2026, incluindo defesa e decisão.",
+          "lado": "desfavoravel",
+          "tema": "Impugnação do registro de candidatura",
+          "tipo": "oficial"
+        },
+        {
+          "consulta": "Localizar no TCU a íntegra do Acórdão nº 3.051/2022 e da tomada de contas referente ao Convênio Suframa nº 27/2007, identificando condutas, valores, recursos e situação definitiva.",
+          "lado": "desfavoravel",
+          "tema": "Convênio com a Suframa e rejeição de contas",
+          "tipo": "oficial"
+        }
+      ]
+    }
+  }
+}

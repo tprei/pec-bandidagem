@@ -2,7 +2,7 @@
   "fonte": {
     "candidaturas": "https://dadosabertos.tse.jus.br/dataset/candidatos-2026",
     "votacoes": "https://dadosabertos.camara.leg.br/arquivos",
-    "geradoEm": "2026-08-27T14:39:56.127Z"
+    "geradoEm": "2026-08-27T18:11:54.136Z"
   },
   "eleicao": {
     "ano": 2026,
@@ -335,6 +335,16 @@
       "proposicao": 2487436
     }
   ],
+  "pesquisa": {
+    "schema": 1,
+    "rubrica": "trabalhador-v1",
+    "lente": "Lente de esquerda com prioridade para o efeito material sobre quem trabalha.",
+    "shards": 256,
+    "totalPesquisados": 9,
+    "totalComPublicacao": 2,
+    "totalAguardandoRevisao": 8,
+    "geradoEm": "2026-08-27T18:11:54.136Z"
+  },
   "ufs": [
     {
       "sigla": "AC",

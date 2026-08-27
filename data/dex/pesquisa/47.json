@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "candidatos": {
+    "10002532423": {
+      "sq": 10002532423,
+      "identidade": {
+        "sq": 10002532423,
+        "nome": "LEONARDO PERRET CRUZ MELO",
+        "nomeUrna": "LEONARDO MELO",
+        "nascimento": "1978-04-06",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1555,
+        "ocupacao": "ENGENHEIRO"
+      },
+      "estado": "concluida",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [],
+      "followUps": [
+        {
+          "consulta": "Consultar no DivulgaCandContas/TSE o RRC nº 10002532423, a declaração original e eventuais retificações de bens de Leonardo Perret Cruz Melo.",
+          "lado": "integridade eleitoral",
+          "tema": "Confirmação oficial da retificação patrimonial e do histórico do registro",
+          "tipo": "oficial"
+        },
+        {
+          "consulta": "Pesquisar o nome completo “Leonardo Perret Cruz Melo” nos diários oficiais e portais de transparência do Acre, de Rio Branco e da União, incluindo nomeações, funções técnicas, contratos, convênios e pagamentos.",
+          "lado": "ambos",
+          "tema": "Cargos públicos, obras, contratos e atuação administrativa anterior",
+          "tipo": "oficial"
+        }
+      ]
+    }
+  }
+}

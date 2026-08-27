@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "candidatos": {
+    "10002532437": {
+      "sq": 10002532437,
+      "identidade": {
+        "sq": 10002532437,
+        "nome": "JOSÉ PEREIRA PASSOS",
+        "nomeUrna": "PEREIRA PASSOS",
+        "nascimento": "1960-10-07",
+        "uf": "AC",
+        "cargo": "DEPUTADO ESTADUAL",
+        "partido": "MDB",
+        "numero": 15223,
+        "ocupacao": "ENGENHEIRO"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [],
+      "followUps": [
+        {
+          "consulta": "\"José Pereira Passos\" engenheiro Acre OR AC nomeação OR secretário OR diretor OR presidente",
+          "lado": "biografia pública e gestão",
+          "tema": "Cargos, nomeações e atuação administrativa no Acre",
+          "tipo": "oficial"
+        },
+        {
+          "consulta": "site:aleac.leg.br \"José Pereira Passos\" OR \"Pereira Passos\"",
+          "lado": "atuação legislativa",
+          "tema": "Mandatos, proposições, votos, audiências e pronunciamentos",
+          "tipo": "oficial"
+        }
+      ]
+    }
+  }
+}

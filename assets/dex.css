@@ -1238,6 +1238,64 @@ details summary {
   line-height: 1.4;
 }
 
+.pesquisa-titulo {
+  margin: 0 0 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.pesquisa-metodo, .pesquisa-aviso {
+  margin: 0 0 0.7rem;
+  color: var(--tinta-fraca);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.pesquisa-grupo {
+  margin-top: 1rem;
+}
+
+.pesquisa-grupo h4 {
+  margin: 0 0 0.55rem;
+  font-size: 0.95rem;
+}
+
+.pesquisa-favoraveis h4 { color: var(--verde); }
+.pesquisa-desfavoraveis h4 { color: var(--vermelho); }
+
+.pesquisa-grupo details {
+  margin-bottom: 0.6rem;
+  border: 1px solid var(--borda-fina);
+  border-left: 5px solid var(--ciano);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--cartao);
+}
+
+.pesquisa-favoraveis details { border-left-color: var(--verde); }
+.pesquisa-desfavoraveis details { border-left-color: var(--vermelho); }
+
+.pesquisa-corpo {
+  padding: 0.75rem 0.85rem;
+  border-top: 1px solid var(--borda-fina);
+  background: var(--painel);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.pesquisa-corpo p { margin: 0; }
+.pesquisa-editorial { color: var(--tinta-fraca); }
+.pesquisa-data { color: var(--tinta-fraca); font-size: 0.8rem; }
+.pesquisa-trecho { color: var(--tinta-fraca); font-style: italic; }
+.pesquisa-status { font-size: 0.8rem; color: var(--tinta-fraca); text-transform: capitalize; }
+.pesquisa-fonte {
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+}
+
 .rodape {
   margin-top: auto;
   background: var(--painel);

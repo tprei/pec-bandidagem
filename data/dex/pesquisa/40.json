@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "candidatos": {
+    "10002532416": {
+      "sq": 10002532416,
+      "identidade": {
+        "sq": 10002532416,
+        "nome": "ADGICLEIA DOS SANTOS GUIMARÃES",
+        "nomeUrna": "DR.. KEL GUIMARÃES",
+        "nascimento": "1991-07-22",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1567,
+        "ocupacao": "MÉDICO"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": []
+    }
+  }
+}

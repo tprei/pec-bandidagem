@@ -1,0 +1,868 @@
+{
+  "schema": 2,
+  "rubrica": "trabalhador-v1",
+  "geradoEm": "2026-08-27T18:13:03.440Z",
+  "candidatos": [
+    {
+      "sq": 10002532416,
+      "identidade": {
+        "sq": 10002532416,
+        "nome": "ADGICLEIA DOS SANTOS GUIMARÃES",
+        "nomeUrna": "DR.. KEL GUIMARÃES",
+        "nascimento": "1991-07-22",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1567,
+        "ocupacao": "MÉDICO"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-luna",
+        "responseId": "resp_564b8434-8e80-42c1-ab44-265e754f33a7",
+        "justificativaIdentidade": "A identidade coincide nos campos centrais: nome civil Adgicleia dos Santos Guimarães, nome de urna Dr. Kel Guimarães, UF AC, cargo de deputada federal, partido MDB, número 1567, ocupação médica e nascimento em 22/07/1991. A ficha eleitoral também informa naturalidade em Brasiléia (AC) e candidatura de 2026, sem evidência localizada de homônimo relevante. Fontes: [web:106][web:109]."
+      }
+    },
+    {
+      "sq": 10002532417,
+      "identidade": {
+        "sq": 10002532417,
+        "nome": "FÁBIO DE ARAÚJO FREITAS",
+        "nomeUrna": "FÁBIO ARAÚJO",
+        "nascimento": "1981-06-25",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1511,
+        "ocupacao": "VEREADOR"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-luna",
+        "responseId": "resp_cc043160-fd42-4f35-8169-9b948a623684",
+        "justificativaIdentidade": "JSON inválido"
+      }
+    },
+    {
+      "sq": 10002532418,
+      "identidade": {
+        "sq": 10002532418,
+        "nome": "JOZINEY ALVES AMORIM",
+        "nomeUrna": "NEY AMORIM",
+        "nascimento": "1977-01-24",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1577,
+        "ocupacao": "EMPRESÁRIO"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-luna",
+        "responseId": "resp_02243008-d0f8-4d64-9a10-27114fe71ba9",
+        "justificativaIdentidade": "JSON inválido"
+      }
+    },
+    {
+      "sq": 10002532420,
+      "identidade": {
+        "sq": 10002532420,
+        "nome": "MINORU MARTINS KINPARA",
+        "nomeUrna": "MINORU KINPARA",
+        "nascimento": "1968-12-02",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1500,
+        "ocupacao": "PROFESSOR DE ENSINO SUPERIOR"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-sol",
+        "responseId": "resp_b7adde3a-5b96-4690-8912-2cd04afaf471",
+        "justificativaIdentidade": "JSON inválido"
+      }
+    },
+    {
+      "sq": 10002532421,
+      "identidade": {
+        "sq": 10002532421,
+        "nome": "VAGNER JOSÉ SALES",
+        "nomeUrna": "VAGNER SALES",
+        "nascimento": "1959-05-18",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1522,
+        "ocupacao": "PRODUTOR AGROPECUÁRIO"
+      },
+      "estado": "concluida",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "completa"
+      },
+      "favoraveis": [
+        {
+          "id": "8f2ec13f99287d5ab226adcb8ebfda11bd0c344fe312d014b256924e7cd7a96a",
+          "polaridade": "favoravel",
+          "conflito": "confirmado",
+          "contexto": "Ao anunciar a candidatura à Câmara e ao assumir a presidência estadual do MDB, Sales afirmou que pretende priorizar o Juruá, municípios e comunidades afastadas, investimentos públicos e pessoas em situação de vulnerabilidade ou insegurança alimentar. As fontes não apresentam programa detalhado, financiamento ou resultado material correspondente.",
+          "fato": "Vagner Sales declarou que sua atuação política e eventual mandato federal priorizariam comunidades carentes, municípios afastados e investimentos para o Acre, especialmente no Juruá.",
+          "leituraEditorial": "A prioridade declarada a populações vulneráveis e regiões com menor acesso a serviços é compatível com a lente editorial, mas vale somente como compromisso político, não como política executada ou benefício comprovado.",
+          "ocorridoEm": "2026-07-22",
+          "papel": {
+            "descricao": "Anunciou e defendeu essas prioridades como candidato e dirigente partidário.",
+            "tipo": "defendeu"
+          },
+          "referenciasFontes": [
+            "src:1",
+            "src:5",
+            "src:17"
+          ],
+          "resultado": {
+            "descricao": "Compromisso declarado sem metas, orçamento, legislação ou implementação demonstrada nas fontes.",
+            "estado": "proposto"
+          },
+          "tipo": "declaracao",
+          "titulo": "Compromisso declarado com comunidades vulneráveis e o Juruá",
+          "trecho": "Sales afirmou que pretende defender investimentos e políticas públicas para o Acre, priorizar o Juruá e cuidar de pessoas que muitas vezes não têm o que comer.",
+          "fontes": [
+            {
+              "id": "src:1",
+              "titulo": "Vagner Sales confirma pré-candidatura à Câmara dos Deputados e reafirma compromisso de representar o Acre em Brasília - 3 de Julho Notícias",
+              "url": "https://3dejulhonoticias.com.br/politica/vagner-sales-confirma-pre-candidatura-a-camara-dos-deputados-e-reafirma-compromisso-de-representar-o-acre-em-brasilia",
+              "publicadoEm": "2026-07-22T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "3dejulhonoticias.com.br"
+            },
+            {
+              "id": "src:5",
+              "titulo": "Vagner Sales confirma pré-candidatura a deputado federal pelo MDB - DEU NOTÍCIA",
+              "url": "https://deunoticia.com/2026/07/vagner-sales-confirma-pre-candidatura-a-deputado-federal-pelo-mdb",
+              "publicadoEm": "2026-07-21T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.176Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "deunoticia.com"
+            },
+            {
+              "id": "src:17",
+              "titulo": "Vagner Sales assume presidência do MDB no Acre e defende união interna – O RIO BRANCO",
+              "url": "https://oriobranco.net/vagner-sales-assume-presidencia-do-mdb-no-acre-e-defende-uniao-interna",
+              "publicadoEm": "2025-08-29T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "oriobranco.net"
+            }
+          ]
+        }
+      ],
+      "desfavoraveis": [
+        {
+          "id": "0d06a5f980b00d6a3ec37cf73d3d12176ffe1a5af1aa93ce4001062f3aec675c",
+          "polaridade": "desfavoravel",
+          "conflito": "contestado",
+          "contexto": "A Procuradoria Regional Eleitoral sustentou que a execução do Convênio nº 27/2007, celebrado entre Cruzeiro do Sul e a Suframa para pavimentação, apresentava irregularidades consideradas graves pelo TCU. Reportagens sobre a ação citam o Acórdão nº 3.051/2022 e afirmam que o MPE atribuiu ao gestor desvio consciente da finalidade pública e possível valorização patrimonial privada. Em 2019, Sales declarou-se inocente, atribuiu o caso a divergências sobre a aplicação do convênio e informou que recorreria.",
+          "fato": "O Ministério Público Eleitoral ajuizou em agosto de 2026 ação para impugnar o registro de Vagner Sales, apoiando-se em decisão do TCU relativa ao Convênio nº 27/2007 e em condenações por improbidade mencionadas na petição.",
+          "leituraEditorial": "A rejeição de contas e a possível destinação indevida de recursos de pavimentação são materialmente desfavoráveis à integridade da gestão e ao uso de infraestrutura pública. A responsabilidade eleitoral ainda depende de julgamento, e a contestação da defesa deve ser preservada.",
+          "ocorridoEm": "2026-08-04",
+          "papel": {
+            "descricao": "Foi prefeito responsável pela execução municipal do convênio e passou a ser alvo da ação de impugnação eleitoral.",
+            "tipo": "alvo_de_apuracao"
+          },
+          "referenciasFontes": [
+            "src:2",
+            "src:7",
+            "src:9"
+          ],
+          "resultado": {
+            "descricao": "A tomada de contas resultou no acórdão do TCU citado pelo MPE; a impugnação do registro eleitoral ainda aguardava decisão judicial nas fontes disponíveis.",
+            "estado": "em_apuracao"
+          },
+          "tipo": "processo_investigacao",
+          "titulo": "Impugnação eleitoral baseada em contas de convênio com a Suframa",
+          "trecho": "A Procuradoria Regional Eleitoral protocolou ação de impugnação e afirmou que as irregularidades do Convênio nº 27/2007 poderiam caracterizar ato doloso com dano ao erário; Sales anteriormente afirmou ser inocente e anunciou recurso.",
+          "fontes": [
+            {
+              "id": "src:2",
+              "titulo": "URGENTE: MP Eleitoral protocola ação para barrar ...",
+              "url": "https://ac24horas.com/2026/08/04/urgente-mp-eleitoral-protocola-acao-para-barrar-candidatura-de-vagner-sales-a-deputado-federal",
+              "publicadoEm": "2026-08-04T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.176Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "ac24horas.com"
+            },
+            {
+              "id": "src:7",
+              "titulo": "Ministério Público Eleitoral do Acre pede impugnação de candidatura de Vagner Sales, do MDB | Folha do Acre",
+              "url": "https://folhadoacre.com.br/2026/08/ministerio-publico-eleitoral-do-acre-pede-impugnacao-de-candidatura-de-vagner-sales-do-mdb",
+              "publicadoEm": "2026-08-04T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.176Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "folhadoacre.com.br"
+            },
+            {
+              "id": "src:9",
+              "titulo": "Vagner Sales afirma ser “inocente” e entrará com recurso após condenação - O Juruá Em Tempo",
+              "url": "https://juruaemtempo.com.br/2019/06/vagner-sales-afirma-ser-inocente-e-entrara-com-recurso-apos-condenacao",
+              "publicadoEm": "2019-06-09T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "juruaemtempo.com.br"
+            }
+          ]
+        },
+        {
+          "id": "2655fb00035c42c1dd16cee98ee9570cdcb1635434954789abf7bdca2f6b9510",
+          "polaridade": "desfavoravel",
+          "conflito": "inconclusivo",
+          "contexto": "A Operação Acúleo apurava um suposto grupo que teria cooptado agentes públicos para fraudar licitações. Segundo a Polícia Federal, uma empresa investigada venceu 32 procedimentos em Cruzeiro do Sul, movimentando aproximadamente R$ 50 milhões, enquanto saques superiores a R$ 12 milhões teriam sido realizados fora dos padrões usuais. As fontes registradas não informam denúncia, condenação ou arquivamento definitivo em relação a Sales.",
+          "fato": "Vagner Sales apareceu entre os investigados da Operação Acúleo, deflagrada pela Polícia Federal em setembro de 2020 para apurar suspeitas de fraude em licitações, corrupção, peculato, lavagem de dinheiro e organização criminosa.",
+          "leituraEditorial": "Suspeitas de captura de licitações e desvio de recursos destinados a obras são gravemente desfavoráveis a trabalhadores que dependem de serviços públicos, mas investigação não equivale a culpa e o desfecho individual não está documentado.",
+          "ocorridoEm": "2020-09-11",
+          "papel": {
+            "descricao": "Ex-prefeito listado pela imprensa entre os investigados pela Polícia Federal.",
+            "tipo": "alvo_de_apuracao"
+          },
+          "referenciasFontes": [
+            "src:6",
+            "src:8"
+          ],
+          "resultado": {
+            "descricao": "Foram cumpridos mandados e decretadas medidas patrimoniais contra investigados, mas as fontes não apresentam o desfecho penal específico de Vagner Sales.",
+            "estado": "em_apuracao"
+          },
+          "tipo": "corrupcao_improbidade",
+          "titulo": "Investigação na Operação Acúleo sobre licitações municipais",
+          "trecho": "As reportagens identificam Vagner Sales entre os investigados e registram que a operação buscava apurar fraudes licitatórias, corrupção, peculato, lavagem de dinheiro e organização criminosa.",
+          "fontes": [
+            {
+              "id": "src:6",
+              "titulo": "Possível esquema de corrupção teria envolvimento de Vagner Sales e Ilderlei Cordeiro - Ecos da Noticia",
+              "url": "https://ecosdanoticia.net/2020/09/possivel-esquema-de-corrupcao-teria-envolvimento-de-vagner-sales-e-ilderlei-cordeiro",
+              "publicadoEm": "2020-09-11T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "ecosdanoticia.net"
+            },
+            {
+              "id": "src:8",
+              "titulo": "Operação Acúleo: ex-prefeitos, servidores e políticos estão entre os investigados pela PF-AC | G1",
+              "url": "https://g1.globo.com/ac/acre/noticia/2020/09/12/operacao-aculeo-ex-prefeitos-servidores-e-politicos-estao-entre-os-investigados-pela-pf-ac.ghtml",
+              "publicadoEm": "2020-09-12T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "g1.globo.com"
+            }
+          ]
+        },
+        {
+          "id": "c846cbb315048783932d8cd4e1675b07087148055534cecdfab3b7ee7955d1ad",
+          "polaridade": "desfavoravel",
+          "conflito": "contestado",
+          "contexto": "Uma sentença de 2025 havia considerado que despesas da gestão municipal de 2015 não tinham comprovação formal de licitação e impôs ressarcimento de R$ 2,47 milhões, multa, suspensão dos direitos políticos e proibição de contratar com o poder público. Em junho de 2026, a Primeira Câmara Cível do TJAC reformou integralmente a sentença por unanimidade, entendendo que não foram demonstrados dano efetivo nem dolo específico.",
+          "fato": "A condenação de primeira instância por alegadas irregularidades em contratações da gestão de 2015 foi integralmente afastada pelo TJAC em junho de 2026.",
+          "leituraEditorial": "As falhas administrativas que originaram a ação merecem escrutínio, mas não podem ser apresentadas como corrupção comprovada: o julgamento colegiado afastou dano, dolo e todas as sanções.",
+          "ocorridoEm": "2026-06-18",
+          "papel": {
+            "descricao": "Como prefeito, administrou as despesas questionadas e figurou como réu na ação de improbidade.",
+            "tipo": "administrou"
+          },
+          "referenciasFontes": [
+            "src:3",
+            "src:11",
+            "src:16"
+          ],
+          "resultado": {
+            "descricao": "O TJAC julgou a ação improcedente e anulou o ressarcimento, a multa, a suspensão dos direitos políticos e as demais sanções.",
+            "estado": "revertido"
+          },
+          "tipo": "licitacao_contrato",
+          "titulo": "Condenação sobre contratações de 2015 revertida pelo TJAC",
+          "trecho": "O colegiado concluiu que irregularidades formais, sem prova de prejuízo concreto ao erário e sem dolo específico, não sustentavam condenação por improbidade.",
+          "fontes": [
+            {
+              "id": "src:3",
+              "titulo": "TJAC derruba condenação de Vagner Sales por improbidade e afasta suspensão dos direitos políticos - Amazônia Agora",
+              "url": "https://amazoniaagora.com.br/tjac-derruba-condenacao-de-vagner-sales-por-improbidade-e-afasta-suspensao-dos-direitos-politicos",
+              "publicadoEm": "2026-06-18T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "amazoniaagora.com.br"
+            },
+            {
+              "id": "src:11",
+              "titulo": "TJAC derruba condenação por improbidade contra Vagner Sales e anula multas de R$ 2,47 milhões",
+              "url": "https://juruaemtempo.com.br/acre/tjac-derruba-condenacao-por-improbidade-contra-vagner-sales-e-anula-multas-de-r-247-milhoes",
+              "publicadoEm": "2026-06-18T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.176Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "juruaemtempo.com.br"
+            },
+            {
+              "id": "src:16",
+              "titulo": "TJAC absolve ex-prefeito Vagner Sales de improbidade administrativa e anula condenação de R$ 2,47 milhões - O Alto Acre",
+              "url": "https://oaltoacre.com/tjac-absolve-ex-prefeito-vagner-sales-de-improbidade-administrativa-e-anula-condenacao-de-r-247-milhoes",
+              "publicadoEm": "2026-06-18T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.176Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "oaltoacre.com"
+            }
+          ]
+        },
+        {
+          "id": "433a36f91988fb2bbab4fb95a2f59ab7538bb861327c4fddf21e4c1797d4bdf3",
+          "polaridade": "desfavoravel",
+          "conflito": "inconclusivo",
+          "contexto": "Sales preside o MDB acreano; sua filha Jéssica Sales integra a executiva como secretária especial do MDB Mulher e foi indicada para disputar a vice-governadoria, enquanto sua esposa, Antônia Sales, aparece como candidata à Assembleia Legislativa. Fontes políticas interpretam a composição como ampliação do poder familiar, mas não apresentam prova de violação legal ou de procedimento partidário irregular.",
+          "fato": "Sob a presidência estadual de Vagner Sales, familiares próximos ocuparam ou buscaram posições políticas relevantes no MDB e nas eleições de 2026.",
+          "leituraEditorial": "A concentração de posições partidárias e candidaturas na mesma família cria risco de conflito de interesses e reduz a pluralidade interna, embora as fontes não comprovem favorecimento ilícito.",
+          "ocorridoEm": "2026-07-14",
+          "papel": {
+            "descricao": "Como presidente estadual do MDB, apoiou a composição eleitoral que incluiu sua filha como candidata a vice-governadora; familiares também integraram a direção e outras disputas eleitorais.",
+            "tipo": "defendeu"
+          },
+          "referenciasFontes": [
+            "src:1",
+            "src:4",
+            "src:5",
+            "src:15",
+            "src:17"
+          ],
+          "resultado": {
+            "descricao": "A filha passou a integrar a executiva partidária e foi anunciada para a disputa de vice-governadora; não há decisão oficial nas fontes reconhecendo conflito ilícito.",
+            "estado": "implementado"
+          },
+          "tipo": "conflito_interesses_familia",
+          "titulo": "Concentração de posições partidárias e candidaturas na família Sales",
+          "trecho": "As fontes registram Vagner Sales na presidência estadual, Jéssica Sales na executiva do MDB e na chapa de vice-governadora, além da presença eleitoral de Antônia Sales.",
+          "fontes": [
+            {
+              "id": "src:1",
+              "titulo": "Vagner Sales confirma pré-candidatura à Câmara dos Deputados e reafirma compromisso de representar o Acre em Brasília - 3 de Julho Notícias",
+              "url": "https://3dejulhonoticias.com.br/politica/vagner-sales-confirma-pre-candidatura-a-camara-dos-deputados-e-reafirma-compromisso-de-representar-o-acre-em-brasilia",
+              "publicadoEm": "2026-07-22T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "3dejulhonoticias.com.br"
+            },
+            {
+              "id": "src:4",
+              "titulo": "Vagner Sales toma posse como presidente do MDB; Chagas Romão e Marcus são vices",
+              "url": "https://contilnetnoticias.com.br/2025/08/vagner-sales-toma-posse-como-presidente-do-mdb-chagas-romao-e-marcus-sao-vices",
+              "publicadoEm": "2025-08-29T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "contilnetnoticias.com.br"
+            },
+            {
+              "id": "src:5",
+              "titulo": "Vagner Sales confirma pré-candidatura a deputado federal pelo MDB - DEU NOTÍCIA",
+              "url": "https://deunoticia.com/2026/07/vagner-sales-confirma-pre-candidatura-a-deputado-federal-pelo-mdb",
+              "publicadoEm": "2026-07-21T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.176Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "deunoticia.com"
+            },
+            {
+              "id": "src:15",
+              "titulo": "Com direitos políticos restabelecidos, Vagner Sales pode disputar vaga de deputado federal em 2026 - O Alto Acre",
+              "url": "https://oaltoacre.com/com-direitos-politicos-restabelecidos-vagner-sales-pode-disputar-vaga-de-deputado-federal-em-2026",
+              "publicadoEm": "2026-07-14T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.176Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "oaltoacre.com"
+            },
+            {
+              "id": "src:17",
+              "titulo": "Vagner Sales assume presidência do MDB no Acre e defende união interna – O RIO BRANCO",
+              "url": "https://oriobranco.net/vagner-sales-assume-presidencia-do-mdb-no-acre-e-defende-uniao-interna",
+              "publicadoEm": "2025-08-29T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "oriobranco.net"
+            }
+          ]
+        },
+        {
+          "id": "e126a7b7b4ae015d9b57fb9dda71e7a8509612d4c9158b234252077af094676d",
+          "polaridade": "desfavoravel",
+          "conflito": "inconclusivo",
+          "contexto": "O processo nº 138.753 do TCE-AC tem origem em procedimento instaurado em 2015 e examina o fornecimento e o consumo de combustível pela Prefeitura de Cruzeiro do Sul no exercício de 2014. A fonte disponível noticia notificação formal, não responsabilização definitiva.",
+          "fato": "Vagner Sales foi notificado em fevereiro de 2026 pelo TCE-AC em processo que apura possíveis irregularidades nos gastos municipais com combustível de 2014.",
+          "leituraEditorial": "Controle deficiente de combustível pode representar desperdício de recursos de serviços públicos, mas a mera notificação não prova irregularidade nem responsabilidade pessoal.",
+          "ocorridoEm": "2026-02-20",
+          "papel": {
+            "descricao": "Era prefeito no exercício examinado e foi formalmente notificado no processo de contas.",
+            "tipo": "alvo_de_apuracao"
+          },
+          "referenciasFontes": [
+            "src:13"
+          ],
+          "resultado": {
+            "descricao": "A apuração permanecia em curso, sem responsabilização definitiva informada.",
+            "estado": "em_apuracao"
+          },
+          "tipo": "processo_investigacao",
+          "titulo": "Apuração do TCE-AC sobre gastos com combustível em 2014",
+          "trecho": "O TCE-AC notificou o ex-prefeito no processo nº 138.753, destinado a esclarecer possíveis irregularidades no fornecimento e consumo de combustível municipal.",
+          "fontes": [
+            {
+              "id": "src:13",
+              "titulo": "Tribunal de Contas notifica ex-prefeito Vagner Sales em processo sobre gastos com combustível – Folha do Juruá",
+              "url": "https://mail.jornalfolhadojurua.com.br/tribunal-de-contas-notifica-ex-prefeito-vagner-sales-em-processo-sobre-gastos-com-combustivel",
+              "publicadoEm": "2026-02-20T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T17:57:33.177Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "824d94d436021238cbd6e5f2d727030857a3561bb0fa7727bd3e7139989b6ec4"
+                }
+              ],
+              "dominio": "mail.jornalfolhadojurua.com.br"
+            }
+          ]
+        }
+      ],
+      "followUps": [
+        {
+          "consulta": "Consultar no TSE/TRE-AC a íntegra e a situação atual da Ação de Impugnação de Registro de Candidatura de Vagner José Sales nas eleições de 2026, incluindo defesa e decisão.",
+          "lado": "desfavoravel",
+          "tema": "Impugnação do registro de candidatura",
+          "tipo": "oficial"
+        },
+        {
+          "consulta": "Localizar no TCU a íntegra do Acórdão nº 3.051/2022 e da tomada de contas referente ao Convênio Suframa nº 27/2007, identificando condutas, valores, recursos e situação definitiva.",
+          "lado": "desfavoravel",
+          "tema": "Convênio com a Suframa e rejeição de contas",
+          "tipo": "oficial"
+        }
+      ],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-sol",
+        "responseId": "resp_6ec1becd-9b54-4263-8eec-091f07b456ba",
+        "pesquisadoEm": "2026-08-27T17:58:46.712Z"
+      }
+    },
+    {
+      "sq": 10002532423,
+      "identidade": {
+        "sq": 10002532423,
+        "nome": "LEONARDO PERRET CRUZ MELO",
+        "nomeUrna": "LEONARDO MELO",
+        "nascimento": "1978-04-06",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1555,
+        "ocupacao": "ENGENHEIRO"
+      },
+      "estado": "concluida",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [
+        {
+          "id": "a9bbc05c0a3749a2280d4098bd2751404adbaf1f361227efb50fded2a9a3d6ca",
+          "polaridade": "desfavoravel",
+          "conflito": "confirmado",
+          "contexto": "A inconsistência foi reconhecida pelo próprio candidato, que a atribuiu a erro de digitação cometido pelo Diretório Regional do MDB. Perfis eleitorais posteriores, baseados em dados do TSE, passaram a informar patrimônio total de R$ 2.893.264. Não há nas fontes registradas indício de enriquecimento ilícito, ocultação patrimonial ou falsidade intencional.",
+          "fato": "A declaração de bens vinculada inicialmente à candidatura exibiu patrimônio de aproximadamente R$ 2,29 bilhões. Leonardo Melo afirmou que o valor resultou de erro de preenchimento e anunciou correção perante a Justiça Eleitoral; consultas posteriores registraram R$ 2,893 milhões.",
+          "leituraEditorial": "É uma falha de transparência eleitoral atribuída à candidatura, mas de gravidade limitada porque foi reconhecida e aparentemente corrigida. A evidência disponível não sustenta tratá-la como corrupção ou fraude deliberada.",
+          "ocorridoEm": "2026-08-08",
+          "papel": {
+            "descricao": "Titular da candidatura e da declaração patrimonial, embora tenha atribuído a inserção incorreta dos valores ao diretório estadual do MDB.",
+            "tipo": "autor"
+          },
+          "referenciasFontes": [
+            "src:5",
+            "src:4",
+            "src:12"
+          ],
+          "resultado": {
+            "descricao": "A correção foi anunciada e os perfis eleitorais posteriores passaram a apresentar patrimônio de R$ 2.893.264.",
+            "estado": "concluido"
+          },
+          "tipo": "conduta_pessoal",
+          "titulo": "Erro corrigido na declaração eleitoral de patrimônio",
+          "trecho": "O cadastro apresentava R$ 2.289.379.627; o candidato declarou que houve “erro de digitação” e que a informação seria corrigida. Registros posteriores listam três participações imobiliárias que totalizam R$ 2.893.264.",
+          "fontes": [
+            {
+              "id": "src:5",
+              "titulo": "Patrimônio bilionário de Leonardo Melo no TSE chama atenção e candidato explica o motivo - Diário do Acre",
+              "url": "https://diariodoacre.com.br/patrimonio-bilionario-de-leonardo-melo-no-tse-chama-atencao-e-candidato-explica-o-motivo",
+              "dominio": "diariodoacre.com.br",
+              "publicadoEm": "2026-08-08T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T18:01:50.368Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "91b2b73b28afe30c765cf2a27a364888dad93d35add668e6babffe667824bb7e"
+                }
+              ]
+            },
+            {
+              "id": "src:4",
+              "titulo": "Leonardo Melo (MDB) — candidato a deputado federal pelo Acre em 2026",
+              "url": "https://candidatos.nexojornal.com.br/2026/ac/leonardo-melo-10002532423",
+              "dominio": "candidatos.nexojornal.com.br",
+              "publicadoEm": null,
+              "acessadoEm": "2026-08-27T18:01:50.367Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "91b2b73b28afe30c765cf2a27a364888dad93d35add668e6babffe667824bb7e"
+                }
+              ]
+            },
+            {
+              "id": "src:12",
+              "titulo": "LEONARDO MELO (MDB - 1555) - Candidato a Deputado Federal do Acre - Portal do Holanda",
+              "url": "https://novo2026.portaldoholanda.com.br/index.php/eleicoes/2026/candidato/ac/deputado-federal/leonardo-melo-1555-mdb",
+              "dominio": "novo2026.portaldoholanda.com.br",
+              "publicadoEm": null,
+              "acessadoEm": "2026-08-27T18:01:50.368Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "91b2b73b28afe30c765cf2a27a364888dad93d35add668e6babffe667824bb7e"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "followUps": [
+        {
+          "consulta": "Consultar no DivulgaCandContas/TSE o RRC nº 10002532423, a declaração original e eventuais retificações de bens de Leonardo Perret Cruz Melo.",
+          "lado": "integridade eleitoral",
+          "tema": "Confirmação oficial da retificação patrimonial e do histórico do registro",
+          "tipo": "oficial"
+        },
+        {
+          "consulta": "Pesquisar o nome completo “Leonardo Perret Cruz Melo” nos diários oficiais e portais de transparência do Acre, de Rio Branco e da União, incluindo nomeações, funções técnicas, contratos, convênios e pagamentos.",
+          "lado": "ambos",
+          "tema": "Cargos públicos, obras, contratos e atuação administrativa anterior",
+          "tipo": "oficial"
+        }
+      ],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-sol",
+        "responseId": "resp_53ef089d-71ee-4d73-bb34-02435e84ba33",
+        "pesquisadoEm": "2026-08-27T18:02:28.054Z"
+      }
+    },
+    {
+      "sq": 10002532424,
+      "identidade": {
+        "sq": 10002532424,
+        "nome": "SIRLENE PEREIRA LUZ",
+        "nomeUrna": "PROFESSORA SIRLENE LUZ",
+        "nascimento": "1978-11-02",
+        "uf": "AC",
+        "cargo": "DEPUTADO FEDERAL",
+        "partido": "MDB",
+        "numero": 1512,
+        "ocupacao": "PROFESSOR DE ENSINO MÉDIO"
+      },
+      "estado": "concluida",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [
+        {
+          "id": "42a09b04d7a2f7bb0c9aaf630eb5dfbb62e65534a809be5dc74a039f0d3aea7c",
+          "polaridade": "favoravel",
+          "conflito": "inconclusivo",
+          "contexto": "Reportagem publicada em 2020 atribuiu à candidata oito anos de gestão na Escola José Ribamar Batista e desempenho elevado de alunos no ingresso na Universidade Federal do Acre. Parte das avaliações reproduzia declarações do MDB e de uma deputada do partido; não foram fornecidas estatísticas oficiais da escola, do Enem ou da Ufac.",
+          "fato": "Sirlene Luz foi apresentada como ex-gestora por oito anos da Escola José Ribamar Batista e associada a um elevado número de aprovações de estudantes na Ufac, inclusive de aluno de escola pública em primeiro lugar no curso de Direito em ampla concorrência.",
+          "leituraEditorial": "Se confirmado por registros oficiais, o trabalho representa fortalecimento da educação pública e ampliação do acesso de jovens trabalhadores e de baixa renda ao ensino superior. A atribuição favorável permanece limitada pela ausência de dados oficiais independentes.",
+          "ocorridoEm": null,
+          "papel": {
+            "descricao": "Exerceu a gestão escolar durante oito anos, conforme a reportagem.",
+            "tipo": "administrou"
+          },
+          "referenciasFontes": [
+            "src:2"
+          ],
+          "resultado": {
+            "descricao": "Período de gestão encerrado antes de março de 2020, com resultados educacionais positivos relatados, mas sem números oficiais apresentados.",
+            "estado": "concluido"
+          },
+          "tipo": "gestao_publica",
+          "titulo": "Gestão escolar associada a aprovações de estudantes na Ufac",
+          "trecho": "“A professora Sirlene Pereira Luz, que foi gestora de sucesso na Escola José Ribamar Batista (Ejorb) por oito anos [...] Como gestora de escola, alcançou o maior número de aprovados nos mais diversos cursos da Universidade Federal do Acre (Ufac).”",
+          "fontes": [
+            {
+              "id": "src:2",
+              "titulo": "Ex-gestora do Ejorb campeã de aprovados no Enem é pré-candidata a vereadora",
+              "url": "https://ac24horas.com/2020/03/02/ex-gestora-do-ejorb-campea-de-aprovados-no-enem-e-pre-candidata-a-vereadora",
+              "dominio": "ac24horas.com",
+              "publicadoEm": "2020-03-02T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T18:02:44.386Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "68af5dc6d23ba42bcf45e12970d527b116e5c77c15e772f0fa28b2ba8d1ce3b1"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "desfavoraveis": [
+        {
+          "id": "2c889cbc1669204a198f13fd0cd6b6547ee9aaf73a4cf329202a6b873ee69aca",
+          "polaridade": "desfavoravel",
+          "conflito": "inconclusivo",
+          "contexto": "Duas reportagens de agosto de 2026 informam que o Ministério Público Eleitoral impugnou o registro por ausência de quitação eleitoral decorrente de irregularidade na prestação de contas. As fontes não apresentam a petição, a manifestação da candidata nem decisão definitiva da Justiça Eleitoral.",
+          "fato": "O pedido de registro de Sirlene Pereira Luz para as eleições de 2026 foi impugnado pelo Ministério Público Eleitoral, segundo as reportagens, sob alegação de ausência de quitação eleitoral por irregularidade na prestação de contas.",
+          "leituraEditorial": "A impugnação suscita questão de integridade e conformidade eleitoral, mas não permite concluir que houve ilícito ou que o registro será negado enquanto não forem examinados o processo oficial, a defesa e a decisão judicial.",
+          "ocorridoEm": "2026-08-20",
+          "papel": {
+            "descricao": "Candidata cujo pedido de registro foi alvo de impugnação do Ministério Público Eleitoral.",
+            "tipo": "alvo_de_apuracao"
+          },
+          "referenciasFontes": [
+            "src:4",
+            "src:8"
+          ],
+          "resultado": {
+            "descricao": "Impugnação noticiada; o desfecho judicial e a situação definitiva da candidatura não constam das fontes registradas.",
+            "estado": "em_apuracao"
+          },
+          "tipo": "processo_investigacao",
+          "titulo": "Impugnação eleitoral por alegada irregularidade na prestação de contas",
+          "trecho": "“Sirlene Pereira Luz (PROFESSORA SIRLENE) – Ausência de quitação eleitoral por irregularidade na prestação de contas. (MDB)”",
+          "fontes": [
+            {
+              "id": "src:4",
+              "titulo": "MP Eleitoral impugna registros de 22 candidatos no Acre; veja os nomes - Agazeta.net",
+              "url": "https://agazeta.net/mp-eleitoral-impugna-registros-de-22-candidatos-no-acre-veja-os-nomes",
+              "dominio": "agazeta.net",
+              "publicadoEm": "2026-08-20T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T18:02:44.386Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "68af5dc6d23ba42bcf45e12970d527b116e5c77c15e772f0fa28b2ba8d1ce3b1"
+                }
+              ]
+            },
+            {
+              "id": "src:8",
+              "titulo": "MP Eleitoral impugnou 22 pedidos de registro de candidaturas no Acre – Extra do Acre",
+              "url": "https://extradoacre.com.br/mp-eleitoral-impugnou-22-pedidos-de-registro-de-candidaturas-no-acre",
+              "dominio": "extradoacre.com.br",
+              "publicadoEm": "2026-08-20T00:00:00.000Z",
+              "acessadoEm": "2026-08-27T18:02:44.386Z",
+              "tipo": "secundaria",
+              "provedores": [
+                {
+                  "provider": "exa",
+                  "requestKey": "68af5dc6d23ba42bcf45e12970d527b116e5c77c15e772f0fa28b2ba8d1ce3b1"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "followUps": [
+        {
+          "consulta": "site:tre-ac.jus.br OR site:pje1g.tse.jus.br \"Sirlene Pereira Luz\" impugnação registro 2026 quitação eleitoral prestação de contas",
+          "lado": "desfavoravel",
+          "tema": "Petição, defesa e decisão na impugnação do registro de 2026",
+          "tipo": "oficial"
+        },
+        {
+          "consulta": "site:tre-ac.jus.br OR site:tse.jus.br \"Sirlene Pereira Luz\" 2024 prestação de contas indeferido Rio Branco",
+          "lado": "desfavoravel",
+          "tema": "Fundamento oficial do indeferimento de 2024 e processo de prestação de contas relacionado",
+          "tipo": "oficial"
+        }
+      ],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-sol",
+        "responseId": "resp_3a6e7ddc-d131-4edc-b3ef-196416c349ec",
+        "pesquisadoEm": "2026-08-27T18:03:22.411Z"
+      }
+    },
+    {
+      "sq": 10002532437,
+      "identidade": {
+        "sq": 10002532437,
+        "nome": "JOSÉ PEREIRA PASSOS",
+        "nomeUrna": "PEREIRA PASSOS",
+        "nascimento": "1960-10-07",
+        "uf": "AC",
+        "cargo": "DEPUTADO ESTADUAL",
+        "partido": "MDB",
+        "numero": 15223,
+        "ocupacao": "ENGENHEIRO"
+      },
+      "estado": "insuficiente",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [],
+      "desfavoraveis": [],
+      "followUps": [
+        {
+          "consulta": "\"José Pereira Passos\" engenheiro Acre OR AC nomeação OR secretário OR diretor OR presidente",
+          "lado": "biografia pública e gestão",
+          "tema": "Cargos, nomeações e atuação administrativa no Acre",
+          "tipo": "oficial"
+        },
+        {
+          "consulta": "site:aleac.leg.br \"José Pereira Passos\" OR \"Pereira Passos\"",
+          "lado": "atuação legislativa",
+          "tema": "Mandatos, proposições, votos, audiências e pronunciamentos",
+          "tipo": "oficial"
+        }
+      ],
+      "execucao": {
+        "schema": 2,
+        "modelo": "openai/gpt-5.6-sol",
+        "responseId": "resp_1a5e1240-aae0-4acf-9a5c-b4bcf5f151f2",
+        "pesquisadoEm": "2026-08-27T18:04:23.169Z"
+      }
+    }
+  ]
+}

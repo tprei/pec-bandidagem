@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "candidatos": {
+    "280002551933": {
+      "sq": 280002551933,
+      "identidade": {
+        "sq": 280002551933,
+        "nome": "GILBERTO KASSAB",
+        "nomeUrna": "GILBERTO KASSAB",
+        "nascimento": "1960-08-12",
+        "uf": "BR",
+        "cargo": "VICE-PRESIDENTE",
+        "partido": "PSD",
+        "numero": 55,
+        "ocupacao": "ENGENHEIRO"
+      },
+      "estado": "concluida",
+      "cobertura": {
+        "favoraveis": "insuficiente",
+        "desfavoraveis": "insuficiente"
+      },
+      "favoraveis": [
+        {
+          "id": "2c8f8316f7a892506ead290adbcc8d2923d707856ca981e129eda5176db60033",
+          "polaridade": "favoravel",
+          "titulo": "Entrega e funcionamento do Hospital Municipal M’Boi Mirim",
+          "fato": "Expansão da oferta de atendimento hospitalar público em região periférica da zona sul de São Paulo.",
+          "trecho": "Em um ano, o hospital realizou mais de 156 mil atendimentos, 2.549 cirurgias, quase 250 mil exames laboratoriais e 72 mil exames de imagem.",
+          "leituraEditorial": "A entrega ampliou capacidade de saúde pública e reduziu deslocamentos para trabalhadores de uma região vulnerável; o crédito adequado é de administração e financiamento municipal, não de autoria individual exclusiva.",
+          "contexto": "A Prefeitura entregou o Hospital Municipal M’Boi Mirim durante a gestão de Kassab. No primeiro ano de funcionamento, a unidade registrou mais de 156 mil atendimentos, 2.549 cirurgias e centenas de milhares de exames. A administração hospitalar foi realizada em parceria com organizações privadas, não exclusivamente pela Prefeitura.",
+          "ocorridoEm": "2008-10-01",
+          "tipo": "politica_publica",
+          "conflito": "confirmado",
+          "papel": {
+            "descricao": "Prefeito responsável pela administração municipal e pela entrega do hospital público.",
+            "tipo": "administrou"
+          },
+          "resultado": {
+            "descricao": "Hospital entregue e em funcionamento, com atendimento, cirurgias e exames realizados no primeiro ano.",
+            "estado": "implementado"
+          },
+          "fontes": [
+            {
+              "titulo": "O caso do Complexo Paraisópolis em gestões: diferenças conceituais em programas de intervenção em favelas em São Paulo",
+              "url": "https://www.scielo.br/j/urbe/a/PDTVbJGQQ5dcL8dCmb8LDLf/abstract/?format=html&lang=en",
+              "dominio": "scielo.br",
+              "publicadoEm": "2018-06-04",
+              "acessadoEm": "2026-08-27T17:17:58.060Z",
+              "tipo": "secundaria"
+            },
+            {
+              "titulo": "Ação conjunta de governos pode urbanizar 1/3 das favelas de SP",
+              "url": "https://novo.nossasaopaulo.org.br/acao-conjunta-de-governos-pode-urbanizar-1-3-das-favelas-de-sp/",
+              "dominio": "novo.nossasaopaulo.org.br",
+              "publicadoEm": "2010-03-25",
+              "acessadoEm": "2026-08-27T17:17:58.060Z",
+              "tipo": "secundaria"
+            }
+          ]
+        },
+        {
+          "id": "4d4d4c3b4562b32de1a19e0a882158567b3f6f46087cfa4716e64c461e226c1c",
+          "polaridade": "favoravel",
+          "titulo": "Aporte municipal para expansão do metrô",
+          "fato": "Financiamento municipal da expansão do metrô, cuja responsabilidade principal era estadual.",
+          "trecho": "A Prefeitura transferiu R$ 455 milhões: R$ 120,5 milhões para a Linha 4-Amarela e R$ 334,5 milhões para a Linha 17-Ouro.",
+          "leituraEditorial": "O aporte direcionou recursos públicos municipais para transporte coletivo de massa, com potencial benefício material amplo para trabalhadores e redução de tempo de deslocamento, embora a execução e a autoria da infraestrutura fossem compartilhadas.",
+          "contexto": "A Prefeitura de São Paulo transferiu R$ 455 milhões para obras metroviárias estaduais: R$ 120,5 milhões para a Linha 4-Amarela e R$ 334,5 milhões para a Linha 17-Ouro, usando recursos de operações urbanas municipais. Kassab foi administrador municipal e financiador da contrapartida, não autor estadual das linhas nem executor direto da obra.",
+          "ocorridoEm": "2012-12-01",
+          "tipo": "obra_publica",
+          "conflito": "confirmado",
+          "papel": {
+            "descricao": "Prefeito que autorizou e administrou a transferência de recursos municipais para projetos metroviários estaduais.",
+            "tipo": "financiou"
+          },
+          "resultado": {
+            "descricao": "Recursos municipais foram transferidos e destinados às linhas metroviárias indicadas; a obra permaneceu como empreendimento de execução estadual.",
+            "estado": "implementado"
+          },
+          "fontes": [
+            {
+              "titulo": "Saúde - Secretaria Municipal de Urbanismo e Licenciamento - Prefeitura",
+              "url": "https://prefeitura.sp.gov.br/web/licenciamento/desenvolvimento_urbano/dados_estatisticos/info_cidade/saude",
+              "dominio": "prefeitura.sp.gov.br",
+              "publicadoEm": "2023-06-01",
+              "acessadoEm": "2026-08-27T17:17:58.060Z",
+              "tipo": "oficial"
+            },
+            {
+              "titulo": "Biografia - Gilberto Kassab - A política a serviço das pessoas",
+              "url": "https://gilbertokassab.com.br/biografia/o-politico-que-quer-renovar-a-politica/",
+              "dominio": "gilbertokassab.com.br",
+              "publicadoEm": "2020-02-07",
+              "acessadoEm": "2026-08-27T17:17:58.060Z",
+              "tipo": "secundaria"
+            }
+          ]
+        }
+      ],
+      "desfavoraveis": [
+        {
+          "id": "09f0da0e3dafd16153f5f65ad0989844e49478345f6d1e00fe15490b4791d9c7",
+          "polaridade": "desfavoravel",
+          "titulo": "Metas incompletas em mobilidade, creches e serviços públicos",
+          "fato": "Parte expressiva das promessas de mobilidade e expansão de serviços públicos não foi concluída durante o mandato.",
+          "trecho": "Das 26 metas de mobilidade urbana e transporte, apenas 8 deveriam ser entregues até o final de 2012; 171 mil crianças aguardavam vagas em creches.",
+          "leituraEditorial": "Para quem trabalha, a insuficiência de transporte coletivo e de creches transfere tempo, custo e trabalho de cuidado para as famílias, especialmente para mulheres e trabalhadores periféricos.",
+          "contexto": "O programa de metas da Prefeitura registrou desempenho especialmente fraco em mobilidade: apenas 8 das 26 metas da área deveriam ser entregues até o fim de 2012. Também permaneceram 171 mil crianças aguardando vagas em creches, segundo balanço jornalístico baseado em dados da própria Prefeitura.",
+          "ocorridoEm": "2012-12-27",
+          "tipo": "gestao_publica",
+          "conflito": "confirmado",
+          "papel": {
+            "descricao": "Prefeito e administrador responsável pela execução do plano de metas municipal.",
+            "tipo": "administrou"
+          },
+          "resultado": {
+            "descricao": "123 das 223 metas foram concluídas, 99 permaneciam em andamento e uma foi abandonada; em mobilidade, corredores, terminais e outras entregas ficaram pendentes.",
+            "estado": "nao_realizado"
+          },
+          "fontes": [
+            {
+              "titulo": "Gilberto Kassab - ÉPOCA | Tudo sobre",
+              "url": "https://epoca.globo.com/tudo-sobre/noticia/2017/08/gilberto-kassab.html",
+              "dominio": "epoca.globo.com",
+              "publicadoEm": "2013-09-26",
+              "acessadoEm": "2026-08-27T17:17:58.061Z",
+              "tipo": "secundaria"
+            },
+            {
+              "titulo": "Gilberto Kassab, candidato ao cargo de Vice-presidente no Brasil nas Eleições 2026 | Agência Sertão",
+              "url": "https://agenciasertao.com/eleicoes/candidato/BR/gilberto-kassab-psd-br--280002551933/",
+              "dominio": "agenciasertao.com",
+              "publicadoEm": "2026-08-14",
+              "acessadoEm": "2026-08-27T17:17:58.061Z",
+              "tipo": "secundaria"
+            }
+          ]
+        },
+        {
+          "id": "f692405618283839f0c1b88c6fdc2cdb268fa731c487daf8f55d3b41d0601443",
+          "polaridade": "desfavoravel",
+          "titulo": "Defesa da privatização dos Correios",
+          "fato": "Defesa de privatização dos Correios, empresa pública responsável por serviço essencial e empregadora de trabalhadores do setor.",
+          "trecho": "Kassab afirmou que privatizaria os Correios se a empresa não saísse do vermelho; posteriormente, o governo informou que não daria seguimento à proposta naquele ano.",
+          "leituraEditorial": "A privatização poderia reduzir o controle público, pressionar empregos e ampliar a lógica de rentabilidade em um serviço universal; a proposta, contudo, não foi implementada naquele período.",
+          "contexto": "Como ministro das Comunicações no governo Michel Temer, Kassab defendeu publicamente a possibilidade de privatização dos Correios caso a empresa não saísse do vermelho. Em 2018, o governo desistiu de levar adiante a proposta naquele ano.",
+          "ocorridoEm": "2017-05-18",
+          "tipo": "politica_publica",
+          "conflito": "confirmado",
+          "papel": {
+            "descricao": "Ministro das Comunicações que anunciou e defendeu a possibilidade de privatização da empresa.",
+            "tipo": "defendeu"
+          },
+          "resultado": {
+            "descricao": "A proposta foi anunciada e defendida, mas o governo posteriormente descartou a privatização dos Correios naquele ano.",
+            "estado": "nao_realizado"
+          },
+          "fontes": [
+            {
+              "titulo": "Governo desiste da proposta de privatização dos Correios, diz Kassab",
+              "url": "https://g1.globo.com/economia/noticia/privatizacao-dos-correios-neste-ano-esta-descartada-diz-kassab.ghtml",
+              "dominio": "g1.globo.com",
+              "publicadoEm": "2018-05-18",
+              "acessadoEm": "2026-08-27T17:17:58.061Z",
+              "tipo": "secundaria"
+            },
+            {
+              "titulo": "STJ suspende liminar que bloqueava bens de Gilberto Kassab",
+              "url": "https://globoplay.globo.com/v/1764472/",
+              "dominio": "globoplay.globo.com",
+              "publicadoEm": "2012-01-11",
+              "acessadoEm": "2026-08-27T17:17:58.061Z",
+              "tipo": "secundaria"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

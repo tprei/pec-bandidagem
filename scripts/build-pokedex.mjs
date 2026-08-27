@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -45,6 +45,12 @@ function ler(caminho, dica) {
   return JSON.parse(readFileSync(caminho, "utf8"));
 }
 
+function escreverAtomico(caminho, dados) {
+  const temporario = `${caminho}.${process.pid}.tmp`;
+  writeFileSync(temporario, `${JSON.stringify(dados, null, 2)}\n`);
+  renameSync(temporario, caminho);
+}
+
 function posicional(dados, chaveColunas) {
   return Object.fromEntries(dados[chaveColunas].map((nome, indice) => [nome, indice]));
 }
@@ -52,6 +58,33 @@ function posicional(dados, chaveColunas) {
 function badge(ocupacao) {
   for (const [nome, regra] of REGRAS_BADGE) if (regra.test(ocupacao)) return nome;
   return null;
+}
+
+const TIPOS_PESQUISA_SENSIVEIS = new Set(["licitacao_contrato", "corrupcao_improbidade", "processo_investigacao", "conflito_interesses_familia", "conduta_pessoal"]);
+
+function carregarPesquisas(candidatos) {
+  const origem = join(ROOT, "data", "pesquisa-candidatos-2026");
+  if (!existsSync(origem)) return { registros: new Map(), aguardandoRevisao: 0 };
+  const decisoes = existsSync(join(origem, "revisoes.json")) ? ler(join(origem, "revisoes.json"), "scripts/research-candidatos-2026.mjs").decisoes ?? {} : {};
+  const conhecidos = new Set(candidatos.candidatos.map((candidato) => candidato[0]));
+  const registros = new Map();
+  let aguardandoRevisao = 0;
+  for (const nome of readdirSync(origem).filter((arquivo) => arquivo.endsWith(".json") && arquivo !== "revisoes.json")) {
+    const dados = ler(join(origem, nome), "scripts/research-candidatos-2026.mjs");
+    for (const registro of dados.candidatos ?? []) {
+      if (!conhecidos.has(registro.sq) || registros.has(registro.sq)) throw new Error(`pesquisa duplicada ou desconhecida: ${registro.sq}`);
+      const publicar = (item) => {
+        if (!item.id || !item.titulo || !item.fato || !item.trecho || !item.leituraEditorial || !item.papel?.descricao || !item.resultado?.descricao || !Array.isArray(item.fontes) || item.fontes.length === 0) throw new Error(`pesquisa inválida para ${registro.sq}`);
+        if (item.fontes.some((fonte) => !/^https?:\/\//.test(fonte.url) || !fonte.titulo || !fonte.dominio || !Object.hasOwn(fonte, "publicadoEm"))) throw new Error(`fonte inválida para ${registro.sq}`);
+        const sensivel = TIPOS_PESQUISA_SENSIVEIS.has(item.tipo) || item.conflito !== "confirmado";
+        const decisao = decisoes[item.id];
+        if (sensivel && decisao?.estado !== "aprovada") { aguardandoRevisao += 1; return false; }
+        return decisao?.estado !== "rejeitada";
+      };
+      registros.set(registro.sq, { ...registro, favoraveis: (registro.favoraveis ?? []).filter(publicar), desfavoraveis: (registro.desfavoraveis ?? []).filter(publicar) });
+    }
+  }
+  return { registros, aguardandoRevisao };
 }
 
 async function comRepeticao(endereco) {
@@ -126,6 +159,7 @@ for (const referencia of curadoria.contexto) {
   if (votacao === undefined) throw new Error(`votação de contexto ${referencia.id} não existe no dataset`);
   curadas.push({ eixo: null, ...referencia, votacao });
 }
+const pesquisas = carregarPesquisas(candidatos);
 
 const idsDeputado = votacoes.deputados.map((deputado) => deputado[id.id]);
 const cpfs = await cpfDosDeputados(idsDeputado);
@@ -260,6 +294,31 @@ const contexto = curadoria.contexto.map((referencia) => {
   };
 });
 
+const pesquisaSaida = join(SAIDA, "pesquisa");
+mkdirSync(pesquisaSaida, { recursive: true });
+for (let shard = 0; shard < 256; shard += 1) {
+  const candidatosShard = [...pesquisas.registros.values()]
+    .filter((registro) => registro.sq % 256 === shard)
+    .map((registro) => {
+      const { execucao, ...publico } = registro;
+      return [String(registro.sq), publico];
+    })
+    .sort(([a], [b]) => Number(a) - Number(b));
+  escreverAtomico(join(pesquisaSaida, `${shard.toString(16).padStart(2, "0")}.json`), { schema: 1, candidatos: Object.fromEntries(candidatosShard) });
+}
+
+const pesquisaPublicada = [...pesquisas.registros.values()].filter((registro) => registro.favoraveis.length > 0 || registro.desfavoraveis.length > 0).length;
+const indicePesquisa = {
+  schema: 1,
+  rubrica: curadoria.pesquisa.id,
+  lente: curadoria.pesquisa.lente,
+  shards: 256,
+  totalPesquisados: pesquisas.registros.size,
+  totalComPublicacao: pesquisaPublicada,
+  totalAguardandoRevisao: pesquisas.aguardandoRevisao,
+  geradoEm: new Date().toISOString(),
+};
+
 const indice = {
   fonte: {
     candidaturas: candidatos.fonte.portal,
@@ -276,9 +335,10 @@ const indice = {
   badges: BADGES,
   eixos,
   contexto,
+  pesquisa: indicePesquisa,
   ufs,
 };
-writeFileSync(join(SAIDA, "indice.json"), `${JSON.stringify(indice, null, 2)}\n`);
+escreverAtomico(join(SAIDA, "indice.json"), indice);
 
 console.log(`\nCatálogo gerado em data/dex/`);
 console.log(`Candidaturas: ${candidatos.candidatos.length} em ${ufs.length} unidades eleitorais`);

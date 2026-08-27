@@ -72,6 +72,8 @@ const estado = {
   indice: null,
   uf: null,
   estados: new Map(),
+  pesquisas: new Map(),
+  fichaGeracao: 0,
   visiveis: [],
   desenhados: 0,
   sentinela: null,
@@ -569,6 +571,61 @@ function alinhamento(codigo, eixo) {
   return "neutro";
 }
 
+async function carregarPesquisa(sq) {
+  const chave = (sq % 256).toString(16).padStart(2, "0");
+  if (!estado.pesquisas.has(chave)) {
+    const promessa = carregarJson(`data/dex/pesquisa/${chave}.json`).catch((erro) => {
+      estado.pesquisas.delete(chave);
+      throw erro;
+    });
+    estado.pesquisas.set(chave, promessa);
+  }
+  const arquivo = await estado.pesquisas.get(chave);
+  return arquivo.candidatos[String(sq)] ?? null;
+}
+
+function renderizarPesquisa(sec, pesquisa) {
+  sec.replaceChildren();
+  sec.append(criar("h3", "pesquisa-titulo", "Vida pública — pesquisa ampla"));
+  sec.append(criar("p", "pesquisa-metodo", "Os fatos vêm das fontes vinculadas. A seleção e a ordem seguem uma lente editorial de esquerda, com prioridade para o efeito material sobre quem trabalha."));
+  if (pesquisa === null) {
+    sec.append(criar("p", "pesquisa-aviso", "Pesquisa ampla ainda não realizada para esta candidatura."));
+    return;
+  }
+  const grupo = (titulo, itens, classe) => {
+    const bloco = criar("div", `pesquisa-grupo ${classe}`);
+    bloco.append(criar("h4", undefined, titulo));
+    if (itens.length === 0) bloco.append(criar("p", "pesquisa-aviso", "Não encontramos evidência suficiente para completar cinco itens deste lado. Isso não é nota nem absolvição."));
+    for (const item of itens) {
+      const details = document.createElement("details");
+      const summary = document.createElement("summary");
+      summary.textContent = item.titulo;
+      details.append(summary);
+      const corpo = criar("div", "pesquisa-corpo");
+      corpo.append(criar("p", undefined, item.fato));
+      corpo.append(criar("p", "pesquisa-trecho", `Trecho da fonte: “${item.trecho}”`));
+      corpo.append(criar("p", undefined, `Papel: ${item.papel.descricao}`));
+      corpo.append(criar("p", undefined, `Resultado: ${item.resultado.descricao}`));
+      corpo.append(criar("p", "pesquisa-status", `Status da evidência: ${item.conflito}`));
+      if (item.ocorridoEm) corpo.append(criar("p", "pesquisa-data", `Data: ${dataBr(item.ocorridoEm)}`));
+      corpo.append(criar("p", undefined, item.contexto));
+      corpo.append(criar("p", "pesquisa-editorial", `Leitura editorial: ${item.leituraEditorial}`));
+      for (const fonte of item.fontes) {
+        const link = criar("a", "pesquisa-fonte", `${fonte.titulo} — ${fonte.dominio}`);
+        link.href = fonte.url;
+        link.target = "_blank";
+        link.rel = "noopener";
+        corpo.append(link);
+      }
+      details.append(corpo);
+      bloco.append(details);
+    }
+    return bloco;
+  };
+  sec.append(grupo("A favor de quem trabalha", pesquisa.favoraveis, "pesquisa-favoraveis"));
+  sec.append(grupo("Contra quem trabalha", pesquisa.desfavoraveis, "pesquisa-desfavoraveis"));
+}
+
 function renderizarFicha(sq) {
   const sec = secoes.ficha;
   sec.replaceChildren();
@@ -621,6 +678,23 @@ function renderizarFicha(sq) {
   }
   cabeca.append(info);
   sec.append(cabeca);
+  const pesquisaSec = criar("div", "ficha-secao pesquisa-secao");
+  pesquisaSec.append(criar("h3", "pesquisa-titulo", "Vida pública — pesquisa ampla"));
+  pesquisaSec.append(criar("p", "pesquisa-aviso", "Carregando pesquisa…"));
+  sec.append(pesquisaSec);
+  const fichaGeracao = ++estado.fichaGeracao;
+  carregarPesquisa(sq)
+    .then((pesquisa) => {
+      if (fichaGeracao === estado.fichaGeracao && location.hash === `#/ficha/${sq}`) renderizarPesquisa(pesquisaSec, pesquisa);
+    })
+    .catch(() => {
+      if (fichaGeracao !== estado.fichaGeracao || location.hash !== `#/ficha/${sq}`) return;
+      pesquisaSec.replaceChildren();
+      const aviso = criar("p", "pesquisa-aviso", "Não foi possível carregar a pesquisa ampla desta candidatura.");
+      aviso.setAttribute("role", "alert");
+      pesquisaSec.append(aviso);
+    });
+
 
   if (dado.ficha !== null) {
     const resumoBox = criar("div", "ficha-resumo-box");

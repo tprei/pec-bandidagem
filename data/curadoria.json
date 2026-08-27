@@ -68,5 +68,30 @@
       "rotulo": "Isenção do IR até R$ 5 mil e tributação de altas rendas",
       "nota": "Aprovado por unanimidade, sem um único voto contrário. Não separa ninguém de ninguém: todo mundo quis o crédito. Fica aqui como contexto, e de propósito não vale ponto em nenhum eixo."
     }
-  ]
+  ],
+  "pesquisa": {
+    "id": "trabalhador-v1",
+    "lente": "Lente de esquerda com prioridade para o efeito material sobre quem trabalha.",
+    "criteriosFavoraveis": [
+      "Direitos trabalhistas, salários, previdência, sindicatos e greve",
+      "Redistribuição, tributação progressiva e serviços públicos",
+      "Infraestrutura, moradia e propriedade pública entregues com evidência de autoria, financiamento e resultado",
+      "Democracia, meio ambiente, direitos de grupos marginalizados e integridade pública"
+    ],
+    "criteriosDesfavoraveis": [
+      "Privatização, austeridade e tributação regressiva",
+      "Repressão trabalhista, autoritarismo, golpe, discriminação ou destruição ambiental",
+      "Corrupção, sobrepreço, licitação ou litígio suspeito",
+      "Conflitos de interesse público que beneficiem familiares"
+    ],
+    "ordemRanking": [
+      "efeito material e número de pessoas afetadas",
+      "responsabilidade direta da pessoa",
+      "resultado implementado e duradouro, acima de anúncio",
+      "força da evidência",
+      "recência como desempate"
+    ],
+    "fontes": "Um registro oficial pode provar ato oficial rotineiro; nos demais casos, exigir dois domínios independentes. Material de campanha prova apenas declaração. Alegações preservam status processual e exigem revisão humana.",
+    "ausencia": "Evidência insuficiente não é nota, absolvição nem condenação."
+  }
 }
