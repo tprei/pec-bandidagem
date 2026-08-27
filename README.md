@@ -117,6 +117,59 @@ Ficaram fora do JSON:
 
 Fora esses campos, o JSON reproduz o CSV linha por linha.
 
+## Votações nominais da Câmara (2021-2026)
+
+`data/votacoes-camara.json` traz as **3.138 votações nominais** do plenário e das comissões da Câmara entre 2021 e 2026, com o voto individual de 887 cadastros de deputado — 990.153 registros de voto. Nada no site usa esse arquivo hoje; ele está aqui como base para medir posicionamento ao longo do mandato.
+
+Regenerar:
+
+```
+node scripts/fetch-votacoes-camara.mjs
+```
+
+O script baixa os 12 dumps anuais (`votacoes-{ano}.csv` e `votacoesVotos-{ano}.csv`, 349 MB no total) para `.cache/camara/`, que fica fora do git. Cada arquivo é medido por `HEAD` antes de baixar e o download é retomável: o manifesto (`.cache/camara/manifesto.json`) guarda tamanho, `etag` e o sha256 do prefixo já verificado, então uma execução interrompida continua de onde parou e um arquivo corrompido no lugar — mesmo preservando o tamanho — é detectado e rebaixado. Uma retomada só é aceita se o `content-range` da resposta casar exatamente com o deslocamento pedido.
+
+349 MB de CSV viram 3,5 MB de JSON (0,60 MB em gzip). A compactação vem de duas decisões:
+
+- os 887 deputados viram um elenco posicional, e o voto de cada votação é **uma string de 887 dígitos**, um por índice do elenco, com o alfabeto em `alfabetoVotos` (`0` sem registro, `1` Sim, `2` Não, `3` Abstenção, `4` Obstrução, `5` Artigo 17, `6` em branco);
+- cada votação é um array posicional, com os nomes dos campos em `colunas`.
+
+```json
+{
+  "resumo": { "votacoes": 3138, "registrosDeVoto": 990153, "cadastrosDeDeputado": 887, "partidos": 29, "cadastrosComMaisDeUmaSigla": 345 },
+  "minimoBancadaAferivel": 5,
+  "partidos": ["PSL", "REPUBLICANOS", "PDT", "PSDB", "PSD", "..."],
+  "colunasDeputado": ["id", "nome", "uf", "participacoes", "votosComMaioriaDoPartido", "votosEmBancadaAferivel"],
+  "deputados": [[220639, "Guilherme Boulos", "SP", 720, 699, 703]],
+  "filiacoes": [[[0, 1], [25, 1013], [10, 1085]]],
+  "colunas": ["id", "dataHora", "orgao", "proposicao", "aprovada", "sim", "nao", "abstencao", "obstrucao", "artigo17", "participantes", "minoria", "rice", "desercoes", "descricao", "votos"],
+  "votacoes": [["2270800-135", "2025-09-16T21:04:35", "PLEN", 2561347, true, 353, 134, 1, 0, 0, 488, 0.2752, 0.7325, 57, "Aprovado, em primeiro turno...", "111110100002..."]]
+}
+```
+
+`filiacoes[i]` são os trechos `[índice do partido, índice da votação]` do deputado `i`, na ordem cronológica das votações, para reconstruir a legenda em que ele estava em qualquer votação. O exemplo acima é o de Bia Kicis: PSL, depois UNIÃO a partir da votação 1013, depois PL a partir da 1085. 345 cadastros mudaram de sigla no período.
+
+### As três métricas de credibilidade
+
+O problema de pontuar parlamentar por votação é que a maioria das votações não diz nada sobre ninguém. Estas três colunas separam o que informa do que não informa:
+
+- **`minoria`** é a fração da minoria entre os votos Sim e Não. Zero significa unanimidade: a votação não distingue ninguém e deve ser descartada. O corte usual é 5%.
+- **`rice`** é o índice de coesão de Rice (Stuart Rice, 1925), `|sim − não| / (sim + não)` dentro de cada bancada, ponderado pelo número de votos. Vale 1 quando toda bancada votou junto e 0 numa divisão exata. Perto de 1 a votação informa o partido, não a pessoa.
+- **`desercoes`** conta os deputados que votaram contra a maioria da própria bancada. É o sinal mais forte sobre o indivíduo, porque contraria a orientação do partido.
+
+`rice`, `desercoes` e os contadores por deputado só consideram bancadas com pelo menos `minimoBancadaAferivel` votos Sim/Não naquela votação, e bancadas empatadas ficam fora da conta de deserção — um empate não tem maioria a trair. `rice` é `null` nas 178 votações em que nenhuma bancada atinge esse mínimo.
+
+Aplicado ao período: 2.625 das 3.138 votações passam do corte de 5% de minoria, e 382 dessas têm `rice > 0,95` — ou seja, informam a sigla e não a pessoa. Na PEC 3/2021 o 1º turno dá `minoria` 0,2752, `rice` 0,7325 e 57 deserções: o PT rachou 12 a 51 e o PSDB 6 a 6, então ali o voto foi individual.
+
+### Limites conhecidos
+
+- O elenco é indexado pelo id de deputado da Câmara, que é um **cadastro, não uma pessoa**: quem foi eleito em legislaturas separadas aparece duas vezes. Átila Lira tem os ids 74459 (1.101 participações) e 123086 (1.104), o mesmo político com o histórico partido em dois. A deduplicação correta é por CPF, no cruzamento com `data/candidatos-2026.json`.
+- `cadastrosComMaisDeUmaSigla` conta qualquer troca de legenda, inclusive as fusões administrativas de 2022 (PSL e DEM para UNIÃO), que não foram decisão do deputado.
+- `nome` e `uf` usam a grafia mais frequente na fonte, que às vezes é a errada: o dump escreve "Chico D\`Angelo" 998 vezes e "Chico D'Angelo" 83. Para exibição, prefira o nome de urna do dataset do TSE.
+- `votosEmBancadaAferivel` é 0 para 6 deputados de bancadas pequenas (REDE), então a fidelidade é indefinida para eles, não zero.
+- `proposicao` é `null` em 776 votações — o dump usa `"0"` para "não vinculada a proposição", e requerimentos e questões de ordem caem nesse caso.
+- `proposicao` é a **última proposição apresentada**, não necessariamente a matéria principal: na PEC 3/2021 ela aponta para o substitutivo (2561347), não para a PEC (2270800). O id da matéria principal é o prefixo do id da votação.
+
 ## Rodando localmente
 
 A página carrega o JSON por `fetch`, então não funciona abrindo `index.html` direto pelo sistema de arquivos (browsers bloqueiam `fetch` sobre `file://`). Sirva a raiz do projeto:
