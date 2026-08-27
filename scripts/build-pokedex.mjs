@@ -148,25 +148,20 @@ votacoes.deputados.forEach((deputado, indice) => {
 if (semCpf.length > 0) throw new Error(`sem CPF na API: ${semCpf.join(", ")}`);
 
 const fichas = new Map();
-let comFoto = 0;
 for (const [sq, indice] of sqParaDeputado) {
   const deputado = votacoes.deputados[indice];
   const votos = {};
   for (const curada of curadas) votos[curada.id] = Number(curada.votacao[iv.votos][indice]);
   const camaraId = deputado[id.id];
-  const temFoto = existsSync(join(ROOT, "fotos", `${camaraId}.jpg`));
-  if (temFoto) comFoto += 1;
   fichas.set(sq, {
     camaraId,
     nomeCamara: deputado[id.nome],
-    temFoto,
     participacoes: deputado[id.participacoes],
     bancadaAferivel: deputado[id.votosEmBancadaAferivel],
     comMaioria: deputado[id.votosComMaioriaDoPartido],
     votos,
   });
 }
-
 const porUf = new Map();
 for (const candidato of candidatos.candidatos) {
   const [sigla] = candidatos.dicionarios.unidadeEleitoral[candidato[ic.ue]];
@@ -175,9 +170,11 @@ for (const candidato of candidatos.candidatos) {
   else lista.push(candidato);
 }
 
-const COLUNAS = ["sq", "numero", "nome", "nomeCompleto", "cargo", "partido", "coligacao", "badge", "ficha"];
+const COLUNAS = ["sq", "numero", "nome", "nomeCompleto", "cargo", "partido", "coligacao", "badge", "foto", "ficha"];
 const totalVotacoes = votacoes.votacoes.length;
 const ufs = [];
+let totalFotoTse = 0;
+let totalFotoCamara = 0;
 
 mkdirSync(SAIDA, { recursive: true });
 
@@ -186,13 +183,23 @@ for (const [sigla, lista] of [...porUf].sort(([a], [b]) => (a < b ? -1 : 1))) {
   const coligacoesUsadas = new Map();
   const linhas = lista
     .map((candidato) => {
+      const sq = candidato[ic.sq];
       const indiceColigacao = candidato[ic.coligacao];
       if (!coligacoesUsadas.has(indiceColigacao)) {
         coligacoesUsadas.set(indiceColigacao, coligacoesUsadas.size);
       }
       const ocupacao = candidatos.dicionarios.ocupacao[candidato[ic.ocupacao]];
+      const ficha = fichas.get(sq) ?? null;
+      let foto = null;
+      if (existsSync(join(ROOT, "fotos-tse", `${sq}.jpg`))) {
+        foto = "t";
+        totalFotoTse += 1;
+      } else if (ficha !== null && existsSync(join(ROOT, "fotos", `${ficha.camaraId}.jpg`))) {
+        foto = "c";
+        totalFotoCamara += 1;
+      }
       return [
-        candidato[ic.sq],
+        sq,
         candidato[ic.numero],
         candidato[ic.nomeUrna],
         candidato[ic.nome],
@@ -200,7 +207,8 @@ for (const [sigla, lista] of [...porUf].sort(([a], [b]) => (a < b ? -1 : 1))) {
         candidato[ic.partido],
         coligacoesUsadas.get(indiceColigacao),
         badge(ocupacao),
-        fichas.get(candidato[ic.sq]) ?? null,
+        foto,
+        ficha,
       ];
     })
     .sort((a, b) => a[4] - b[4] || a[1] - b[1] || (a[2] < b[2] ? -1 : 1));
@@ -210,14 +218,13 @@ for (const [sigla, lista] of [...porUf].sort(([a], [b]) => (a < b ? -1 : 1))) {
     return { nome: original.nome, tipo: original.tipo, composicao: original.composicao };
   });
 
-  const comFicha = linhas.filter((linha) => linha[8] !== null).length;
+  const comFicha = linhas.filter((linha) => linha[9] !== null).length;
   writeFileSync(
     join(SAIDA, `${sigla}.json`),
     `${JSON.stringify({ uf: sigla, nome: nomeUf, coligacoes, colunas: COLUNAS, candidatos: linhas })}\n`,
   );
   ufs.push({ sigla, nome: nomeUf, candidatos: linhas.length, comFicha });
 }
-
 const eixos = curadoria.eixos.map((eixo) => ({
   id: eixo.id,
   nome: eixo.nome,
@@ -275,7 +282,8 @@ writeFileSync(join(SAIDA, "indice.json"), `${JSON.stringify(indice, null, 2)}\n`
 
 console.log(`\nCatálogo gerado em data/dex/`);
 console.log(`Candidaturas: ${candidatos.candidatos.length} em ${ufs.length} unidades eleitorais`);
-console.log(`Com ficha de votação: ${indice.totalComFicha} (${comFoto} com foto local)`);
+console.log(`Com ficha de votação: ${indice.totalComFicha}`);
+console.log(`Com foto: ${totalFotoTse} do TSE, ${totalFotoCamara} da Câmara`);
 console.log(`Eixos: ${eixos.map((eixo) => `${eixo.nome} (${eixo.votacoes.length} votações)`).join(", ")}`);
 for (const uf of [...ufs].sort((a, b) => b.candidatos - a.candidatos).slice(0, 5)) {
   console.log(`  ${uf.sigla} ${String(uf.candidatos).padStart(5)} candidaturas, ${uf.comFicha} com ficha`);

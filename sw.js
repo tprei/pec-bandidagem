@@ -1,26 +1,28 @@
-const VERSAO = "dex-v4";
+const VERSAO = "dex-v5";
 
 const CONCHA = [
   "dex.html",
   "assets/dex.css",
   "assets/dex.js",
+  "assets/fontes/DSEG7Classic-BoldItalic.woff2",
   "assets/icone.svg",
   "assets/icone-192.png",
   "assets/icone-512.png",
   "manifest.webmanifest",
   "data/dex/indice.json",
+  "data/dex/BR.json",
 ];
 
 const PROPRIOS = [
   "dex.html",
   "assets/dex.css",
   "assets/dex.js",
+  "assets/fontes/DSEG7Classic-BoldItalic.woff2",
   "assets/icone.svg",
   "assets/icone-192.png",
   "assets/icone-512.png",
   "manifest.webmanifest",
 ];
-
 function absoluta(caminho) {
   return new URL(caminho, self.registration.scope).pathname;
 }
@@ -124,7 +126,7 @@ self.addEventListener("fetch", (evento) => {
     return;
   }
 
-  if (url.pathname.startsWith(absoluta("fotos/"))) {
+  if (url.pathname.startsWith(absoluta("fotos/")) || url.pathname.startsWith(absoluta("fotos-tse/"))) {
     evento.respondWith(primeiroDoCache(pedido, evento));
     return;
   }

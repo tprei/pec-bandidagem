@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Dex 2026">
-  <rect x="2.5" y="2.5" width="59" height="59" rx="13" fill="#13171b"/>
-  <rect x="2.5" y="2.5" width="59" height="59" rx="13" fill="none" stroke="#414e5b" stroke-width="3"/>
-  <rect x="9" y="9" width="46" height="46" rx="7" fill="#0b0e11"/>
-  <circle cx="32" cy="31" r="12.5" fill="#0b0e11" stroke="#ffb037" stroke-width="4.5"/>
-  <circle cx="32" cy="31" r="3.5" fill="#ffd584"/>
-  <path d="M24 24 A10.5 10.5 0 0 1 31 20.5" fill="none" stroke="#fff1cf" stroke-width="2" stroke-linecap="round"/>
-  <rect x="18" y="47" width="5" height="3" rx="1.5" fill="#3fd68f"/>
-  <rect x="25" y="47" width="14" height="3" rx="1.5" fill="#2c363f"/>
-  <rect x="41" y="47" width="5" height="3" rx="1.5" fill="#ffb037"/>
+  <rect x="3" y="3" width="58" height="58" rx="14" fill="#dc0a2d" stroke="#1b1f23" stroke-width="3"/>
+  <circle cx="23" cy="23" r="13" fill="#f4f1e8" stroke="#1b1f23" stroke-width="2.5"/>
+  <circle cx="23" cy="23" r="8.5" fill="#3ba2ff" stroke="#1b1f23" stroke-width="2"/>
+  <circle cx="20.5" cy="20.5" r="2.5" fill="#ffffff"/>
+  <circle cx="43" cy="17" r="3.5" fill="#ef4444" stroke="#1b1f23" stroke-width="2"/>
+  <circle cx="52" cy="17" r="3.5" fill="#fcd34d" stroke="#1b1f23" stroke-width="2"/>
+  <rect x="11" y="43" width="42" height="11" rx="3" fill="#c7d3b8" stroke="#1b1f23" stroke-width="2"/>
+  <line x1="17" y1="48.5" x2="29" y2="48.5" stroke="#22301f" stroke-width="2" stroke-linecap="round"/>
+  <line x1="33" y1="48.5" x2="47" y2="48.5" stroke="#22301f" stroke-width="2" stroke-linecap="round"/>
 </svg>
