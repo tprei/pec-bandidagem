@@ -1,0 +1,432 @@
+{
+  "fonte": {
+    "candidaturas": "https://dadosabertos.tse.jus.br/dataset/candidatos-2026",
+    "votacoes": "https://dadosabertos.camara.leg.br/arquivos",
+    "geradoEm": "2026-08-27T13:27:29.009Z"
+  },
+  "eleicao": {
+    "ano": 2026,
+    "turno": 1,
+    "tipo": "ELEIÇÃO ORDINÁRIA",
+    "data": "2026-10-04"
+  },
+  "totalCandidatos": 20765,
+  "totalComFicha": 708,
+  "votacoesNoHistorico": 3138,
+  "cargos": {
+    "1": "PRESIDENTE",
+    "2": "VICE-PRESIDENTE",
+    "3": "GOVERNADOR",
+    "4": "VICE-GOVERNADOR",
+    "5": "SENADOR",
+    "6": "DEPUTADO FEDERAL",
+    "7": "DEPUTADO ESTADUAL",
+    "8": "DEPUTADO DISTRITAL",
+    "9": "1º SUPLENTE",
+    "10": "2º SUPLENTE"
+  },
+  "partidos": {
+    "10": {
+      "sigla": "REPUBLICANOS",
+      "nome": "REPUBLICANOS"
+    },
+    "11": {
+      "sigla": "PP",
+      "nome": "PROGRESSISTAS"
+    },
+    "12": {
+      "sigla": "PDT",
+      "nome": "PARTIDO DEMOCRÁTICO TRABALHISTA"
+    },
+    "13": {
+      "sigla": "PT",
+      "nome": "PARTIDO DOS TRABALHADORES"
+    },
+    "14": {
+      "sigla": "MISSÃO",
+      "nome": "PARTIDO MISSÃO"
+    },
+    "15": {
+      "sigla": "MDB",
+      "nome": "MOVIMENTO DEMOCRÁTICO BRASILEIRO"
+    },
+    "16": {
+      "sigla": "PSTU",
+      "nome": "PARTIDO SOCIALISTA  DOS TRABALHADORES UNIFICADO"
+    },
+    "18": {
+      "sigla": "REDE",
+      "nome": "REDE SUSTENTABILIDADE"
+    },
+    "20": {
+      "sigla": "PODE",
+      "nome": "PODEMOS"
+    },
+    "21": {
+      "sigla": "PCB",
+      "nome": "PARTIDO COMUNISTA BRASILEIRO"
+    },
+    "22": {
+      "sigla": "PL",
+      "nome": "PARTIDO LIBERAL"
+    },
+    "23": {
+      "sigla": "CIDADANIA",
+      "nome": "CIDADANIA"
+    },
+    "25": {
+      "sigla": "PRD",
+      "nome": "PARTIDO RENOVACAO DEMOCRATICA"
+    },
+    "27": {
+      "sigla": "DC",
+      "nome": "DEMOCRACIA CRISTÃ"
+    },
+    "28": {
+      "sigla": "PRTB",
+      "nome": "PARTIDO RENOVADOR TRABALHISTA BRASILEIRO"
+    },
+    "29": {
+      "sigla": "PCO",
+      "nome": "PARTIDO DA CAUSA OPERÁRIA"
+    },
+    "30": {
+      "sigla": "NOVO",
+      "nome": "PARTIDO NOVO"
+    },
+    "33": {
+      "sigla": "MOBILIZA",
+      "nome": "MOBILIZAÇÃO NACIONAL"
+    },
+    "35": {
+      "sigla": "DEMOCRATA",
+      "nome": "DEMOCRATA"
+    },
+    "36": {
+      "sigla": "AGIR",
+      "nome": "AGIR"
+    },
+    "40": {
+      "sigla": "PSB",
+      "nome": "PARTIDO SOCIALISTA BRASILEIRO"
+    },
+    "43": {
+      "sigla": "PV",
+      "nome": "PARTIDO VERDE"
+    },
+    "44": {
+      "sigla": "UNIÃO",
+      "nome": "UNIÃO BRASIL"
+    },
+    "45": {
+      "sigla": "PSDB",
+      "nome": "PARTIDO DA SOCIAL DEMOCRACIA BRASILEIRA"
+    },
+    "50": {
+      "sigla": "PSOL",
+      "nome": "PARTIDO SOCIALISMO E LIBERDADE"
+    },
+    "55": {
+      "sigla": "PSD",
+      "nome": "PARTIDO SOCIAL DEMOCRÁTICO"
+    },
+    "65": {
+      "sigla": "PCDOB",
+      "nome": "PARTIDO COMUNISTA DO BRASIL"
+    },
+    "70": {
+      "sigla": "AVANTE",
+      "nome": "AVANTE"
+    },
+    "77": {
+      "sigla": "SOLIDARIEDADE",
+      "nome": "SOLIDARIEDADE"
+    },
+    "80": {
+      "sigla": "UP",
+      "nome": "UNIDADE POPULAR"
+    }
+  },
+  "federacoes": {
+    "100": {
+      "sigla": "PSDB/CIDADANIA",
+      "nome": "FEDERAÇÃO PSDB CIDADANIA",
+      "composicao": "PSDB/CIDADANIA"
+    },
+    "101": {
+      "sigla": "PT/PC do B/PV",
+      "nome": "FEDERAÇÃO BRASIL DA ESPERANÇA - FE BRASIL",
+      "composicao": "PT/PC do B/PV"
+    },
+    "102": {
+      "sigla": "PSOL/REDE",
+      "nome": "FEDERAÇÃO PSOL REDE",
+      "composicao": "PSOL/REDE"
+    },
+    "103": {
+      "sigla": "PRD/SOLIDARIEDADE",
+      "nome": "FEDERAÇÃO RENOVAÇÃO SOLIDÁRIA",
+      "composicao": "PRD/SOLIDARIEDADE"
+    },
+    "104": {
+      "sigla": "UNIÃO/PP",
+      "nome": "FEDERAÇÃO UNIÃO PROGRESSISTA",
+      "composicao": "UNIÃO/PP"
+    }
+  },
+  "badges": {
+    "politico": "Político de carreira",
+    "seguranca": "Segurança e Forças Armadas",
+    "religioso": "Religioso",
+    "saude": "Saúde",
+    "educacao": "Educação",
+    "juridico": "Jurídico",
+    "comunicacao": "Comunicação",
+    "agro": "Agro",
+    "artista": "Artista",
+    "empresario": "Empresário",
+    "servidor": "Servidor público",
+    "sindical": "Sindical",
+    "trabalhador": "Trabalhador"
+  },
+  "eixos": [
+    {
+      "id": "blindagem",
+      "nome": "Blindagem parlamentar",
+      "pergunta": "Votou para dificultar processos criminais contra parlamentares?",
+      "posicao": "A PEC 3/2021 exigia licença prévia da própria Câmara para o STF aceitar denúncia contra deputado e devolvia o voto secreto a essas decisões. É privilégio de foro pago pelo eleitor, não prerrogativa de mandato.",
+      "defendeOEleitor": 2,
+      "contraOEleitor": 1,
+      "votacoes": [
+        {
+          "id": "2270800-135",
+          "rotulo": "PEC da Blindagem, 1º turno",
+          "data": "2025-09-16",
+          "sim": 353,
+          "nao": 134,
+          "outros": 1,
+          "proposicao": 2270800
+        },
+        {
+          "id": "2270800-160",
+          "rotulo": "PEC da Blindagem, 2º turno",
+          "data": "2025-09-16",
+          "sim": 344,
+          "nao": 133,
+          "outros": 0,
+          "proposicao": 2270800
+        }
+      ]
+    },
+    {
+      "id": "jornada",
+      "nome": "Jornada de trabalho",
+      "pergunta": "Votou para reduzir a jornada e acabar com a escala 6x1?",
+      "posicao": "A PEC 221/2019 é o veículo que a Câmara aprovou para reduzir a jornada semanal e garantir dois dias de descanso, o fim da escala 6x1. Quem votou contra votou contra quem trabalha seis dias para descansar um.",
+      "defendeOEleitor": 1,
+      "contraOEleitor": 2,
+      "votacoes": [
+        {
+          "id": "2233802-424",
+          "rotulo": "PEC da jornada (fim da 6x1), 1º turno",
+          "data": "2026-05-27",
+          "sim": 472,
+          "nao": 22,
+          "outros": 1,
+          "proposicao": 2233802
+        },
+        {
+          "id": "2233802-438",
+          "rotulo": "PEC da jornada (fim da 6x1), 2º turno",
+          "data": "2026-05-27",
+          "sim": 461,
+          "nao": 19,
+          "outros": 0,
+          "proposicao": 2233802
+        }
+      ]
+    }
+  ],
+  "contexto": [
+    {
+      "id": "2487436-169",
+      "rotulo": "Isenção do IR até R$ 5 mil e tributação de altas rendas",
+      "nota": "Aprovado por unanimidade, sem um único voto contrário. Não separa ninguém de ninguém: todo mundo quis o crédito. Fica aqui como contexto, e de propósito não vale ponto em nenhum eixo.",
+      "data": "2025-10-01",
+      "sim": 493,
+      "nao": 0,
+      "outros": 1,
+      "proposicao": 2487436
+    }
+  ],
+  "ufs": [
+    {
+      "sigla": "AC",
+      "nome": "ACRE",
+      "candidatos": 385,
+      "comFicha": 14
+    },
+    {
+      "sigla": "AL",
+      "nome": "ALAGOAS",
+      "candidatos": 283,
+      "comFicha": 10
+    },
+    {
+      "sigla": "AM",
+      "nome": "AMAZONAS",
+      "candidatos": 468,
+      "comFicha": 13
+    },
+    {
+      "sigla": "AP",
+      "nome": "AMAPÁ",
+      "candidatos": 318,
+      "comFicha": 16
+    },
+    {
+      "sigla": "BA",
+      "nome": "BAHIA",
+      "candidatos": 1222,
+      "comFicha": 45
+    },
+    {
+      "sigla": "BR",
+      "nome": "BRASIL",
+      "candidatos": 26,
+      "comFicha": 2
+    },
+    {
+      "sigla": "CE",
+      "nome": "CEARÁ",
+      "candidatos": 708,
+      "comFicha": 34
+    },
+    {
+      "sigla": "DF",
+      "nome": "DISTRITO FEDERAL",
+      "candidatos": 657,
+      "comFicha": 13
+    },
+    {
+      "sigla": "ES",
+      "nome": "ESPÍRITO SANTO",
+      "candidatos": 588,
+      "comFicha": 13
+    },
+    {
+      "sigla": "GO",
+      "nome": "GOIÁS",
+      "candidatos": 895,
+      "comFicha": 22
+    },
+    {
+      "sigla": "MA",
+      "nome": "MARANHÃO",
+      "candidatos": 604,
+      "comFicha": 31
+    },
+    {
+      "sigla": "MG",
+      "nome": "MINAS GERAIS",
+      "candidatos": 1822,
+      "comFicha": 67
+    },
+    {
+      "sigla": "MS",
+      "nome": "MATO GROSSO DO SUL",
+      "candidatos": 421,
+      "comFicha": 11
+    },
+    {
+      "sigla": "MT",
+      "nome": "MATO GROSSO",
+      "candidatos": 445,
+      "comFicha": 15
+    },
+    {
+      "sigla": "PA",
+      "nome": "PARÁ",
+      "candidatos": 729,
+      "comFicha": 23
+    },
+    {
+      "sigla": "PB",
+      "nome": "PARAÍBA",
+      "candidatos": 443,
+      "comFicha": 18
+    },
+    {
+      "sigla": "PE",
+      "nome": "PERNAMBUCO",
+      "candidatos": 957,
+      "comFicha": 31
+    },
+    {
+      "sigla": "PI",
+      "nome": "PIAUÍ",
+      "candidatos": 397,
+      "comFicha": 11
+    },
+    {
+      "sigla": "PR",
+      "nome": "PARANÁ",
+      "candidatos": 1079,
+      "comFicha": 45
+    },
+    {
+      "sigla": "RJ",
+      "nome": "RIO DE JANEIRO",
+      "candidatos": 2029,
+      "comFicha": 65
+    },
+    {
+      "sigla": "RN",
+      "nome": "RIO GRANDE DO NORTE",
+      "candidatos": 325,
+      "comFicha": 10
+    },
+    {
+      "sigla": "RO",
+      "nome": "RONDÔNIA",
+      "candidatos": 435,
+      "comFicha": 13
+    },
+    {
+      "sigla": "RR",
+      "nome": "RORAIMA",
+      "candidatos": 401,
+      "comFicha": 13
+    },
+    {
+      "sigla": "RS",
+      "nome": "RIO GRANDE DO SUL",
+      "candidatos": 1051,
+      "comFicha": 39
+    },
+    {
+      "sigla": "SC",
+      "nome": "SANTA CATARINA",
+      "candidatos": 695,
+      "comFicha": 21
+    },
+    {
+      "sigla": "SE",
+      "nome": "SERGIPE",
+      "candidatos": 406,
+      "comFicha": 13
+    },
+    {
+      "sigla": "SP",
+      "nome": "SÃO PAULO",
+      "candidatos": 2618,
+      "comFicha": 86
+    },
+    {
+      "sigla": "TO",
+      "nome": "TOCANTINS",
+      "candidatos": 358,
+      "comFicha": 14
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "sobre": "Camada editorial do catálogo. Cada eixo declara uma posição e aponta as votações nominais que a sustentam. Os placares, datas e votos individuais não são escritos aqui: vêm de data/votacoes-camara.json, e o build aborta se um id de votação não existir lá.",
+  "eixos": [
+    {
+      "id": "blindagem",
+      "nome": "Blindagem parlamentar",
+      "pergunta": "Votou para dificultar processos criminais contra parlamentares?",
+      "posicao": "A PEC 3/2021 exigia licença prévia da própria Câmara para o STF aceitar denúncia contra deputado e devolvia o voto secreto a essas decisões. É privilégio de foro pago pelo eleitor, não prerrogativa de mandato.",
+      "defendeOEleitor": 2,
+      "contraOEleitor": 1,
+      "votacoes": [
+        { "id": "2270800-135", "rotulo": "PEC da Blindagem, 1º turno" },
+        { "id": "2270800-160", "rotulo": "PEC da Blindagem, 2º turno" }
+      ]
+    },
+    {
+      "id": "jornada",
+      "nome": "Jornada de trabalho",
+      "pergunta": "Votou para reduzir a jornada e acabar com a escala 6x1?",
+      "posicao": "A PEC 221/2019 é o veículo que a Câmara aprovou para reduzir a jornada semanal e garantir dois dias de descanso, o fim da escala 6x1. Quem votou contra votou contra quem trabalha seis dias para descansar um.",
+      "defendeOEleitor": 1,
+      "contraOEleitor": 2,
+      "votacoes": [
+        { "id": "2233802-424", "rotulo": "PEC da jornada (fim da 6x1), 1º turno" },
+        { "id": "2233802-438", "rotulo": "PEC da jornada (fim da 6x1), 2º turno" }
+      ]
+    }
+  ],
+  "contexto": [
+    {
+      "id": "2487436-169",
+      "rotulo": "Isenção do IR até R$ 5 mil e tributação de altas rendas",
+      "nota": "Aprovado por unanimidade, sem um único voto contrário. Não separa ninguém de ninguém: todo mundo quis o crédito. Fica aqui como contexto, e de propósito não vale ponto em nenhum eixo."
+    }
+  ]
+}

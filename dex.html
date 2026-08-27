@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dex 2026 — candidaturas e o que os deputados votaram</title>
+  <meta name="description" content="Guia offline das 20.765 candidaturas de 2026, com o número da urna em destaque e o histórico de votação de 708 deputados na Câmara dos Deputados.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#13171b">
+  <link rel="stylesheet" href="assets/dex.css">
+  <link rel="icon" href="assets/icone.svg" type="image/svg+xml">
+  <script type="module" src="assets/dex.js"></script>
+</head>
+<body>
+
+  <header class="topo">
+    <h1 class="topo-marca">Dex&nbsp;2026</h1>
+    <div class="topo-controles">
+      <button id="uf-atual" class="uf-atual" type="button" aria-haspopup="dialog">UF</button>
+      <input id="busca" class="busca" type="search" placeholder="Nome ou número na urna" autocomplete="off" spellcheck="false" enterkeyhint="search">
+      <button id="instalar" class="instalar" type="button" hidden>Instalar</button>
+    </div>
+    <p class="topo-resumo">20.765 candidaturas registradas no TSE para 2026 — 708 delas têm histórico de votação na Câmara dos Deputados.</p>
+    <p class="topo-nota">O que conta como “defende o eleitor” ou “contra o eleitor” é opinião editorial declarada deste guia, aplicada sobre votações nominais reais. Não é uma medida neutra.</p>
+  </header>
+
+  <nav id="filtros" class="filtros" aria-label="Filtros da lista">
+    <div class="filtro-grupo" data-grupo="cargo"></div>
+    <div class="filtro-grupo" data-grupo="badge"></div>
+    <button id="so-ficha" class="so-ficha" type="button" aria-pressed="false">Só quem já votou na Câmara</button>
+  </nav>
+
+  <p id="contagem" class="contagem"></p>
+
+  <section id="grade" class="grade"></section>
+
+  <button id="abrir-lista" class="minha-lista" type="button" aria-label="Minha lista de candidatos salvos"><span id="minha-lista-n">0</span></button>
+
+  <dialog id="ficha" class="ficha"></dialog>
+  <dialog id="seletor-uf" class="seletor-uf"></dialog>
+  <dialog id="lista" class="lista"></dialog>
+
+  <footer class="rodape">
+    <p>Candidaturas e números de urna obtidos do <a href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener">portal de Dados Abertos do TSE</a>. Registros de votação nominais obtidos do <a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener">portal de Dados Abertos da Câmara dos Deputados</a>, com link para a votação nominal de cada uma.</p>
+    <p>Fotos existem só para os deputados federais que já estiveram em exercício; todo o resto aparece sem foto, por opção.</p>
+    <p>Votações exibidas em “Contexto” foram unânimes e não pontuam em nenhum eixo: quando todo mundo vota igual, o resultado não diz nada sobre cada um.</p>
+    <p>Ausência de registro nunca vira zero por cento: quem não estava na Casa ou não votou aparece como “sem registro”, não como nota baixa.</p>
+    <p>E os conceitos “defende o eleitor” e “contra o eleitor” permanecem opinião editorial declarada deste guia sobre votações reais — você decide se concorda.</p>
+  </footer>
+
+</body>
+</html>

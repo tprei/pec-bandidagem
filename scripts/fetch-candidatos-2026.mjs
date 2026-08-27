@@ -360,6 +360,16 @@ const partes = [
 mkdirSync(join(ROOT, "data"), { recursive: true });
 writeFileSync(join(ROOT, "data", "candidatos-2026.json"), `${partes.join("\n")}\n`);
 
+const porCpf = {};
+for (const registro of registros) {
+  const cpf = registro.NR_CPF_CANDIDATO.padStart(11, "0");
+  if (!/^\d{11}$/.test(cpf)) throw new Error(`CPF inesperado em ${registro.SQ_CANDIDATO}: ${cpf}`);
+  if (porCpf[cpf] === undefined) porCpf[cpf] = [];
+  porCpf[cpf].push(numero(registro.SQ_CANDIDATO));
+}
+mkdirSync(join(ROOT, ".cache", "tse"), { recursive: true });
+writeFileSync(join(ROOT, ".cache", "tse", "cpf-sq.json"), `${JSON.stringify(porCpf)}\n`);
+
 console.log(`Candidaturas 2026 (TSE) — ${MEMBRO}`);
 console.log(`Gerado pelo TSE em: ${dados.fonte.geradoEm}`);
 console.log(`Total de candidaturas: ${candidatos.length}`);
