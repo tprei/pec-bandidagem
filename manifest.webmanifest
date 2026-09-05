@@ -1,15 +1,15 @@
 {
-  "name": "Catálogo 2026 — candidaturas e votações",
-  "short_name": "Dex 2026",
-  "description": "Guia offline das candidaturas de 2026 com o número da urna em destaque e o histórico de votações na Câmara dos Deputados.",
+  "name": "Voto Secreto — o voto é secreto, a opinião não",
+  "short_name": "Voto Secreto",
+  "description": "Declare NÃO VOTO ou VOTO com a votação nominal do Congresso como prova. Dados públicos do TSE, da Câmara e do Senado.",
   "lang": "pt-BR",
   "dir": "ltr",
   "start_url": "dex.html",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f4f1e8",
-  "theme_color": "#dc0a2d",
+  "background_color": "#f4efe3",
+  "theme_color": "#131218",
   "icons": [
     {
       "src": "assets/icone-192.png",

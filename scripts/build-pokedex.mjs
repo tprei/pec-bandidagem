@@ -40,6 +40,11 @@ const REGRAS_BADGE = [
   ["trabalhador", /(TRABALHADOR|MOTORISTA|MOTOBOY|COMERCIÁRIO|ELETRICISTA|MECÂNICO|CONSTRUÇÃO|OPERADOR|VENDEDOR|CABELEIREIRO|COSTUREIR|COZINHEIR|PEDREIRO|SERVENTE|MARCENEIR|SOLDADOR|PORTEIRO|GARÇOM|FEIRANTE|ARTESÃO|BORRACHEIRO|PINTOR|CARPINTEIR)/],
 ];
 
+const INICIO_LEGISLATURA_ATUAL = "2023-02-01";
+const CARGO_DA_CASA = { camara: 6, senado: 5 };
+const OCUPACAO_POLITICA = new Set(["MINISTRO DE ESTADO", "GOVERNADOR", "PREFEITO", "SENADOR", "DEPUTADO", "VEREADOR"]);
+const PERFIS = { novo: "Estreante", reeleicao: "Reeleição", outro: "Já teve mandato" };
+
 function ler(caminho, dica) {
   if (!existsSync(caminho)) throw new Error(`${caminho} não existe. Rode ${dica} primeiro.`);
   return JSON.parse(readFileSync(caminho, "utf8"));
@@ -67,6 +72,13 @@ function normalizarTexto(texto) {
 function badge(ocupacao) {
   for (const [nome, regra] of REGRAS_BADGE) if (regra.test(ocupacao)) return nome;
   return null;
+}
+
+function perfil(cargo, ocupacao, ficha) {
+  if (ficha !== null && ficha.mandatoAtual !== null && CARGO_DA_CASA[ficha.mandatoAtual] === cargo) return "reeleicao";
+  if (ocupacao === "GOVERNADOR" && cargo === 3) return "reeleicao";
+  if (ficha !== null || OCUPACAO_POLITICA.has(ocupacao)) return "outro";
+  return "novo";
 }
 
 function limparDescricao(texto) {
@@ -257,9 +269,14 @@ for (const sq of todosSqs) {
     }
   }
 
+  const votouNaCamaraAtual = indiceDeputado !== undefined && votacoesCamara.votacoes.some((v) => v[ivc.dataHora] >= INICIO_LEGISLATURA_ATUAL && v[ivc.votos][indiceDeputado] !== "0");
+  const votouNoSenadoAtual = indiceSenador !== undefined && votacoesSenado.votacoes.some((v) => v[ivs.dataHora] >= INICIO_LEGISLATURA_ATUAL && v[ivs.votos][indiceSenador] !== "0");
+  const mandatoAtual = votouNoSenadoAtual ? "senado" : votouNaCamaraAtual ? "camara" : null;
+
   if (deputado && senador) {
     fichas.set(sq, {
       casa: "ambas",
+      mandatoAtual,
       camaraId: deputado[idc.id],
       senadoId: senador[ids.id],
       nomeCamara: deputado[idc.nome],
@@ -275,6 +292,7 @@ for (const sq of todosSqs) {
   } else if (senador) {
     fichas.set(sq, {
       casa: "senado",
+      mandatoAtual,
       senadoId: senador[ids.id],
       nomeSenado: senador[ids.nome],
       nomeCamara: senador[ids.nome],
@@ -288,6 +306,7 @@ for (const sq of todosSqs) {
   } else if (deputado) {
     fichas.set(sq, {
       casa: "camara",
+      mandatoAtual,
       camaraId: deputado[idc.id],
       nomeCamara: deputado[idc.nome],
       nomeParlamentar: deputado[idc.nome],
@@ -308,7 +327,7 @@ for (const candidato of candidatos.candidatos) {
   else lista.push(candidato);
 }
 
-const COLUNAS = ["sq", "numero", "nome", "nomeCompleto", "cargo", "partido", "coligacao", "badge", "foto", "ficha"];
+const COLUNAS = ["sq", "numero", "nome", "nomeCompleto", "cargo", "partido", "coligacao", "badge", "foto", "perfil", "ficha"];
 const votacoesCamaraOrdenadas = [...votacoesCamara.votacoes].sort((a, b) => (a[ivc.dataHora] < b[ivc.dataHora] ? -1 : a[ivc.dataHora] > b[ivc.dataHora] ? 1 : 0));
 const totalVotacoesCamara = votacoesCamaraOrdenadas.length;
 
@@ -352,6 +371,7 @@ for (const [sigla, lista] of [...porUf].sort(([a], [b]) => (a < b ? -1 : 1))) {
         coligacoesUsadas.get(indiceColigacao),
         badge(ocupacao),
         foto,
+        perfil(candidato[ic.cargo], ocupacao, ficha),
         ficha,
       ];
     })
@@ -362,12 +382,17 @@ for (const [sigla, lista] of [...porUf].sort(([a], [b]) => (a < b ? -1 : 1))) {
     return { nome: original.nome, tipo: original.tipo, composicao: original.composicao };
   });
 
-  const comFicha = linhas.filter((linha) => linha[9] !== null).length;
+  const comFicha = linhas.filter((linha) => linha[10] !== null).length;
+  const porPerfil = { novo: 0, reeleicao: 0, outro: 0 };
+  for (const linha of linhas) {
+    const p = linha[9];
+    if (porPerfil[p] !== undefined) porPerfil[p] += 1;
+  }
   writeFileSync(
     join(SAIDA, `${sigla}.json`),
     `${JSON.stringify({ uf: sigla, nome: nomeUf, coligacoes, colunas: COLUNAS, candidatos: linhas })}\n`,
   );
-  ufs.push({ sigla, nome: nomeUf, candidatos: linhas.length, comFicha });
+  ufs.push({ sigla, nome: nomeUf, candidatos: linhas.length, comFicha, porPerfil });
 }
 
 const eixos = curadoria.eixos.map((eixo) => ({
@@ -453,6 +478,7 @@ const indice = {
   partidos: candidatos.dicionarios.partido,
   federacoes: candidatos.dicionarios.federacao,
   badges: BADGES,
+  perfis: PERFIS,
   eixos,
   contexto,
   pesquisa: indicePesquisa,

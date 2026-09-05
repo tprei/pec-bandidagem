@@ -1,104 +1,390 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quem votou a favor da PEC da Blindagem — Mural da Vergonha</title>
-  <meta name="description" content="Lista dos deputados federais que votaram Sim na PEC 3/2021 (PEC da Blindagem) na Câmara dos Deputados, com filtros por nome, partido, estado e turno.">
-  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 6.2 3.9 10.4 9 12 5.1-1.6 9-5.8 9-12V5l-9-4z" fill="%231a1512"/><path d="M12 3.2 5 6.2v4.8c0 4.9 3 8.4 7 9.9 4-1.5 7-5 7-9.9V6.2l-7-3z" fill="%23f4efe4"/><path d="M12 5.2 7 7.3v3.7c0 3.7 2.2 6.4 5 7.7V5.2z" fill="%238f1d1d"/></svg>'>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Libre+Franklin:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Voto Secreto — o voto é secreto, a opinião não</title>
+  <meta name="description" content="Declare NÃO VOTO ou VOTO com a votação nominal do Congresso como prova. Dados públicos do TSE, da Câmara dos Deputados e do Senado Federal. Sem cadastro.">
+  <meta name="theme-color" content="#131218">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/voto.css">
+  <script src="assets/vendor/qrcode.js"></script>
+  <script type="module" src="assets/voto.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#lista">Pular para a lista de deputados</a>
+  <main id="telas">
+    <!-- ONBOARDING -->
+    <section class="tela tela-onboarding" data-tela="onboarding" hidden>
+      <div class="onboarding-logo">
+        VOTO<br>
+        <span class="logo-risco">SECRETO</span>
+        <span class="onboarding-emoji">🤭</span>
+      </div>
+      <h1 class="onboarding-titulo">O voto é secreto.<br>A sua opinião não precisa ser.</h1>
+      <p class="onboarding-sub">Declare quem merece — e quem não merece — o seu voto, com a votação nominal do Congresso como prova. Sem cadastro, sem nome. Só link e QR.</p>
+      
+      <div class="onboarding-seletor">
+        <div class="onboarding-legenda-uf">Onde você vota?</div>
+        <div id="onboarding-grade-ufs" class="grid-ufs" role="radiogroup" aria-label="Unidade federativa"></div>
+        <button id="btn-entrar-cabine" class="btn-cta-primario">ENTRAR NA CABINE</button>
+        <button id="btn-entrar-todos" class="btn-cta-secundario">Ver todas as candidaturas mesmo assim</button>
+        <p class="onboarding-rodape">A cédula é regional: você só vota em candidatura do seu estado. A cabine começa por quem já tem histórico no Congresso.</p>
+      </div>
+    </section>
 
-  <header class="container cabecalho">
-    <div class="kicker-faixa">
-      <p class="kicker">Câmara dos Deputados · PEC 3/2021 · Votação Nominal</p>
-    </div>
-    <h1 class="titulo-poster">Quem votou a favor da <span class="pec-vilao">PEC da Blindagem</span></h1>
-    <p class="lede">Em 16 de setembro de 2025, <strong class="destaque-numeral" id="destaque-numeral">—</strong> deputados federais votaram <strong>Sim</strong> à PEC 3/2021 — proposta que tornaria quase impossível abrir processo criminal contra parlamentares — em pelo menos um dos dois turnos.</p>
-    <div class="cartazes-meta">
-      <p class="referencia carimbo-oficial">
-        <span class="carimbo-oficial__selo">Registro Oficial</span>
-        <a href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800" target="_blank" rel="noopener">PEC 3/2021 na íntegra (Câmara) ↗</a>
+    <!-- CATÁLOGO -->
+    <section class="tela" data-tela="catalogo" hidden>
+      <header class="topo-fixo">
+        <div class="topo-barra">
+          <div class="logo-pequeno" id="btn-logo-catalogo">
+            VOTO <span class="logo-risco">SECRETO</span> 🤭
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button id="btn-catalogo-scan" class="btn-pilula" title="Escanear QR">
+              <span style="position: relative; width: 14px; height: 14px; display: block;">
+                <span style="position: absolute; left: 0; top: 0; width: 4px; height: 4px; border-left: 2px solid currentColor; border-top: 2px solid currentColor;"></span>
+                <span style="position: absolute; right: 0; top: 0; width: 4px; height: 4px; border-right: 2px solid currentColor; border-top: 2px solid currentColor;"></span>
+                <span style="position: absolute; left: 0; bottom: 0; width: 4px; height: 4px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor;"></span>
+                <span style="position: absolute; right: 0; bottom: 0; width: 4px; height: 4px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;"></span>
+              </span>
+              Escanear
+            </button>
+            <button id="btn-catalogo-uf" class="btn-pilula">SP ▾</button>
+          </div>
+        </div>
+
+        <div class="caixa-busca">
+          <span style="font-size: 18px; color: var(--mudo); line-height: 1;">⌕</span>
+          <input id="input-busca" type="search" placeholder="Nome ou número na urna" inputmode="search" autocomplete="off">
+          <span id="chip-busca-lcd" class="lcd-numero" style="font-size: 18px; display: none;"></span>
+          <button id="btn-limpar-busca" class="btn-limpar" style="display: none;">✕</button>
+        </div>
+
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="controle-segmentado" style="flex: 1;">
+            <button id="btn-secao-historico" class="ativo">Com histórico</button>
+            <button id="btn-secao-todos">Todos</button>
+          </div>
+          <button id="btn-abrir-filtros" class="btn-pilula" style="flex-shrink: 0;">
+            <span style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="width: 14px; height: 2px; background: currentColor;"></span>
+              <span style="width: 10px; height: 2px; background: currentColor;"></span>
+              <span style="width: 6px; height: 2px; background: currentColor;"></span>
+            </span>
+            Filtros
+            <span id="cracha-filtros" style="background: var(--vermelho); color: #fff; border-radius: 999px; font-size: 10px; padding: 1px 6px; display: none;">0</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="conteudo-rolavel" id="catalogo-conteudo">
+        <div id="catalogo-contagem" class="linha-contagem">Carregando catálogo…</div>
+        <div id="catalogo-lista" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        <button id="btn-carregar-mais" class="btn-carregar-mais" style="display: none;">Carregar mais</button>
+      </div>
+    </section>
+
+    <!-- FICHA -->
+    <section class="tela" data-tela="ficha" hidden>
+      <header class="topo-fixo" style="padding: 8px 12px;">
+        <div class="topo-barra" style="justify-content: flex-start; gap: 12px;">
+          <button class="btn-voltar" id="btn-ficha-voltar">← Voltar</button>
+          <span id="ficha-topo-rotulo" style="font-size: 12px; font-weight: 700; color: var(--mudo); letter-spacing: .08em; text-transform: uppercase;">FICHA</span>
+        </div>
+      </header>
+
+      <div class="conteudo-rolavel" id="ficha-conteudo" style="padding-bottom: 120px;"></div>
+
+      <div class="ficha-botoes-fixos">
+        <div class="botoes-declaracao">
+          <button id="btn-ficha-nao" class="btn-nao-voto">NÃO VOTO</button>
+          <button id="btn-ficha-voto" class="btn-voto">VOTO</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CRIAR HUB -->
+    <section class="tela" data-tela="criar" hidden>
+      <div class="conteudo-rolavel" style="padding: 18px 16px 96px; gap: 14px;">
+        <h1 style="margin: 0; font-family: var(--fonte-titulo); font-size: 28px; letter-spacing: .03em; line-height: 1;">CRIAR POST 🤭</h1>
+        <p style="margin: -4px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--corpo); text-wrap: pretty;">Todo post nasce de um registro nominal do Congresso e vira link + QR. Escolha o formato.</p>
+        
+        <div class="grade-opcoes-criar">
+          <button id="hub-opcao-candidato" class="cartao-opcao-criar">
+            <div class="miniatura-preview"><canvas id="mini-candidato" width="72" height="90"></canvas></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-family: var(--fonte-titulo); font-size: 18px; letter-spacing: .03em;">UM CANDIDATO</div>
+              <div style="font-size: 12.5px; line-height: 1.4; color: var(--mudo); margin-top: 2px;">Declare NÃO VOTO ou VOTO em alguém, com os motivos. Escolha no catálogo.</div>
+            </div>
+          </button>
+
+          <button id="hub-opcao-duelo" class="cartao-opcao-criar">
+            <div class="miniatura-preview"><canvas id="mini-duelo" width="72" height="90"></canvas></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-family: var(--fonte-titulo); font-size: 18px; letter-spacing: .03em;">DUELO</div>
+              <div style="font-size: 12.5px; line-height: 1.4; color: var(--mudo); margin-top: 2px;">Este não, este sim. Uma candidatura no radar ao lado de quem defendeu o eleitor.</div>
+            </div>
+          </button>
+
+          <button id="hub-opcao-lista" class="cartao-opcao-criar">
+            <div class="miniatura-preview"><canvas id="mini-lista" width="72" height="90"></canvas></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-family: var(--fonte-titulo); font-size: 18px; letter-spacing: .03em; color: var(--vermelho);">LISTA NO RADAR</div>
+              <div style="font-size: 12.5px; line-height: 1.4; color: var(--mudo); margin-top: 2px;" id="hub-lista-desc">Até 9 de uma vez. Já vem com nomes selecionados do radar de SP — você só escolhe quem entra.</div>
+            </div>
+          </button>
+
+          <button id="hub-opcao-pauta" class="cartao-opcao-criar">
+            <div class="miniatura-preview"><canvas id="mini-pauta" width="72" height="90"></canvas></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-family: var(--fonte-titulo); font-size: 18px; letter-spacing: .03em;">PAUTA</div>
+              <div style="font-size: 12.5px; line-height: 1.4; color: var(--mudo); margin-top: 2px;">Quem votou como em uma votação específica: blindagem, 6x1, anistia, Previdência…</div>
+            </div>
+          </button>
+
+          <button id="hub-opcao-scan" class="btn-carregar-mais" style="border-style: dashed; margin-top: 4px;">
+            Ou escaneie um QR de adesivo / cartaz
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPOSER / NOVO -->
+    <section class="tela" data-tela="novo" hidden>
+      <header class="topo-fixo" style="padding: 8px 12px;">
+        <div class="topo-barra">
+          <button class="btn-voltar" id="btn-novo-voltar">← Voltar</button>
+          <span id="novo-titulo-topo" style="font-family: var(--fonte-titulo); font-size: 17px; letter-spacing: .04em;">NOVO POST</span>
+          <span style="width: 76px;"></span>
+        </div>
+      </header>
+
+      <div class="conteudo-rolavel" style="padding: 0; padding-bottom: 120px;">
+        <div class="poco-preview">
+          <canvas id="preview-composer" width="1080" height="1350"></canvas>
+        </div>
+        <div class="secao-controles" id="novo-controles"></div>
+      </div>
+
+      <div class="ficha-botoes-fixos">
+        <button id="btn-gerar-link-qr" class="btn-cta-primario" style="margin: 0; height: 54px; font-size: 20px;">
+          GERAR LINK + QR
+        </button>
+      </div>
+    </section>
+
+    <!-- COMPARTILHAR / PRONTO -->
+    <section class="tela" data-tela="pronto" hidden>
+      <header class="topo-fixo" style="padding: 8px 12px;">
+        <div class="topo-barra">
+          <button class="btn-voltar" id="btn-pronto-editar">← Editar</button>
+          <span style="font-family: var(--fonte-titulo); font-size: 17px; letter-spacing: .04em;">PRONTO. ESPALHE.</span>
+          <button id="btn-pronto-fechar" class="btn-limpar" style="width: 34px; height: 34px; font-size: 14px;">✕</button>
+        </div>
+      </header>
+
+      <div class="conteudo-rolavel" style="padding: 0; padding-bottom: 40px;">
+        <div class="poco-preview pronto-preview">
+          <canvas id="preview-pronto" width="1080" height="1350"></canvas>
+        </div>
+        <div style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+          <div class="caixa-link-curto">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mudo);">Link curto</div>
+              <div class="link-texto-box"><span id="pronto-link-texto" style="overflow-wrap: anywhere;"></span></div>
+              <button id="btn-copiar-link" class="btn-cta-primario" style="margin: 0; height: 40px; font-size: 13.5px; border-radius: 8px; font-family: inherit; font-weight: 800; box-shadow: none;">Copiar link</button>
+              <p style="margin: 0; font-size: 11.5px; line-height: 1.45; color: var(--mudo); text-wrap: pretty;">O caminho já declara a postura: <b>/nao/</b> ou <b>/voto/</b>. Quem abre vê a prova e faz o próprio post em dois toques.</p>
+            </div>
+            <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+              <div style="width: 128px; height: 128px; background: #fff; padding: 6px; border: 2px solid var(--tinta); border-radius: 8px; box-sizing: border-box;">
+                <canvas id="qr-pronto-tile" width="116" height="116" style="width: 100%; height: 100%; display: block;"></canvas>
+              </div>
+              <span style="font-size: 10.5px; font-weight: 700; color: var(--mudo); text-align: center; line-height: 1.3;">QR está impresso<br>na imagem também</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mudo);">Compartilhar imagem</div>
+            <div class="grid-compartilhar">
+              <button id="btn-share-whats" class="btn-acao-share btn-whats">WhatsApp</button>
+              <button id="btn-share-stories" class="btn-acao-share btn-stories">Stories 9:16</button>
+              <button id="btn-share-baixar" class="btn-acao-share btn-outline">Baixar imagem</button>
+              <button id="btn-share-adesivos" class="btn-acao-share btn-outline">Adesivos p/ imprimir</button>
+            </div>
+          </div>
+
+          <p class="aviso-legal">Compartilhe antes de 4 de outubro. No dia da eleição a lei só permite manifestação individual e silenciosa: nada de disparo em massa nem distribuição de links.</p>
+
+          <div class="caixa-anonimo">
+            <b>Anônimo por padrão.</b> O link não carrega nada seu — só o número, a postura e o registro nominal do Congresso. Voto secreto, opinião pública.
+          </div>
+
+          <button id="btn-ver-como-link" class="btn-carregar-mais" style="height: 46px;">
+            Ver como quem abre o link →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LINK RECEIVER -->
+    <section class="tela" data-tela="link" hidden>
+      <header class="topo-fixo" style="padding: 8px 12px; background: var(--tela);">
+        <div class="topo-barra">
+          <button class="btn-voltar" id="btn-link-voltar" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; display: grid; place-items: center;">‹</button>
+          <div style="flex: 1; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: #fff; border-radius: 999px; font: 700 12.5px var(--fonte-mono); color: var(--tinta); overflow: hidden; white-space: nowrap;">
+            <span style="font-size: 11px; color: var(--mudo);">🔒</span>
+            <span id="link-url-pill" style="overflow: hidden; text-overflow: ellipsis;">votosecreto.com.br</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="banner-atribuicao">
+        Manifestação individual de eleitor gerada via Voto Secreto com base em dados oficiais da Câmara dos Deputados e do Senado Federal.
+      </div>
+
+      <div class="conteudo-rolavel" id="link-conteudo-rolavel" style="padding: 0; padding-bottom: 40px;">
+        <div id="link-conteudo-valido">
+          <div class="poco-preview receiver-preview">
+            <canvas id="preview-link" width="1080" height="1350"></canvas>
+          </div>
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+            <p id="link-legenda-texto" style="margin: 0; font-size: 15px; line-height: 1.45; font-weight: 600; text-wrap: pretty;"></p>
+            
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mudo);">A prova</div>
+              <div id="link-provas-lista" style="display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+
+            <button id="btn-link-remix" class="btn-cta-primario" style="margin: 0; height: 54px; font-size: 20px;">
+              FAZER O MEU
+            </button>
+
+            <div id="link-botoes-extra" style="display: flex; gap: 8px;">
+              <button id="btn-link-discordar" class="btn-carregar-mais" style="flex: 1; height: 44px; font-size: 13px;"></button>
+              <button id="btn-link-ficha" class="btn-carregar-mais" style="flex: 1; height: 44px; font-size: 13px;">Ver ficha completa</button>
+            </div>
+
+            <p style="margin: 0; font-size: 11px; line-height: 1.5; color: var(--mudo); text-align: center;">
+              votosecreto.com.br · dados públicos do TSE, da Câmara e do Senado · sem cadastro
+            </p>
+          </div>
+        </div>
+
+        <div id="link-invalido-view" style="display: none; padding: 40px 20px; text-align: center;">
+          <h2 style="font-family: var(--fonte-titulo); font-size: 28px; color: var(--vermelho);">LINK INVÁLIDO</h2>
+          <p style="color: var(--mudo); font-size: 14px; line-height: 1.5; margin: 12px 0 24px;">
+            Este link não aponta para nenhuma candidatura conhecida. Ele pode ter sido digitado errado ou vir de uma versão antiga.
+          </p>
+          <button id="btn-link-ir-catalogo" class="btn-cta-primario" style="max-width: 280px; margin: 0 auto; height: 48px; font-size: 18px;">
+            Ir para o catálogo
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RADAR -->
+    <section class="tela" data-tela="radar" hidden>
+      <header class="topo-fixo">
+        <div class="topo-barra">
+          <span style="font-family: var(--fonte-titulo); font-size: 24px; letter-spacing: .03em; line-height: 1; color: var(--vermelho);">NO RADAR</span>
+          <button id="btn-radar-uf" class="btn-pilula">SP ▾</button>
+        </div>
+        <p id="radar-blurb" class="radar-blurb"></p>
+        <div class="controle-segmentado">
+          <button id="btn-radar-partido" class="ativo">Por partido</button>
+          <button id="btn-radar-pauta">Por pauta</button>
+          <button id="btn-radar-ranking">Ranking</button>
+        </div>
+      </header>
+
+      <div class="conteudo-rolavel" id="radar-conteudo"></div>
+    </section>
+
+    <!-- SCAN -->
+    <section class="tela tela-scan" data-tela="scan" hidden>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-family: var(--fonte-titulo); font-size: 20px; letter-spacing: .04em;">ESCANEAR</span>
+        <span style="font-size: 11px; font-weight: 700; color: #a9a3b5; letter-spacing: .1em; text-transform: uppercase;">câmera</span>
+      </div>
+
+      <div class="scan-visor" id="scan-visor">
+        <video id="scan-video" class="scan-video" playsinline muted autoplay></video>
+        <div class="scan-mira" id="scan-mira">
+          <span class="scan-canto canto-tl"></span>
+          <span class="scan-canto canto-tr"></span>
+          <span class="scan-canto canto-bl"></span>
+          <span class="scan-canto canto-br"></span>
+          <span class="scan-linha"></span>
+        </div>
+        <div id="scan-aviso-camera" style="position: absolute; inset: 0; padding: 20px; display: none; place-items: center; text-align: center; color: #c9c3d3; font-size: 13.5px; line-height: 1.5; background: #1a1820;">
+          Câmera indisponível neste navegador. Cole o link abaixo.
+        </div>
+      </div>
+
+      <p style="margin: 0; font-size: 13.5px; line-height: 1.5; color: #c9c3d3; text-align: center; text-wrap: pretty;">
+        Aponte para um QR do Voto Secreto — adesivo no poste, cartaz, story de alguém. Abre a ficha com a prova e você declara o seu em dois toques.
       </p>
-      <aside class="nota nota--arquivada">
-        <span class="nota__selo" aria-hidden="true">ARQUIVADA</span>
-        <span>Em 24/09/2025, a CCJ do Senado rejeitou e arquivou a proposta.</span>
-      </aside>
-      <p class="referencia carimbo-oficial"><span class="carimbo-oficial__selo">Eleições 2026</span><a href="dex.html"><strong>Catálogo 2026</strong>: candidatos do seu estado e o histórico de votações na Câmara ↗</a></p>
-    </div>
-    <noscript>
-      <p class="sem-js">Para usar os filtros interativos, ative o JavaScript — ou consulte a planilha direta em <a href="data/votos-pec-blindagem.csv">data/votos-pec-blindagem.csv</a>.</p>
-    </noscript>
-  </header>
 
-  <main class="container conteudo">
-    <section class="estatisticas" id="estatisticas" aria-label="Estatísticas das votações" hidden>
-      <div class="estatistica">
-        <span class="estatistica__numero" id="stat-sim-algum">—</span>
-        <span class="estatistica__rotulo">Sim em algum turno</span>
+      <div style="display: flex; gap: 8px; align-items: center; height: 46px; padding: 0 12px; background: #1a1820; border: 1.5px solid #3a3645; border-radius: 10px;">
+        <span style="font-size: 11px; color: #a9a3b5; font-weight: 700;">OU</span>
+        <input id="input-scan-link" placeholder="Cole um link votosecreto.com.br/…" style="flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-size: 13.5px; color: #f4efe3; font-weight: 600;">
+        <button id="btn-scan-abrir-link" style="border: none; background: var(--vermelho-vivo); color: #fff; font-size: 12px; font-weight: 800; border-radius: 6px; padding: 6px 10px; cursor: pointer;">Abrir</button>
       </div>
-      <div class="estatistica estatistica--alerta">
-        <span class="estatistica__numero" id="stat-sim-ambos">—</span>
-        <span class="estatistica__rotulo">Sim nos dois turnos</span>
-      </div>
-      <div class="estatistica">
-        <span class="estatistica__numero" id="stat-data">—</span>
-        <span class="estatistica__rotulo">Data da votação</span>
-      </div>
-    </section>
-
-    <section class="barra" id="barra-filtros" hidden aria-label="Filtros da lista">
-      <div class="controle controle--busca">
-        <label for="busca">Buscar por nome</label>
-        <input type="search" id="busca" autocomplete="off" spellcheck="false" placeholder="Digite o nome do deputado">
-      </div>
-      <div class="controle">
-        <label for="partido">Partido</label>
-        <select id="partido"></select>
-      </div>
-      <div class="controle">
-        <label for="uf">Estado</label>
-        <select id="uf"></select>
-      </div>
-      <div class="controle">
-        <label for="turno">Turno</label>
-        <select id="turno">
-          <option value="qualquer">Sim em algum turno</option>
-          <option value="ambos">Sim nos dois turnos</option>
-          <option value="t1">Sim no 1º turno</option>
-          <option value="t2">Sim no 2º turno</option>
-        </select>
-      </div>
-      <div class="controle">
-        <label for="ordem">Ordenar por</label>
-        <select id="ordem">
-          <option value="partido">Partido</option>
-          <option value="nome">Nome</option>
-          <option value="uf">UF</option>
-        </select>
-      </div>
-      <button type="button" id="limpar" class="botao-limpar">Limpar filtros</button>
-    </section>
-
-    <nav class="chips" id="chips" hidden aria-label="Resumo por partido"></nav>
-    <p class="legenda" id="legenda" hidden>Vermelho mais intenso = votou a favor nos dois turnos; verde = votou contra.</p>
-
-    <p class="contador" id="contador" role="status" aria-live="polite"></p>
-    <ul class="linhas" id="lista"></ul>
-    <section class="painel-status" id="painel-status" aria-live="polite">
-      <p class="carregando" id="carregando">Carregando os dados das duas votações…</p>
     </section>
   </main>
 
-  <footer class="container rodape">
-    <p>Dados públicos obtidos da <a href="https://dadosabertos.camara.leg.br" target="_blank" rel="noopener">API de Dados Abertos da Câmara dos Deputados</a>. Registros nominais das votações de 16/09/2025, conferidos a partir da divulgação feita no <a href="https://www.youtube.com/watch?v=aDjuRLF4cIo" target="_blank" rel="noopener">vídeo “NÃO VOTE neles!”</a>, de Gabriel Salazar.</p>
-  </footer>
+  <!-- TAB BAR -->
+  <nav id="abas" class="abas" hidden>
+    <button id="aba-catalogo" class="aba-item ativa">
+      <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px;">
+        <span style="width: 8px; height: 8px; background: currentColor; border-radius: 2px;"></span>
+        <span style="width: 8px; height: 8px; background: currentColor; border-radius: 2px;"></span>
+        <span style="width: 8px; height: 8px; background: currentColor; border-radius: 2px;"></span>
+        <span style="width: 8px; height: 8px; background: currentColor; border-radius: 2px;"></span>
+      </span>
+      Catálogo
+    </button>
+    <button id="aba-criar" class="aba-criar" title="Criar post">
+      <span style="font: 800 26px/1 var(--fonte-corpo);">+</span>
+      <span style="font-size: 9px; font-weight: 800; letter-spacing: .06em;">CRIAR</span>
+    </button>
+    <button id="aba-radar" class="aba-item">
+      <span style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid currentColor; display: grid; place-items: center; box-sizing: border-box;">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span>
+      </span>
+      Radar
+    </button>
+  </nav>
 
-  <script type="module" src="assets/app.js"></script>
+  <!-- FILTROS MODAL SHEET -->
+  <dialog id="folha-filtros" class="folha" aria-labelledby="filtros-titulo">
+    <span class="folha-puxador"></span>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span id="filtros-titulo" style="font-family: var(--fonte-titulo); font-size: 20px; letter-spacing: .04em;">FILTROS</span>
+      <button id="btn-limpar-filtros" style="border: none; background: transparent; color: var(--vermelho); font-size: 13px; font-weight: 800; cursor: pointer;">Limpar</button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mudo);">Ordenar</div>
+      <div class="chip-grupo" id="filtros-grupo-ordem"></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mudo);">Cargo</div>
+      <div class="chip-grupo" id="filtros-grupo-cargo"></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mudo);">Perfil</div>
+      <div class="chip-grupo" id="filtros-grupo-perfil"></div>
+    </div>
+
+    <button id="btn-fechar-filtros" class="btn-cta-primario" style="margin-top: 6px; height: 48px; font-size: 18px; border-radius: 10px; box-shadow: none; background: var(--tinta);">
+      PRONTO
+    </button>
+  </dialog>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

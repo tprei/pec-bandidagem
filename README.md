@@ -234,54 +234,60 @@ Duas restrições do serviço do Senado pesam na implementação:
 
 O esquema é o mesmo de `votacoes-camara.json`: elenco posicional de senadores, e o voto de cada votação é uma string com um dígito por senador. `id` tem o prefixo `SF-` e o resto é o `codigoSessaoVotacao` da fonte. A sigla do voto do Senado é mais rica que a da Câmara e mapeia assim: `Sim`→1, `Não`→2, `Abstenção`→3, `Obstrução` e `P-NRV`→4, `Presidente (art. 51 RISF)`→5, o resto (`AP`, `LS`, `LP`, `MIS`, `NA`, `NCom`)→0 sem registro. Como bancadas de senador são menores, `minimoBancadaAferivel` aqui é 3 (na Câmara, 5).
 
-## Catálogo 2026 (`dex.html`)
+## Voto Secreto (`dex.html`)
 
-O catálogo é um segundo aplicativo no mesmo repositório, mobile-first e offline-first, pensado para quem está no ônibus com sinal ruim e precisa lembrar do número na urna. `index.html` continua sendo o mural da PEC da Blindagem e não mudou de função.
+O Voto Secreto é uma aplicação mobile-first e offline-first pensada para permitir a declaração individual de voto ou rejeição de candidaturas em 2026 com base nas votações nominais do Congresso Nacional como prova. `index.html` permanece como o mural histórico da PEC da Blindagem.
 
-A ideia é uma pokédex: o dex é **regional por padrão** porque a cédula também é — você só vota em candidatura do seu próprio estado. O número na urna é o elemento mais destacado da carta, porque é a única informação que transforma intenção em voto.
+A premissa central é que o voto é secreto na cabine, mas a manifestação de preferência ou recusa é pública e garantida por lei. A aplicação não possui cadastro, servidor de banco de dados ou rastreamento.
 
-Gerar os dados do catálogo:
+### Telas da aplicação
 
-```
-node scripts/fetch-candidatos-2026.mjs
-node scripts/fetch-votacoes-camara.mjs
-node scripts/fetch-votacoes-senado.mjs
-node scripts/build-pokedex.mjs
-```
+- **Onboarding:** seleção regional do estado onde o eleitor vota (a cédula é regional).
+- **Catálogo:** pesquisa instantânea por nome ou número na urna com chip de visor LCD, abas de filtro ("Com histórico" e "Todos"), régua de votações de 8 segmentos nos eixos editoriais e botões de ação individual ("NÃO VOTO" e "VOTO").
+- **Ficha:** visão aprofundada da candidatura, identificação de reeleição ou mandato anterior, número na urna em LCD e detalhamento de votos por eixo temático com links para as atas oficiais da Câmara e do Senado.
+- **Criar post (Hub):** atalhos para os formatos de postagem: "Um candidato", "Duelo", "Lista no radar" e "Pauta", além de acesso ao leitor de QR code.
+- **Composer:** gerador do post em canvas (formatos Cabine e Cédula), com seleção de motivos nominais, oponente ou lista de nomes, atualizando a prévia em tempo real.
+- **Compartilhar (Pronto):** entrega do link curto sem estado, exibição do QR code e botões de exportação direta para WhatsApp, Stories 9:16, download de imagem (1080x1350) e cartela de adesivos A4 para impressão.
+- **Link receiver:** tela acessada por quem abre um link compartilhado (`#/nao/<id>` ou `#/voto/<id>`), exibindo o banner de manifestação individual de eleitor, a imagem do post, a legenda correspondente, a prova nominal com links oficiais e botão de remix ("Fazer o meu").
+- **Radar:** visão analítica das candidaturas no radar de votações contrárias ao eleitor, agrupadas por partido, por pauta ou em ranking decrescente.
+- **Escanear:** leitor de QR code integrado usando `BarcodeDetector` via câmera do dispositivo ou entrada manual de link.
 
-`build-pokedex.mjs` cruza as candidaturas com os deputados **por CPF**, que é chave exata e dispensa casamento por nome. O CPF entra pelo `.cache/tse/cpf-sq.json` (fora do git, escrito por `fetch-candidatos-2026.mjs`) e pelos cadastros da API da Câmara (`.cache/camara/deputados-cpf.json`), e nunca é gravado em `data/`. O resultado são 28 arquivos por unidade eleitoral mais um índice:
+### Formato de links sem estado
 
-| arquivo | conteúdo | tamanho |
-| --- | --- | --- |
-| `data/dex/indice.json` | cargos, partidos, badges, eixos editoriais, lista de UFs | 12 KB (3 KB gzip) |
-| `data/dex/SP.json` | a maior UF, 2.618 candidaturas | 252 KB (66 KB gzip) |
-| `data/dex/AC.json` | a menor, 385 candidaturas | 44 KB (11 KB gzip) |
+Os links gerados (`#/nao/<id>` e `#/voto/<id>`) são completamente sem estado: carregam apenas as decisões do eleitor empacotadas em Base32 Crockford (`ALFABETO = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"`), que são resolvidas em tempo de execução contra o conjunto público de dados:
 
-O service worker pré-carrega só a casca e o índice. Os arquivos por estado entram no cache no primeiro uso, porque o país inteiro são 2 MB e o eleitor precisa de um estado só. As fotos nunca são pré-carregadas.
+| Tipo | Descrição | Campos e bits | Chars |
+| --- | --- | --- | --- |
+| `C` | Candidato | modelo(1) + motivos(8) + ref(27) = 36 bits | 1+8 (9 chars) |
+| `D` | Duelo | modelo(1) + refNao(27) + refSim(27) = 55 bits | 1+11 (12 chars) |
+| `P` | Pauta | modelo(1) + eixo(4) + n(4) + n×ref(27) = 9+27n bits | 1+ceil((9+27n)/5) |
+| `L` | Lista | modelo(1) + n(4) + n×ref(27) = 5+27n bits | 1+ceil((5+27n)/5) |
 
-### Quem tem ficha, e quem não tem
+Cada referência `ref(sq)` compacta a Unidade Eleitoral (5 bits, 1 a 28) e a sequência do candidato (22 bits), viabilizando identificadores extremamente concisos e sem necessidade de armazenamento centralizado.
 
-Das 20.765 candidaturas, **861 têm histórico de votação** no Congresso entre 2017 e 2026 — 791 na Câmara e 91 no Senado, com 21 que passaram pelas duas casas. São os deputados e senadores em exercício que disputam a reeleição ou outro cargo, mais os que passaram pelo Congresso no período. As outras 19.904 não têm ficha, e isso é a decisão de produto mais importante do catálogo: **ausência de registro nunca vira nota zero**. Quem nunca foi deputado federal nem senador aparece como "Sem histórico no Congresso", que é informação, não demérito. Inventar um número para 96% das candidaturas destruiria a credibilidade do resto.
+### Perfis de candidatura
 
-A mesma regra vale um nível abaixo: quem tem ficha mas não votou numa votação específica recebe "sem registro" naquele eixo, não 0%. Renan Filho (AL) é o caso exemplar: tem 13 participações nominais no Senado no período, mas nenhuma delas cai nas 19 votações curadas, então os eixos dele aparecem em branco.
+O pipeline de dados classifica as candidaturas em três perfis objetivos:
+1. **Reeleição (`reeleicao`):** parlamentares que registraram votação nominal na Câmara ou no Senado na legislatura iniciada em 01/02/2023, concorrendo ao mesmo cargo, ou candidatos ao governo estadual que declararam a ocupação `GOVERNADOR`.
+2. **Já teve mandato (`outro`):** candidaturas com histórico de votação no Congresso anterior à legislatura atual ou ocupação política prévia declarada (ministro, prefeito, vereador).
+3. **Estreante (`novo`):** candidaturas sem registro prévio de votação nominal federal nem histórico de mandatos políticos declarados. Ausência de registro não é nota negativa.
 
-### Os eixos são opinião declarada
+*Nota sobre os dados do TSE 2026:* O arquivo do TSE não disponibiliza a coluna `ST_REELEICAO`, de modo que a reeleição para cargos do Executivo baseia-se na ocupação autodeclarada ao tribunal.
 
-`data/curadoria.json` é a camada editorial, e é curta de propósito. Cada eixo declara uma posição e aponta as votações nominais que a sustentam; placares, datas e votos individuais vêm de `data/votacoes-camara.json` e de `data/votacoes-senado.json`, e o build aborta se um id curado não existir lá.
+### Critério do Radar
 
-- **Blindagem parlamentar** — PEC 3/2021, dois turnos. Votar Sim é votar a favor do privilégio. Discrimina de verdade: minoria de 27,5%, o PT rachou 12 a 51 e o PSDB 6 a 6. **339 candidaturas de 2026 votaram a favor da blindagem.**
-- **Jornada de trabalho** — PEC 221/2019, dois turnos, o veículo do fim da escala 6x1 aprovado em 27/05/2026. Aqui só 21 candidaturas votaram contra, e a maioria delas em Santa Catarina. Com minoria abaixo de 5% o eixo não gradua todo mundo: ele identifica os poucos que se expuseram.
-- **Contexto, sem pontuar** — PL 1087/2025, isenção do IR e tributação de altas rendas, aprovado **493 a 0**. Não existe voto contrário para pontuar. Fica visível e marcado como não pontuável, porque quando todos votam igual o placar não diz nada sobre ninguém.
+Uma candidatura entra no radar quando acumula 3 ou mais votos contrários aos direitos do eleitor nos eixos avaliados.
 
-A cor de cada voto segue o **significado no eixo**, não o código bruto: o mesmo "Sim" aparece vermelho na blindagem e verde na jornada. Colorir por Sim/Não faria "votou a favor da blindagem" parecer elogio.
+## Conformidade eleitoral
 
-A fidelidade partidária aparece como fato, nunca como virtude: "votou com o próprio partido em 96% das 262 votações mensuráveis" (Flávio Bolsonaro, no Senado). Voto independente não é automaticamente bom nem ruim, e o eixo é que dá direção.
+O projeto Voto Secreto foi concebido com rigorosa observância à legislação eleitoral brasileira, em especial a Resolução TSE nº 23.610/2019 (art. 28):
 
-### O que o app faz
-
-Busca por nome ou número (sem acento, sem caixa), filtro por cargo e por perfil de ocupação, e um recorte de "só quem já votou no Congresso". Cada carta abre uma ficha com a composição da coligação traduzida em "votar aqui também ajuda a eleger", cada votação curada com placar, o voto daquela pessoa e link para a ata oficial — na Câmara ou no Senado, conforme a casa da votação. "Minha lista" guarda candidaturas no `localStorage` e funciona como cola de votação sem sinal nenhum, que é a situação real na fila da seção eleitoral.
-
-Os badges de perfil saem da ocupação declarada ao TSE e cobrem 73,5% das candidaturas. Ocupações sem carga política clara (OUTROS, ENGENHEIRO, ESTUDANTE, DONA DE CASA) ficam sem badge de propósito: um badge só vale se significar algo.
+1. **Manifestação estritamente em primeira pessoa:** Toda linguagem da interface e dos cartazes gerados adota a primeira pessoa (`NÃO VOTO`, `VOTO`, `meu voto não vai pro…`). O modo imperativo (`não vote`, `vote em`) é proibido em todo o projeto.
+2. **Manifestação individual e dados públicos:** O autor de qualquer manifestação é o próprio cidadão no exercício de sua liberdade de expressão. O site apenas renderiza dados públicos e não armazena votos, identidades nem contadores.
+3. **Vedação a termos desonrosos:** Termos desonrosos ou injuriosos são banidos da cópia do produto. A avaliação apoia-se unicamente em registros oficiais de votação nominal.
+4. **Sem impulsionamento ou disparos em massa:** O projeto não utiliza anúncios pagos, pixels de conversão ou ferramentas automatizadas de mensageria.
+5. **Aviso legal para o dia da eleição:** A aplicação alerta explicitamente sobre a vedação legal a disparos e distribuição de panfletagem digital no dia da eleição, data em que apenas a manifestação individual e silenciosa é permitida.
+6. **Garantia constitucional e legal:** A manifestação pacífica e individual do eleitor sobre suas escolhas e rejeições eleitorais é assegurada pelo art. 28 da Resolução TSE nº 23.610/2019.
 
 ## Rodando localmente
 
@@ -291,8 +297,8 @@ Nenhuma das duas páginas funciona abrindo o arquivo direto pelo sistema de arqu
 python3 -m http.server 8000
 ```
 
-O mural da PEC fica em <http://localhost:8000> e o catálogo em <http://localhost:8000/dex.html>.
+O mural da PEC fica em <http://localhost:8000> e o app em <http://localhost:8000/dex.html>.
 
 ## Atribuição
 
-Dados das votações: [API de Dados Abertos da Câmara dos Deputados](https://dadosabertos.camara.leg.br), termo de reutilização e licenciamento paralelo da Câmara, e [Serviço de Dados Abertos do Senado Federal](https://legis.senado.leg.br/dadosabertos). Dados das candidaturas de 2026: [Portal de Dados Abertos do TSE](https://dadosabertos.tse.jus.br). Ideia e divulgação original: vídeo ["NÃO VOTE neles! A lista dos Deputados que votaram para se BLINDAR"](https://www.youtube.com/watch?v=aDjuRLF4cIo), de Gabriel Salazar.
+Dados das votações: [API de Dados Abertos da Câmara dos Deputados](https://dadosabertos.camara.leg.br), termo de reutilização e licenciamento paralelo da Câmara, e [Serviço de Dados Abertos do Senado Federal](https://legis.senado.leg.br/dadosabertos). Dados das candidaturas de 2026: [Portal de Dados Abertos do TSE](https://dadosabertos.tse.jus.br). Ideia e divulgação original: [vídeo de Gabriel Salazar sobre a PEC da Blindagem](https://www.youtube.com/watch?v=aDjuRLF4cIo).

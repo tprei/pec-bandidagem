@@ -1,10 +1,18 @@
-const VERSAO = "dex-v11";
+const VERSAO = "voto-v1";
 
 const CONCHA = [
+  "index.html",
   "dex.html",
-  "assets/dex.css",
-  "assets/dex.js",
-  "assets/story.js",
+  "assets/voto.css",
+  "assets/voto.js",
+  "assets/elo.js",
+  "assets/cartaz.js",
+  "assets/vendor/qrcode.js",
+  "assets/fontes/Anton-Regular.woff2",
+  "assets/fontes/Archivo-400.woff2",
+  "assets/fontes/Archivo-600.woff2",
+  "assets/fontes/Archivo-700.woff2",
+  "assets/fontes/Archivo-800.woff2",
   "assets/fontes/DSEG7Classic-BoldItalic.woff2",
   "assets/icone.svg",
   "assets/icone-192.png",
@@ -15,10 +23,18 @@ const CONCHA = [
 ];
 
 const PROPRIOS = [
+  "index.html",
   "dex.html",
-  "assets/dex.css",
-  "assets/dex.js",
-  "assets/story.js",
+  "assets/voto.css",
+  "assets/voto.js",
+  "assets/elo.js",
+  "assets/cartaz.js",
+  "assets/vendor/qrcode.js",
+  "assets/fontes/Anton-Regular.woff2",
+  "assets/fontes/Archivo-400.woff2",
+  "assets/fontes/Archivo-600.woff2",
+  "assets/fontes/Archivo-700.woff2",
+  "assets/fontes/Archivo-800.woff2",
   "assets/fontes/DSEG7Classic-BoldItalic.woff2",
   "assets/icone.svg",
   "assets/icone-192.png",
@@ -124,8 +140,15 @@ self.addEventListener("fetch", (evento) => {
   if (url.origin !== self.location.origin) return;
 
   if (pedido.mode === "navigate") {
-    if (url.pathname !== absoluta("dex.html")) return;
-    evento.respondWith(primeiroDaRede(pedido, evento));
+    const p = url.pathname;
+    if (
+      p === absoluta("dex.html") ||
+      p === absoluta("index.html") ||
+      p === absoluta("") ||
+      p === absoluta("/")
+    ) {
+      evento.respondWith(primeiroDaRede(pedido, evento));
+    }
     return;
   }
 
