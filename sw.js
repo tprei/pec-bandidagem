@@ -1,9 +1,10 @@
-const VERSAO = "dex-v8";
+const VERSAO = "dex-v10";
 
 const CONCHA = [
   "dex.html",
   "assets/dex.css",
   "assets/dex.js",
+  "assets/story.js",
   "assets/fontes/DSEG7Classic-BoldItalic.woff2",
   "assets/icone.svg",
   "assets/icone-192.png",
@@ -17,12 +18,14 @@ const PROPRIOS = [
   "dex.html",
   "assets/dex.css",
   "assets/dex.js",
+  "assets/story.js",
   "assets/fontes/DSEG7Classic-BoldItalic.woff2",
   "assets/icone.svg",
   "assets/icone-192.png",
   "assets/icone-512.png",
   "manifest.webmanifest",
 ];
+
 function absoluta(caminho) {
   return new URL(caminho, self.registration.scope).pathname;
 }

@@ -1,3 +1,5 @@
+import { abrirFolhaStory } from "./story.js";
+
 const CHAVE_UF = "dex.uf";
 const CHAVE_LISTA = "dex.lista";
 const CHAVE_INSTALAR = "dex.instalarDispensado";
@@ -56,6 +58,17 @@ const ROTULO_VOTO = {
   4: "Obstrução",
   5: "Artigo 17",
   6: "em branco",
+};
+
+const ROTULO_CURTO_EIXO = {
+  blindagem: "Blindagem",
+  jornada: "Fim da 6x1",
+  anistia: "Anistia",
+  trabalhista: "Direitos na pandemia",
+  clt: "Reforma de 2017",
+  previdencia: "Previdência",
+  eletrobras: "Eletrobras",
+  ricos: "Taxar os ricos",
 };
 
 const elemento = (id) => document.getElementById(id);
@@ -213,6 +226,71 @@ function resumo(ficha) {
   return { notas, contra, defende };
 }
 
+function rotulosDeEixo(ficha, lado) {
+  const rotulos = [];
+  for (const eixo of estado.indice.eixos) {
+    if (pontuar(ficha, eixo).estado !== lado) continue;
+    rotulos.push(lado === "contra" ? ROTULO_CURTO_EIXO[eixo.id] ?? eixo.nome : VERBO[eixo.id].curto.defende);
+  }
+  return rotulos;
+}
+
+function montarItemStory(dado, uf, minimo) {
+  let fotoSrc = null;
+  if (dado !== null) {
+    if (dado.foto === "t") fotoSrc = `fotos-tse/${dado.sq}.jpg`;
+    else if (dado.foto === "c" && dado.ficha !== null) fotoSrc = `fotos/${dado.ficha.camaraId}.jpg`;
+  }
+  return {
+    sq: minimo.sq,
+    nome: minimo.nome,
+    numero: minimo.numero,
+    sigla: dado !== null ? estado.indice.partidos[dado.partido].sigla : "",
+    nomeCargo: estado.indice.cargos[minimo.cargo],
+    uf,
+    fotoSrc,
+    iniciais: iniciaisDe(minimo.nome),
+    matiz: (minimo.numero * 137) % 360,
+    motivos: dado !== null && dado.ficha !== null ? rotulosDeEixo(dado.ficha, "contra") : [],
+    defesas: dado !== null && dado.ficha !== null ? rotulosDeEixo(dado.ficha, "defende") : [],
+  };
+}
+
+async function resolverItensSalvos() {
+  const avisos = [];
+  const itens = [];
+  const porUf = new Map();
+  for (const item of estado.salvos.values()) {
+    if (!porUf.has(item.uf)) porUf.set(item.uf, []);
+    porUf.get(item.uf).push(item);
+  }
+
+  for (const [uf, salvosDessaUf] of porUf) {
+    let arquivo = estado.estados.get(uf);
+    if (arquivo === undefined) {
+      try {
+        arquivo = await carregarJson(`data/dex/${uf}.json`);
+        arquivo.indices = Object.fromEntries(arquivo.colunas.map((nome, i) => [nome, i]));
+        estado.estados.set(uf, arquivo);
+      } catch {
+        avisos.push(uf);
+        arquivo = null;
+      }
+    }
+    for (const item of salvosDessaUf) {
+      let dado = null;
+      if (arquivo !== null) {
+        const linha = arquivo.candidatos.find((c) => c[arquivo.indices.sq] === item.sq);
+        if (linha !== undefined) dado = campos({ arquivo, linha });
+      }
+      itens.push(montarItemStory(dado, uf, item));
+    }
+  }
+
+  itens.sort((a, b) => a.numero - b.numero);
+  return { avisos, itens };
+}
+
 let elementoDica = null;
 let alvoDica = null;
 
@@ -346,18 +424,16 @@ function fileiraPontos(notas, ficha = null) {
   return ul;
 }
 
-function montarMonograma(nome, numeroPartido, largura = 96, altura = 128) {
+function iniciaisDe(nome) {
   const palavras = nome.split(/\s+/).filter((p) => p.length > 2);
-  let iniciais = "";
-  if (palavras.length >= 2) {
-    iniciais = (palavras[0][0] + palavras[1][0]).toUpperCase();
-  } else if (palavras.length === 1) {
-    iniciais = palavras[0].slice(0, 2).toUpperCase();
-  } else {
-    iniciais = nome.slice(0, 2).toUpperCase();
-  }
+  if (palavras.length >= 2) return (palavras[0][0] + palavras[1][0]).toUpperCase();
+  if (palavras.length === 1) return palavras[0].slice(0, 2).toUpperCase();
+  return nome.slice(0, 2).toUpperCase();
+}
+
+function montarMonograma(nome, numeroPartido, largura = 96, altura = 128) {
   const matiz = (numeroPartido * 137) % 360;
-  const monograma = criar("div", "monograma", iniciais);
+  const monograma = criar("div", "monograma", iniciaisDe(nome));
   monograma.style.setProperty("--matiz", String(matiz));
   monograma.style.width = `${largura}px`;
   monograma.style.height = `${altura}px`;
@@ -1258,6 +1334,18 @@ function renderizarInimigos() {
     sec.append(criar("p", "inimigos-vazio", "Nenhuma candidatura deste estado votou contra o eleitor nos eixos avaliados."));
     return;
   }
+  const compartilhar = criar("button", "inimigos-story", "Compartilhar como story");
+  compartilhar.type = "button";
+  compartilhar.addEventListener("click", () => {
+    abrirFolhaStory({
+      itens: qualificados.map(({ dado, par }) =>
+        montarItemStory(dado, par.arquivo.uf, { sq: dado.sq, nome: dado.nome, numero: dado.numero, cargo: dado.cargo }),
+      ),
+      posturaInicial: "repudio",
+      avisos: [],
+    });
+  });
+  sec.append(compartilhar);
 
   const lista = criar("div", "inimigos-lista");
   for (const item of qualificados) {
@@ -1304,6 +1392,19 @@ function renderizarLista() {
   }
 
   sec.append(criar("p", "lista-intro", "Funciona sem internet. Os números abaixo são o que você digita na urna."));
+
+  const compartilhar = criar("button", "lista-story", "Compartilhar story");
+  compartilhar.type = "button";
+  compartilhar.addEventListener("click", async () => {
+    compartilhar.disabled = true;
+    try {
+      const { avisos, itens } = await resolverItensSalvos();
+      abrirFolhaStory({ itens, posturaInicial: "apoio", avisos });
+    } finally {
+      compartilhar.disabled = false;
+    }
+  });
+  sec.append(compartilhar);
 
   const porCargo = new Map();
   for (const item of estado.salvos.values()) {
