@@ -111,7 +111,9 @@ const estado = {
   geracao: 0,
   votacoesRenderizadas: false,
   catalogoVotacoes: null,
+  catalogoVotacoesSenado: null,
   votosPorCamaraId: new Map(),
+  votosPorSenadoId: new Map(),
   sentinelaVotacoes: null,
   todasColunas: null,
   todasRegistros: null,
@@ -506,7 +508,7 @@ function montarCarta(par) {
   }
 
   if (dado.ficha === null) {
-    corpo.append(criar("p", "carta-sem-ficha", "Sem histórico na Câmara"));
+    corpo.append(criar("p", "carta-sem-ficha", "Sem histórico no Congresso"));
   } else {
     const res = resumo(dado.ficha);
     const pontos = fileiraPontos(res.notas, dado.ficha);
@@ -651,11 +653,11 @@ function atualizarContagem() {
   if (estado.secao === "reeleicao") {
     contagem.textContent =
       visiveis === totalSecao
-        ? `${plural(totalSecao, "candidatura", "candidaturas")} com histórico na Câmara · ${numeroBr(totalGeral)} no total`
+        ? `${plural(totalSecao, "candidatura", "candidaturas")} com histórico parlamentar · ${numeroBr(totalGeral)} no total`
         : `${numeroBr(visiveis)} de ${plural(totalSecao, "candidatura", "candidaturas")} com histórico`;
   } else if (visiveis === totalGeral) {
     const comFicha = estado.visiveis.filter((par) => campos(par).ficha !== null).length;
-    contagem.textContent = `${plural(totalGeral, "candidatura", "candidaturas")} · ${numeroBr(comFicha)} com histórico na Câmara`;
+    contagem.textContent = `${plural(totalGeral, "candidatura", "candidaturas")} · ${numeroBr(comFicha)} com histórico parlamentar`;
   } else {
     contagem.textContent = `${numeroBr(visiveis)} de ${plural(totalGeral, "candidatura", "candidaturas")}`;
   }
@@ -775,16 +777,21 @@ function linhaVotacao(votacao, codigo, eixo) {
   voto.dataset.voto = String(codigo ?? 0);
   voto.dataset.alinhamento = alinhamento(codigo, eixo);
   linha.append(voto);
+  const ehSenado = String(votacao.id).startsWith("SF-");
   const nominal = criar("a", undefined, "votação nominal ↗");
-  nominal.href = `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${votacao.id}`;
+  nominal.href = ehSenado
+    ? `https://legis.senado.leg.br/dadosabertos/votacao?idProcesso=${votacao.idProcesso}`
+    : `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${votacao.id}`;
   nominal.target = "_blank";
   nominal.rel = "noopener";
   linha.append(nominal);
-  const materia = criar("a", undefined, "proposição ↗");
-  materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${votacao.proposicao}`;
-  materia.target = "_blank";
-  materia.rel = "noopener";
-  linha.append(materia);
+  if (!ehSenado && typeof votacao.proposicao === "number") {
+    const materia = criar("a", undefined, "proposição ↗");
+    materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${votacao.proposicao}`;
+    materia.target = "_blank";
+    materia.rel = "noopener";
+    linha.append(materia);
+  }
   return linha;
 }
 
@@ -880,6 +887,15 @@ function catalogoVotacoes() {
   }
   return estado.catalogoVotacoes;
 }
+function catalogoVotacoesSenado() {
+  if (estado.catalogoVotacoesSenado === null) {
+    estado.catalogoVotacoesSenado = carregarJson("data/dex/votacoes-senado.json").catch((erro) => {
+      estado.catalogoVotacoesSenado = null;
+      throw new Error(`data/dex/votacoes-senado.json: ${erro.message}`);
+    });
+  }
+  return estado.catalogoVotacoesSenado;
+}
 
 function votosDeCamaraId(camaraId) {
   let promessa = estado.votosPorCamaraId.get(camaraId);
@@ -896,6 +912,25 @@ function votosDeCamaraId(camaraId) {
         throw new Error(`data/dex/votos/${camaraId}.json: ${erro.message}`);
       });
     estado.votosPorCamaraId.set(camaraId, promessa);
+  }
+  return promessa;
+}
+
+function votosDeSenadoId(senadoId) {
+  let promessa = estado.votosPorSenadoId.get(senadoId);
+  if (promessa === undefined) {
+    promessa = carregarJson(`data/dex/votos/sf-${senadoId}.json`)
+      .then((arquivo) => {
+        if (typeof arquivo.votos !== "string") {
+          throw new Error(`data/dex/votos/sf-${senadoId}.json não tem o campo votos`);
+        }
+        return arquivo.votos;
+      })
+      .catch((erro) => {
+        estado.votosPorSenadoId.delete(senadoId);
+        throw new Error(`data/dex/votos/sf-${senadoId}.json: ${erro.message}`);
+      });
+    estado.votosPorSenadoId.set(senadoId, promessa);
   }
   return promessa;
 }
@@ -918,16 +953,21 @@ function linhaVotacaoToda(votacao, codigo, coluna) {
   if (votacao[coluna.obstrucao] > 0) placar.push(`${numeroBr(votacao[coluna.obstrucao])} Obstrução`);
   linha.append(criar("p", "ficha-todas-placar", `Placar: ${placar.join(" x ")}`));
   const links = criar("p", "ficha-todas-links");
+  const ehSenado = String(votacao[coluna.id]).startsWith("SF-");
   const nominal = criar("a", undefined, "votação nominal ↗");
-  nominal.href = `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${votacao[coluna.id]}`;
+  nominal.href = ehSenado
+    ? `https://legis.senado.leg.br/dadosabertos/votacao?idProcesso=${votacao[coluna.idProcesso]}`
+    : `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${votacao[coluna.id]}`;
   nominal.target = "_blank";
   nominal.rel = "noopener";
   links.append(nominal);
-  const materia = criar("a", undefined, "proposição ↗");
-  materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${votacao[coluna.proposicao]}`;
-  materia.target = "_blank";
-  materia.rel = "noopener";
-  links.append(materia);
+  if (!ehSenado && typeof votacao[coluna.proposicao] === "number") {
+    const materia = criar("a", undefined, "proposição ↗");
+    materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${votacao[coluna.proposicao]}`;
+    materia.target = "_blank";
+    materia.rel = "noopener";
+    links.append(materia);
+  }
   linha.append(links);
   return linha;
 }
@@ -977,34 +1017,100 @@ function montarTodasVotacoes(ficha) {
     carregado = true;
     corpo.replaceChildren(criar("p", "ficha-todas-status", "Carregando votações…"));
     try {
-      const catalogo = await catalogoVotacoes();
-      if (!details.isConnected) return;
-      const votoTexto = await votosDeCamaraId(ficha.camaraId);
-      if (!details.isConnected) return;
-      if (votoTexto.length !== catalogo.votacoes.length) {
-        throw new Error(
-          `o registro de votos tem ${numeroBr(votoTexto.length)} posições para ${numeroBr(catalogo.votacoes.length)} votações do catálogo`,
+      if (ficha.casa === "senado") {
+        const catalogo = await catalogoVotacoesSenado();
+        if (!details.isConnected) return;
+        const votoTexto = await votosDeSenadoId(ficha.senadoId);
+        if (!details.isConnected) return;
+        if (votoTexto.length !== catalogo.votacoes.length) {
+          throw new Error(
+            `o registro de votos tem ${numeroBr(votoTexto.length)} posições para ${numeroBr(catalogo.votacoes.length)} votações do catálogo`,
+          );
+        }
+        const coluna = Object.fromEntries(catalogo.colunas.map((nome, i) => [nome, i]));
+        const registros = [];
+        for (let i = catalogo.votacoes.length - 1; i >= 0; i -= 1) {
+          const codigo = Number(votoTexto[i]);
+          if (codigo === 0) continue;
+          registros.push({ votacao: catalogo.votacoes[i], codigo });
+        }
+        estado.todasColunas = coluna;
+        estado.todasRegistros = registros;
+        estado.todasExibidas = 0;
+        estado.todasLista = lista;
+        estado.todasBotaoMais = botaoMais;
+        const contagem = criar(
+          "p",
+          "ficha-todas-contagem",
+          `${plural(registros.length, "votação com voto registrado", "votações com voto registrado")}, de ${numeroBr(catalogo.votacoes.length)} realizadas no Senado entre ${catalogo.periodo.de} e ${catalogo.periodo.ate}.`,
         );
+        corpo.replaceChildren(contagem, lista, botaoMais);
+        desenharLoteVotacoes();
+      } else if (ficha.casa === "ambas") {
+        const [catalogoCamara, votoTextoCamara, catalogoSenado, votoTextoSenado] = await Promise.all([
+          catalogoVotacoes(),
+          votosDeCamaraId(ficha.camaraId),
+          catalogoVotacoesSenado(),
+          votosDeSenadoId(ficha.senadoId),
+        ]);
+        if (!details.isConnected) return;
+        const coluna = Object.fromEntries(catalogoCamara.colunas.map((nome, i) => [nome, i]));
+        const registros = [];
+        for (let i = 0; i < catalogoCamara.votacoes.length; i += 1) {
+          const codigo = Number(votoTextoCamara[i]);
+          if (codigo !== 0) {
+            registros.push({ votacao: catalogoCamara.votacoes[i], codigo, data: catalogoCamara.votacoes[i][coluna.data] });
+          }
+        }
+        for (let i = 0; i < catalogoSenado.votacoes.length; i += 1) {
+          const codigo = Number(votoTextoSenado[i]);
+          if (codigo !== 0) {
+            registros.push({ votacao: catalogoSenado.votacoes[i], codigo, data: catalogoSenado.votacoes[i][coluna.data] });
+          }
+        }
+        registros.sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0));
+        estado.todasColunas = coluna;
+        estado.todasRegistros = registros;
+        estado.todasExibidas = 0;
+        estado.todasLista = lista;
+        estado.todasBotaoMais = botaoMais;
+        const contagem = criar(
+          "p",
+          "ficha-todas-contagem",
+          `${plural(registros.length, "votação com voto registrado", "votações com voto registrado")} no Congresso Nacional (${numeroBr(ficha.participacoesCamara)} na Câmara e ${numeroBr(ficha.participacoesSenado)} no Senado).`,
+        );
+        corpo.replaceChildren(contagem, lista, botaoMais);
+        desenharLoteVotacoes();
+      } else {
+        const catalogo = await catalogoVotacoes();
+        if (!details.isConnected) return;
+        const votoTexto = await votosDeCamaraId(ficha.camaraId);
+        if (!details.isConnected) return;
+        if (votoTexto.length !== catalogo.votacoes.length) {
+          throw new Error(
+            `o registro de votos tem ${numeroBr(votoTexto.length)} posições para ${numeroBr(catalogo.votacoes.length)} votações do catálogo`,
+          );
+        }
+        const coluna = Object.fromEntries(catalogo.colunas.map((nome, i) => [nome, i]));
+        const registros = [];
+        for (let i = catalogo.votacoes.length - 1; i >= 0; i -= 1) {
+          const codigo = Number(votoTexto[i]);
+          if (codigo === 0) continue;
+          registros.push({ votacao: catalogo.votacoes[i], codigo });
+        }
+        estado.todasColunas = coluna;
+        estado.todasRegistros = registros;
+        estado.todasExibidas = 0;
+        estado.todasLista = lista;
+        estado.todasBotaoMais = botaoMais;
+        const contagem = criar(
+          "p",
+          "ficha-todas-contagem",
+          `${plural(registros.length, "votação com voto registrado", "votações com voto registrado")}, de ${numeroBr(catalogo.votacoes.length)} realizadas na Câmara entre ${catalogo.periodo.de} e ${catalogo.periodo.ate}.`,
+        );
+        corpo.replaceChildren(contagem, lista, botaoMais);
+        desenharLoteVotacoes();
       }
-      const coluna = Object.fromEntries(catalogo.colunas.map((nome, i) => [nome, i]));
-      const registros = [];
-      for (let i = catalogo.votacoes.length - 1; i >= 0; i -= 1) {
-        const codigo = Number(votoTexto[i]);
-        if (codigo === 0) continue;
-        registros.push({ votacao: catalogo.votacoes[i], codigo });
-      }
-      estado.todasColunas = coluna;
-      estado.todasRegistros = registros;
-      estado.todasExibidas = 0;
-      estado.todasLista = lista;
-      estado.todasBotaoMais = botaoMais;
-      const contagem = criar(
-        "p",
-        "ficha-todas-contagem",
-        `${plural(registros.length, "votação com voto registrado", "votações com voto registrado")}, de ${numeroBr(catalogo.votacoes.length)} realizadas entre ${catalogo.periodo.de} e ${catalogo.periodo.ate}.`,
-      );
-      corpo.replaceChildren(contagem, lista, botaoMais);
-      desenharLoteVotacoes();
     } catch (erro) {
       carregado = false;
       if (!details.isConnected) return;
@@ -1133,19 +1239,26 @@ function renderizarFicha(sq) {
 
     const historico = criar("div", "ficha-secao");
     const ficha = dado.ficha;
-    historico.append(criar("h3", "ficha-eixo-pergunta", `Histórico como ${ficha.nomeCamara}`));
+    const casaRotulo =
+      ficha.casa === "senado"
+        ? "no Senado"
+        : ficha.casa === "ambas"
+        ? "no Congresso Nacional"
+        : "na Câmara";
+    const nomeExibicao = ficha.nomeParlamentar || ficha.nomeSenado || ficha.nomeCamara;
+    historico.append(criar("h3", "ficha-eixo-pergunta", `Histórico ${casaRotulo} como ${nomeExibicao}`));
     const fidelidade =
       ficha.bancadaAferivel === 0
         ? "Fidelidade partidária indefinida: nunca votou em bancada grande o bastante para medir."
         : `Votou com o próprio partido em ${Math.round((100 * ficha.comMaioria) / ficha.bancadaAferivel)}% das ${numeroBr(ficha.bancadaAferivel)} votações mensuráveis. É um fato, não uma virtude nem um defeito.`;
     historico.append(criar("p", "ficha-fidelidade", fidelidade));
-    historico.append(
-      criar(
-        "p",
-        undefined,
-        `Participou de ${numeroBr(ficha.participacoes)} das ${numeroBr(estado.indice.votacoesNoHistorico)} votações nominais do período.`,
-      ),
-    );
+    const totalParticipacoesTexto =
+      ficha.casa === "senado"
+        ? `Participou de ${numeroBr(ficha.participacoes)} das ${numeroBr(estado.indice.votacoesNoHistoricoSenado)} votações nominais do Senado no período.`
+        : ficha.casa === "ambas"
+        ? `Participou de ${numeroBr(ficha.participacoes)} votações nominais no período (${numeroBr(ficha.participacoesCamara)} na Câmara e ${numeroBr(ficha.participacoesSenado)} no Senado).`
+        : `Participou de ${numeroBr(ficha.participacoes)} das ${numeroBr(estado.indice.votacoesNoHistoricoCamara || estado.indice.votacoesNoHistorico)} votações nominais da Câmara no período.`;
+    historico.append(criar("p", undefined, totalParticipacoesTexto));
 
     for (const item of res.notas) {
       const eixo = item.eixo;
@@ -1188,7 +1301,7 @@ function renderizarFicha(sq) {
       criar(
         "p",
         "carta-sem-ficha",
-        "Sem histórico na Câmara entre 2017 e 2026. Não é nota baixa: estreantes e quem só teve mandato estadual ou municipal aparecem assim.",
+        "Sem histórico no Congresso Nacional (Câmara ou Senado) entre 2017 e 2026. Não é nota baixa: estreantes e quem só teve mandato estadual ou municipal aparecem assim.",
       ),
     );
     sec.append(historico);
@@ -1199,7 +1312,7 @@ function renderizarFicha(sq) {
     criar(
       "p",
       "ficha-fonte",
-      "Fontes: Dados Abertos do TSE e da Câmara dos Deputados. Os eixos são opinião editorial deste guia.",
+      "Fontes: Dados Abertos do TSE, da Câmara dos Deputados e do Senado Federal. Os eixos são opinião editorial deste guia.",
     ),
   );
   sec.append(fonte);
@@ -1236,20 +1349,24 @@ function renderizarVotacoes() {
       if (v.outros > 0) placar.push(`${v.outros} sem lado`);
       item.append(criar("p", "votacoes-item-meta", `${dataBr(v.data)} · ${placar.join(" x ")}`));
 
+      const ehSenado = String(v.id).startsWith("SF-");
       const links = criar("p", "votacoes-item-links");
       const nominal = criar("a", undefined, "votação nominal ↗");
-      nominal.href = `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${v.id}`;
+      nominal.href = ehSenado
+        ? `https://legis.senado.leg.br/dadosabertos/votacao?idProcesso=${v.idProcesso}`
+        : `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${v.id}`;
       nominal.target = "_blank";
       nominal.rel = "noopener";
       links.append(nominal);
 
-      links.append(document.createTextNode(" · "));
-
-      const materia = criar("a", undefined, "proposição ↗");
-      materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${v.proposicao}`;
-      materia.target = "_blank";
-      materia.rel = "noopener";
-      links.append(materia);
+      if (!ehSenado && typeof v.proposicao === "number") {
+        links.append(document.createTextNode(" · "));
+        const materia = criar("a", undefined, "proposição ↗");
+        materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${v.proposicao}`;
+        materia.target = "_blank";
+        materia.rel = "noopener";
+        links.append(materia);
+      }
       item.append(links);
       listaVot.append(item);
     }
@@ -1265,18 +1382,23 @@ function renderizarVotacoes() {
     const placar = [`${item.sim} Sim`, `${item.nao} Não`];
     if (item.outros > 0) placar.push(`${item.outros} sem lado`);
     itemDiv.append(criar("p", "votacoes-item-meta", `${dataBr(item.data)} · ${placar.join(" x ")}`));
+    const ehSenado = String(item.id).startsWith("SF-");
     const links = criar("p", "votacoes-item-links");
     const nominal = criar("a", undefined, "votação nominal ↗");
-    nominal.href = `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${item.id}`;
+    nominal.href = ehSenado
+      ? `https://legis.senado.leg.br/dadosabertos/votacao?idProcesso=${item.idProcesso}`
+      : `https://www.camara.leg.br/presenca-comissoes/votacao-portal?idVotacao=${item.id}`;
     nominal.target = "_blank";
     nominal.rel = "noopener";
     links.append(nominal);
-    links.append(document.createTextNode(" · "));
-    const materia = criar("a", undefined, "proposição ↗");
-    materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${item.proposicao}`;
-    materia.target = "_blank";
-    materia.rel = "noopener";
-    links.append(materia);
+    if (!ehSenado && typeof item.proposicao === "number") {
+      links.append(document.createTextNode(" · "));
+      const materia = criar("a", undefined, "proposição ↗");
+      materia.href = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${item.proposicao}`;
+      materia.target = "_blank";
+      materia.rel = "noopener";
+      links.append(materia);
+    }
     itemDiv.append(links);
     card.append(itemDiv);
     gradeEixos.append(card);

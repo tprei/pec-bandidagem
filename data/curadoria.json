@@ -41,7 +41,7 @@
       "posicao": "A MP 1.045/2021 usou o programa emergencial de manutenção do emprego como veículo de uma minirreforma trabalhista: contratos novos com menos direitos e fora da CLT plena. Quem votou Sim votou para pagar a crise com o direito de quem trabalha. O Senado derrubou depois, mas o voto da Câmara ficou registrado.",
       "defendeOEleitor": 2,
       "contraOEleitor": 1,
-      "votacoes": [{ "id": "2279513-64", "rotulo": "Minirreforma trabalhista (MP 1.045/2021)" }]
+      "votacoes": [{ "id": "2279513-64", "rotulo": "Minirreforma trabalhista na Câmara (MP 1.045/2021)" }, { "id": "SF-6398", "rotulo": "Minirreforma trabalhista no Senado (MPV 1045/2021)" }]
     },
     {
       "id": "clt",
@@ -50,7 +50,7 @@
       "posicao": "O PL 6.787/2016 fez o negociado valer mais que o legislado, criou o trabalho intermitente e pôs pedágio no acesso à Justiça do Trabalho. Quem votou Sim votou para tirar da CLT o que levou décadas para entrar.",
       "defendeOEleitor": 2,
       "contraOEleitor": 1,
-      "votacoes": [{ "id": "2122076-348", "rotulo": "Reforma trabalhista (PL 6.787/2016)" }]
+      "votacoes": [{ "id": "2122076-348", "rotulo": "Reforma trabalhista na Câmara (PL 6.787/2016)" }, { "id": "SF-5726", "rotulo": "Reforma trabalhista no Senado (PLC 38/2017)" }]
     },
     {
       "id": "previdencia",
@@ -60,8 +60,10 @@
       "defendeOEleitor": 2,
       "contraOEleitor": 1,
       "votacoes": [
-        { "id": "2192459-636", "rotulo": "Reforma da Previdência (PEC 6/2019), 1º turno" },
-        { "id": "2192459-786", "rotulo": "Reforma da Previdência (PEC 6/2019), 2º turno" }
+        { "id": "2192459-636", "rotulo": "Reforma da Previdência na Câmara (PEC 6/2019), 1º turno" },
+        { "id": "2192459-786", "rotulo": "Reforma da Previdência na Câmara (PEC 6/2019), 2º turno" },
+        { "id": "SF-6024", "rotulo": "Reforma da Previdência no Senado (PEC 6/2019), 1º turno" },
+        { "id": "SF-6046", "rotulo": "Reforma da Previdência no Senado (PEC 6/2019), 2º turno" }
       ]
     },
     {
@@ -71,7 +73,7 @@
       "posicao": "A MP 1.031/2021 entregou o controle da maior elétrica do país, com térmicas embutidas na lei cujo custo é pago na tarifa de todo consumidor. Quem votou Sim votou para vender patrimônio público e encarecer a luz.",
       "defendeOEleitor": 2,
       "contraOEleitor": 1,
-      "votacoes": [{ "id": "2270789-73", "rotulo": "Privatização da Eletrobras (MP 1.031/2021)" }]
+      "votacoes": [{ "id": "2270789-73", "rotulo": "Privatização da Eletrobras na Câmara (MP 1.031/2021)" }, { "id": "SF-6377", "rotulo": "Privatização da Eletrobras no Senado (MPV 1031/2021)" }]
     },
     {
       "id": "ricos",
@@ -93,6 +95,11 @@
       "id": "2422697-69",
       "rotulo": "Taxa das blusinhas: manutenção do imposto de 20% (PL 914/2024)",
       "nota": "Este placar não separa ninguém pela régua deste guia: mantiveram a taxa o governo, PT, PSOL, União e MDB; votaram para derrubá-la o PL e a oposição. Dá para ler dos dois lados — imposto regressivo sobre a compra de quem tem menos, ou defesa do emprego têxtil contra a importação isenta. Como as duas leituras se sustentam, fica como contexto e não vale ponto em nenhum eixo."
+    },
+    {
+      "id": "SF-6836",
+      "rotulo": "Taxa das blusinhas no Senado: aprovação da taxação de 20% (PL 914/2024)",
+      "nota": "Aprovado no Senado em 05/06/2024."
     }
   ],
   "pesquisa": {

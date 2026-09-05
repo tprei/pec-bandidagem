@@ -1,4 +1,4 @@
-const VERSAO = "dex-v10";
+const VERSAO = "dex-v11";
 
 const CONCHA = [
   "dex.html",

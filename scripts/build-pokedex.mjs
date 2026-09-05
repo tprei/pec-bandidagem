@@ -55,10 +55,20 @@ function posicional(dados, chaveColunas) {
   return Object.fromEntries(dados[chaveColunas].map((nome, indice) => [nome, indice]));
 }
 
+function normalizarTexto(texto) {
+  return (texto || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function badge(ocupacao) {
   for (const [nome, regra] of REGRAS_BADGE) if (regra.test(ocupacao)) return nome;
   return null;
 }
+
 function limparDescricao(texto) {
   if (!texto || typeof texto !== "string") return texto;
   const limpo = texto
@@ -149,65 +159,147 @@ async function cpfDosDeputados(ids) {
 }
 
 const candidatos = ler(join(ROOT, "data", "candidatos-2026.json"), "node scripts/fetch-candidatos-2026.mjs");
-const votacoes = ler(join(ROOT, "data", "votacoes-camara.json"), "node scripts/fetch-votacoes-camara.mjs");
+const votacoesCamara = ler(join(ROOT, "data", "votacoes-camara.json"), "node scripts/fetch-votacoes-camara.mjs");
+const votacoesSenado = ler(join(ROOT, "data", "votacoes-senado.json"), "node scripts/fetch-votacoes-senado.mjs");
 const curadoria = ler(join(ROOT, "data", "curadoria.json"), "nada");
 const cpfParaSq = ler(join(ROOT, ".cache", "tse", "cpf-sq.json"), "node scripts/fetch-candidatos-2026.mjs");
 
 const ic = posicional(candidatos, "colunas");
-const iv = posicional(votacoes, "colunas");
-const id = posicional(votacoes, "colunasDeputado");
+const ivc = posicional(votacoesCamara, "colunas");
+const idc = posicional(votacoesCamara, "colunasDeputado");
+const ivs = posicional(votacoesSenado, "colunas");
+const ids = posicional(votacoesSenado, "colunasSenador");
 
-const porId = new Map(votacoes.votacoes.map((votacao) => [votacao[iv.id], votacao]));
+const porIdCamara = new Map(votacoesCamara.votacoes.map((v) => [v[ivc.id], v]));
+const porIdSenado = new Map(votacoesSenado.votacoes.map((v) => [v[ivs.id], v]));
+
 const curadas = [];
 for (const eixo of curadoria.eixos) {
   for (const referencia of eixo.votacoes) {
-    const votacao = porId.get(referencia.id);
+    const ehSenado = referencia.id.startsWith("SF-");
+    const votacao = ehSenado ? porIdSenado.get(referencia.id) : porIdCamara.get(referencia.id);
     if (votacao === undefined) throw new Error(`votação curada ${referencia.id} não existe no dataset`);
-    curadas.push({ eixo: eixo.id, ...referencia, votacao });
+    curadas.push({ eixo: eixo.id, ...referencia, votacao, casa: ehSenado ? "senado" : "camara" });
   }
 }
 for (const referencia of curadoria.contexto) {
-  const votacao = porId.get(referencia.id);
+  const ehSenado = referencia.id.startsWith("SF-");
+  const votacao = ehSenado ? porIdSenado.get(referencia.id) : porIdCamara.get(referencia.id);
   if (votacao === undefined) throw new Error(`votação de contexto ${referencia.id} não existe no dataset`);
-  curadas.push({ eixo: null, ...referencia, votacao });
+  curadas.push({ eixo: null, ...referencia, votacao, casa: ehSenado ? "senado" : "camara" });
 }
 const pesquisas = carregarPesquisas(candidatos);
 
-const idsDeputado = votacoes.deputados.map((deputado) => deputado[id.id]);
+const idsDeputado = votacoesCamara.deputados.map((deputado) => deputado[idc.id]);
 const cpfs = await cpfDosDeputados(idsDeputado);
 
 const sqParaDeputado = new Map();
 const semCpf = [];
-votacoes.deputados.forEach((deputado, indice) => {
-  const cpf = cpfs[deputado[id.id]];
+votacoesCamara.deputados.forEach((deputado, indice) => {
+  const cpf = cpfs[deputado[idc.id]];
   if (cpf === null) {
-    semCpf.push(deputado[id.nome]);
+    semCpf.push(deputado[idc.nome]);
     return;
   }
   for (const sq of cpfParaSq[cpf] ?? []) {
     const anterior = sqParaDeputado.get(sq);
-    if (anterior === undefined || votacoes.deputados[anterior][id.participacoes] < deputado[id.participacoes]) {
+    if (anterior === undefined || votacoesCamara.deputados[anterior][idc.participacoes] < deputado[idc.participacoes]) {
       sqParaDeputado.set(sq, indice);
     }
   }
 });
 if (semCpf.length > 0) throw new Error(`sem CPF na API: ${semCpf.join(", ")}`);
 
-const fichas = new Map();
-for (const [sq, indice] of sqParaDeputado) {
-  const deputado = votacoes.deputados[indice];
-  const votos = {};
-  for (const curada of curadas) votos[curada.id] = Number(curada.votacao[iv.votos][indice]);
-  const camaraId = deputado[id.id];
-  fichas.set(sq, {
-    camaraId,
-    nomeCamara: deputado[id.nome],
-    participacoes: deputado[id.participacoes],
-    bancadaAferivel: deputado[id.votosEmBancadaAferivel],
-    comMaioria: deputado[id.votosComMaioriaDoPartido],
-    votos,
-  });
+const porNomeNasc = new Map();
+const porNome = new Map();
+for (const c of candidatos.candidatos) {
+  const n = normalizarTexto(c[ic.nome]);
+  const d = c[ic.nascimento];
+  if (d) porNomeNasc.set(`${n}|${d}`, c);
+  if (!porNome.has(n)) porNome.set(n, []);
+  porNome.get(n).push(c);
 }
+
+const sqParaSenador = new Map();
+votacoesSenado.senadores.forEach((senador, indice) => {
+  const nomeCompleto = normalizarTexto(senador[ids.nomeCompleto]);
+  const dataNasc = senador[ids.dataNascimento];
+  let candMatch = null;
+  if (dataNasc && porNomeNasc.has(`${nomeCompleto}|${dataNasc}`)) {
+    candMatch = porNomeNasc.get(`${nomeCompleto}|${dataNasc}`);
+  } else if (porNome.has(nomeCompleto) && porNome.get(nomeCompleto).length === 1) {
+    candMatch = porNome.get(nomeCompleto)[0];
+  }
+  if (candMatch) {
+    const sq = candMatch[ic.sq];
+    const anterior = sqParaSenador.get(sq);
+    if (anterior === undefined || votacoesSenado.senadores[anterior][ids.participacoes] < senador[ids.participacoes]) {
+      sqParaSenador.set(sq, indice);
+    }
+  }
+});
+
+const todosSqs = new Set([...sqParaDeputado.keys(), ...sqParaSenador.keys()]);
+const fichas = new Map();
+
+for (const sq of todosSqs) {
+  const indiceDeputado = sqParaDeputado.get(sq);
+  const indiceSenador = sqParaSenador.get(sq);
+  const deputado = indiceDeputado !== undefined ? votacoesCamara.deputados[indiceDeputado] : null;
+  const senador = indiceSenador !== undefined ? votacoesSenado.senadores[indiceSenador] : null;
+
+  const votos = {};
+  for (const curada of curadas) {
+    if (curada.casa === "senado") {
+      votos[curada.id] = indiceSenador !== undefined ? Number(curada.votacao[ivs.votos][indiceSenador]) : 0;
+    } else {
+      votos[curada.id] = indiceDeputado !== undefined ? Number(curada.votacao[ivc.votos][indiceDeputado]) : 0;
+    }
+  }
+
+  if (deputado && senador) {
+    fichas.set(sq, {
+      casa: "ambas",
+      camaraId: deputado[idc.id],
+      senadoId: senador[ids.id],
+      nomeCamara: deputado[idc.nome],
+      nomeSenado: senador[ids.nome],
+      nomeParlamentar: deputado[idc.nome],
+      participacoes: deputado[idc.participacoes] + senador[ids.participacoes],
+      participacoesCamara: deputado[idc.participacoes],
+      participacoesSenado: senador[ids.participacoes],
+      bancadaAferivel: deputado[idc.votosEmBancadaAferivel] + senador[ids.votosEmBancadaAferivel],
+      comMaioria: deputado[idc.votosComMaioriaDoPartido] + senador[ids.votosComMaioriaDoPartido],
+      votos,
+    });
+  } else if (senador) {
+    fichas.set(sq, {
+      casa: "senado",
+      senadoId: senador[ids.id],
+      nomeSenado: senador[ids.nome],
+      nomeCamara: senador[ids.nome],
+      nomeParlamentar: senador[ids.nome],
+      participacoes: senador[ids.participacoes],
+      participacoesSenado: senador[ids.participacoes],
+      bancadaAferivel: senador[ids.votosEmBancadaAferivel],
+      comMaioria: senador[ids.votosComMaioriaDoPartido],
+      votos,
+    });
+  } else if (deputado) {
+    fichas.set(sq, {
+      casa: "camara",
+      camaraId: deputado[idc.id],
+      nomeCamara: deputado[idc.nome],
+      nomeParlamentar: deputado[idc.nome],
+      participacoes: deputado[idc.participacoes],
+      participacoesCamara: deputado[idc.participacoes],
+      bancadaAferivel: deputado[idc.votosEmBancadaAferivel],
+      comMaioria: deputado[idc.votosComMaioriaDoPartido],
+      votos,
+    });
+  }
+}
+
 const porUf = new Map();
 for (const candidato of candidatos.candidatos) {
   const [sigla] = candidatos.dicionarios.unidadeEleitoral[candidato[ic.ue]];
@@ -217,8 +309,13 @@ for (const candidato of candidatos.candidatos) {
 }
 
 const COLUNAS = ["sq", "numero", "nome", "nomeCompleto", "cargo", "partido", "coligacao", "badge", "foto", "ficha"];
-const votacoesOrdenadas = [...votacoes.votacoes].sort((a, b) => (a[iv.dataHora] < b[iv.dataHora] ? -1 : a[iv.dataHora] > b[iv.dataHora] ? 1 : 0));
-const totalVotacoes = votacoesOrdenadas.length;
+const votacoesCamaraOrdenadas = [...votacoesCamara.votacoes].sort((a, b) => (a[ivc.dataHora] < b[ivc.dataHora] ? -1 : a[ivc.dataHora] > b[ivc.dataHora] ? 1 : 0));
+const totalVotacoesCamara = votacoesCamaraOrdenadas.length;
+
+const votacoesSenadoOrdenadas = [...votacoesSenado.votacoes].sort((a, b) => (a[ivs.dataHora] < b[ivs.dataHora] ? -1 : a[ivs.dataHora] > b[ivs.dataHora] ? 1 : 0));
+const totalVotacoesSenado = votacoesSenadoOrdenadas.length;
+
+const totalVotacoesGeral = totalVotacoesCamara + totalVotacoesSenado;
 const ufs = [];
 let totalFotoTse = 0;
 let totalFotoCamara = 0;
@@ -241,7 +338,7 @@ for (const [sigla, lista] of [...porUf].sort(([a], [b]) => (a < b ? -1 : 1))) {
       if (existsSync(join(ROOT, "fotos-tse", `${sq}.jpg`))) {
         foto = "t";
         totalFotoTse += 1;
-      } else if (ficha !== null && existsSync(join(ROOT, "fotos", `${ficha.camaraId}.jpg`))) {
+      } else if (ficha !== null && ficha.camaraId && existsSync(join(ROOT, "fotos", `${ficha.camaraId}.jpg`))) {
         foto = "c";
         totalFotoCamara += 1;
       }
@@ -272,6 +369,7 @@ for (const [sigla, lista] of [...porUf].sort(([a], [b]) => (a < b ? -1 : 1))) {
   );
   ufs.push({ sigla, nome: nomeUf, candidatos: linhas.length, comFicha });
 }
+
 const eixos = curadoria.eixos.map((eixo) => ({
   id: eixo.id,
   nome: eixo.nome,
@@ -280,7 +378,9 @@ const eixos = curadoria.eixos.map((eixo) => ({
   defendeOEleitor: eixo.defendeOEleitor,
   contraOEleitor: eixo.contraOEleitor,
   votacoes: eixo.votacoes.map((referencia) => {
-    const votacao = porId.get(referencia.id);
+    const ehSenado = referencia.id.startsWith("SF-");
+    const votacao = ehSenado ? porIdSenado.get(referencia.id) : porIdCamara.get(referencia.id);
+    const iv = ehSenado ? ivs : ivc;
     return {
       id: referencia.id,
       rotulo: referencia.rotulo,
@@ -288,13 +388,16 @@ const eixos = curadoria.eixos.map((eixo) => ({
       sim: votacao[iv.sim],
       nao: votacao[iv.nao],
       outros: votacao[iv.abstencao] + votacao[iv.obstrucao] + votacao[iv.artigo17],
-      proposicao: Number(referencia.id.split("-")[0]),
+      proposicao: ehSenado ? referencia.id : Number(referencia.id.split("-")[0]),
+      idProcesso: ehSenado ? votacao[ivs.idProcesso] : null,
     };
   }),
 }));
 
 const contexto = curadoria.contexto.map((referencia) => {
-  const votacao = porId.get(referencia.id);
+  const ehSenado = referencia.id.startsWith("SF-");
+  const votacao = ehSenado ? porIdSenado.get(referencia.id) : porIdCamara.get(referencia.id);
+  const iv = ehSenado ? ivs : ivc;
   return {
     id: referencia.id,
     rotulo: referencia.rotulo,
@@ -303,7 +406,8 @@ const contexto = curadoria.contexto.map((referencia) => {
     sim: votacao[iv.sim],
     nao: votacao[iv.nao],
     outros: votacao[iv.abstencao] + votacao[iv.obstrucao] + votacao[iv.artigo17],
-    proposicao: Number(referencia.id.split("-")[0]),
+    proposicao: ehSenado ? referencia.id : Number(referencia.id.split("-")[0]),
+    idProcesso: ehSenado ? votacao[ivs.idProcesso] : null,
   };
 });
 
@@ -335,13 +439,16 @@ const indicePesquisa = {
 const indice = {
   fonte: {
     candidaturas: candidatos.fonte.portal,
-    votacoes: votacoes.fonte.portal,
+    votacoesCamara: votacoesCamara.fonte.portal,
+    votacoesSenado: votacoesSenado.fonte.portal,
     geradoEm: new Date().toISOString(),
   },
   eleicao: candidatos.eleicao,
   totalCandidatos: candidatos.candidatos.length,
   totalComFicha: ufs.reduce((soma, uf) => soma + uf.comFicha, 0),
-  votacoesNoHistorico: totalVotacoes,
+  votacoesNoHistorico: totalVotacoesGeral,
+  votacoesNoHistoricoCamara: totalVotacoesCamara,
+  votacoesNoHistoricoSenado: totalVotacoesSenado,
   cargos: Object.fromEntries(Object.entries(candidatos.dicionarios.cargo).map(([codigo, valor]) => [codigo, valor.nome])),
   partidos: candidatos.dicionarios.partido,
   federacoes: candidatos.dicionarios.federacao,
@@ -353,86 +460,109 @@ const indice = {
 };
 escreverAtomico(join(SAIDA, "indice.json"), indice);
 
-const linhasVotacoes = votacoesOrdenadas.map((votacao) => [
-  votacao[iv.id],
-  votacao[iv.dataHora].slice(0, 10),
-  votacao[iv.orgao],
-  Number(votacao[iv.id].split("-")[0]),
-  limparDescricao(votacao[iv.descricao]),
-  votacao[iv.aprovada],
-  votacao[iv.sim],
-  votacao[iv.nao],
-  votacao[iv.abstencao],
-  votacao[iv.obstrucao],
+const linhasVotacoesCamara = votacoesCamaraOrdenadas.map((votacao) => [
+  votacao[ivc.id],
+  votacao[ivc.dataHora].slice(0, 10),
+  votacao[ivc.orgao],
+  Number(votacao[ivc.id].split("-")[0]),
+  limparDescricao(votacao[ivc.descricao]),
+  votacao[ivc.aprovada],
+  votacao[ivc.sim],
+  votacao[ivc.nao],
+  votacao[ivc.abstencao],
+  votacao[ivc.obstrucao],
+  null,
 ]);
 
-const primeiroAno = Number(votacoesOrdenadas[0][iv.dataHora].slice(0, 4));
-const ultimoAno = Number(votacoesOrdenadas[totalVotacoes - 1][iv.dataHora].slice(0, 4));
-
-const catalogoVotacoes = {
+const catalogoVotacoesCamara = {
   sobre: "Catálogo completo de votações nominais da Câmara dos Deputados",
-  periodo: { de: primeiroAno, ate: ultimoAno },
-  colunas: ["id", "data", "orgao", "proposicao", "descricao", "aprovada", "sim", "nao", "abstencao", "obstrucao"],
-  votacoes: linhasVotacoes,
+  periodo: {
+    de: Number(votacoesCamaraOrdenadas[0][ivc.dataHora].slice(0, 4)),
+    ate: Number(votacoesCamaraOrdenadas[totalVotacoesCamara - 1][ivc.dataHora].slice(0, 4)),
+  },
+  colunas: ["id", "data", "orgao", "proposicao", "descricao", "aprovada", "sim", "nao", "abstencao", "obstrucao", "idProcesso"],
+  votacoes: linhasVotacoesCamara,
 };
+writeFileSync(join(SAIDA, "votacoes.json"), `${JSON.stringify(catalogoVotacoesCamara)}\n`);
 
-const conteudoCatalogo = `${JSON.stringify(catalogoVotacoes)}\n`;
-writeFileSync(join(SAIDA, "votacoes.json"), conteudoCatalogo);
-const tamanhoCatalogo = Buffer.byteLength(conteudoCatalogo, "utf8");
+const linhasVotacoesSenado = votacoesSenadoOrdenadas.map((votacao) => [
+  votacao[ivs.id],
+  votacao[ivs.dataHora].slice(0, 10),
+  votacao[ivs.orgao],
+  votacao[ivs.proposicao] ?? votacao[ivs.id],
+  limparDescricao(votacao[ivs.descricao]),
+  votacao[ivs.aprovada],
+  votacao[ivs.sim],
+  votacao[ivs.nao],
+  votacao[ivs.abstencao],
+  votacao[ivs.obstrucao],
+  votacao[ivs.idProcesso],
+]);
 
-const deputadosComFicha = new Map();
-for (const [sq, indice] of sqParaDeputado) {
-  if (indice < 0 || indice >= votacoes.deputados.length) {
-    throw new Error(`Índice ${indice} fora dos limites de deputados (tamanho ${votacoes.deputados.length})`);
-  }
-  const dep = votacoes.deputados[indice];
-  if (dep === undefined) throw new Error(`Deputado indefinido no índice ${indice}`);
-  deputadosComFicha.set(dep[id.id], indice);
-}
+const catalogoVotacoesSenado = {
+  sobre: "Catálogo completo de votações nominais do Senado Federal",
+  periodo: {
+    de: Number(votacoesSenadoOrdenadas[0][ivs.dataHora].slice(0, 4)),
+    ate: Number(votacoesSenadoOrdenadas[totalVotacoesSenado - 1][ivs.dataHora].slice(0, 4)),
+  },
+  colunas: ["id", "data", "orgao", "proposicao", "descricao", "aprovada", "sim", "nao", "abstencao", "obstrucao", "idProcesso"],
+  votacoes: linhasVotacoesSenado,
+};
+writeFileSync(join(SAIDA, "votacoes-senado.json"), `${JSON.stringify(catalogoVotacoesSenado)}\n`);
 
 const PASTA_VOTOS = join(SAIDA, "votos");
 mkdirSync(PASTA_VOTOS, { recursive: true });
 
+const deputadosComFicha = new Map();
+for (const [sq, indice] of sqParaDeputado) {
+  const dep = votacoesCamara.deputados[indice];
+  if (dep !== undefined) deputadosComFicha.set(dep[idc.id], indice);
+}
+
 const votosPorCamaraId = new Map();
-for (const [camaraId, indice] of deputadosComFicha) {
-  votosPorCamaraId.set(camaraId, new Array(totalVotacoes));
+for (const [camaraId] of deputadosComFicha) {
+  votosPorCamaraId.set(camaraId, new Array(totalVotacoesCamara));
 }
 
-for (let i = 0; i < totalVotacoes; i++) {
-  const votacao = votacoesOrdenadas[i];
-  const stringVotos = votacao[iv.votos];
-  if (stringVotos.length !== votacoes.deputados.length) {
-    throw new Error(`Votação ${votacao[iv.id]} tem ${stringVotos.length} votos, esperado ${votacoes.deputados.length}`);
-  }
+for (let i = 0; i < totalVotacoesCamara; i += 1) {
+  const votacao = votacoesCamaraOrdenadas[i];
+  const stringVotos = votacao[ivc.votos];
   for (const [camaraId, indice] of deputadosComFicha) {
-    const votoChar = stringVotos[indice];
-    if (votoChar === undefined) {
-      throw new Error(`Voto indefinido para deputado ${camaraId} (índice ${indice}) na votação ${votacao[iv.id]}`);
-    }
-    votosPorCamaraId.get(camaraId)[i] = votoChar;
+    votosPorCamaraId.get(camaraId)[i] = stringVotos[indice] ?? "0";
   }
 }
 
-let bytesTotaisVotos = 0;
 for (const [camaraId, arrayVotos] of votosPorCamaraId) {
-  const stringVotos = arrayVotos.join("");
-  if (stringVotos.length !== totalVotacoes) {
-    throw new Error(`Tamanho de votos para deputado ${camaraId} (${stringVotos.length}) difere do total de votações (${totalVotacoes})`);
-  }
-  const conteudoVotos = `${JSON.stringify({ camaraId, votos: stringVotos })}\n`;
-  bytesTotaisVotos += Buffer.byteLength(conteudoVotos, "utf8");
+  const conteudoVotos = `${JSON.stringify({ camaraId, votos: arrayVotos.join("") })}\n`;
   writeFileSync(join(PASTA_VOTOS, `${camaraId}.json`), conteudoVotos);
 }
-const totalArquivosVoto = votosPorCamaraId.size;
-const tamanhoMedioVoto = totalArquivosVoto > 0 ? Math.round(bytesTotaisVotos / totalArquivosVoto) : 0;
+
+const senadoresComFicha = new Map();
+for (const [sq, indice] of sqParaSenador) {
+  const sen = votacoesSenado.senadores[indice];
+  if (sen !== undefined) senadoresComFicha.set(sen[ids.id], indice);
+}
+
+const votosPorSenadoId = new Map();
+for (const [senadoId] of senadoresComFicha) {
+  votosPorSenadoId.set(senadoId, new Array(totalVotacoesSenado));
+}
+
+for (let i = 0; i < totalVotacoesSenado; i += 1) {
+  const votacao = votacoesSenadoOrdenadas[i];
+  const stringVotos = votacao[ivs.votos];
+  for (const [senadoId, indice] of senadoresComFicha) {
+    votosPorSenadoId.get(senadoId)[i] = stringVotos[indice] ?? "0";
+  }
+}
+
+for (const [senadoId, arrayVotos] of votosPorSenadoId) {
+  const conteudoVotos = `${JSON.stringify({ senadoId, votos: arrayVotos.join("") })}\n`;
+  writeFileSync(join(PASTA_VOTOS, `sf-${senadoId}.json`), conteudoVotos);
+}
 
 console.log(`\nCatálogo gerado em data/dex/`);
 console.log(`Candidaturas: ${candidatos.candidatos.length} em ${ufs.length} unidades eleitorais`);
-console.log(`Com ficha de votação: ${indice.totalComFicha}`);
-console.log(`Com foto: ${totalFotoTse} do TSE, ${totalFotoCamara} da Câmara`);
-console.log(`Votações no catálogo: ${totalVotacoes} (${formatarBytes(tamanhoCatalogo)})`);
-console.log(`Históricos de voto: ${totalArquivosVoto} arquivos em data/dex/votos/ (média ${formatarBytes(tamanhoMedioVoto)}/deputado)`);
-console.log(`Eixos: ${eixos.map((eixo) => `${eixo.nome} (${eixo.votacoes.length} votações)`).join(", ")}`);
-for (const uf of [...ufs].sort((a, b) => b.candidatos - a.candidatos).slice(0, 5)) {
-  console.log(`  ${uf.sigla} ${String(uf.candidatos).padStart(5)} candidaturas, ${uf.comFicha} com ficha`);
-}
+console.log(`Com ficha de votação: ${indice.totalComFicha} (${sqParaDeputado.size} da Câmara, ${sqParaSenador.size} do Senado)`);
+console.log(`Votações no catálogo: ${totalVotacoesGeral} (${totalVotacoesCamara} Câmara, ${totalVotacoesSenado} Senado)`);
+console.log(`Históricos de voto salvos: ${votosPorCamaraId.size} Câmara, ${votosPorSenadoId.size} Senado`);

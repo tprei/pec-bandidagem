@@ -1,8 +1,9 @@
 {
   "fonte": {
     "candidaturas": "https://dadosabertos.tse.jus.br/dataset/candidatos-2026",
-    "votacoes": "https://dadosabertos.camara.leg.br/arquivos",
-    "geradoEm": "2026-08-27T18:46:56.831Z"
+    "votacoesCamara": "https://dadosabertos.camara.leg.br/arquivos",
+    "votacoesSenado": "https://legis.senado.leg.br/dadosabertos",
+    "geradoEm": "2026-09-05T11:22:55.459Z"
   },
   "eleicao": {
     "ano": 2026,
@@ -11,8 +12,10 @@
     "data": "2026-10-04"
   },
   "totalCandidatos": 20765,
-  "totalComFicha": 791,
-  "votacoesNoHistorico": 4241,
+  "totalComFicha": 861,
+  "votacoesNoHistorico": 5642,
+  "votacoesNoHistoricoCamara": 4241,
+  "votacoesNoHistoricoSenado": 1401,
   "cargos": {
     "1": "PRESIDENTE",
     "2": "VICE-PRESIDENTE",
@@ -205,7 +208,8 @@
           "sim": 353,
           "nao": 134,
           "outros": 1,
-          "proposicao": 2270800
+          "proposicao": 2270800,
+          "idProcesso": null
         },
         {
           "id": "2270800-160",
@@ -214,7 +218,8 @@
           "sim": 344,
           "nao": 133,
           "outros": 0,
-          "proposicao": 2270800
+          "proposicao": 2270800,
+          "idProcesso": null
         }
       ]
     },
@@ -233,7 +238,8 @@
           "sim": 472,
           "nao": 22,
           "outros": 1,
-          "proposicao": 2233802
+          "proposicao": 2233802,
+          "idProcesso": null
         },
         {
           "id": "2233802-438",
@@ -242,7 +248,8 @@
           "sim": 461,
           "nao": 19,
           "outros": 0,
-          "proposicao": 2233802
+          "proposicao": 2233802,
+          "idProcesso": null
         }
       ]
     },
@@ -261,7 +268,8 @@
           "sim": 311,
           "nao": 163,
           "outros": 8,
-          "proposicao": 2562149
+          "proposicao": 2562149,
+          "idProcesso": null
         }
       ]
     },
@@ -275,12 +283,23 @@
       "votacoes": [
         {
           "id": "2279513-64",
-          "rotulo": "Minirreforma trabalhista (MP 1.045/2021)",
+          "rotulo": "Minirreforma trabalhista na Câmara (MP 1.045/2021)",
           "data": "2021-08-10",
           "sim": 304,
           "nao": 133,
           "outros": 3,
-          "proposicao": 2279513
+          "proposicao": 2279513,
+          "idProcesso": null
+        },
+        {
+          "id": "SF-6398",
+          "rotulo": "Minirreforma trabalhista no Senado (MPV 1045/2021)",
+          "data": "2021-09-01",
+          "sim": 27,
+          "nao": 47,
+          "outros": 2,
+          "proposicao": "SF-6398",
+          "idProcesso": 8066317
         }
       ]
     },
@@ -294,12 +313,23 @@
       "votacoes": [
         {
           "id": "2122076-348",
-          "rotulo": "Reforma trabalhista (PL 6.787/2016)",
+          "rotulo": "Reforma trabalhista na Câmara (PL 6.787/2016)",
           "data": "2017-04-26",
           "sim": 296,
           "nao": 177,
           "outros": 1,
-          "proposicao": 2122076
+          "proposicao": 2122076,
+          "idProcesso": null
+        },
+        {
+          "id": "SF-5726",
+          "rotulo": "Reforma trabalhista no Senado (PLC 38/2017)",
+          "data": "2017-07-11",
+          "sim": 50,
+          "nao": 26,
+          "outros": 3,
+          "proposicao": "SF-5726",
+          "idProcesso": 5252519
         }
       ]
     },
@@ -313,21 +343,43 @@
       "votacoes": [
         {
           "id": "2192459-636",
-          "rotulo": "Reforma da Previdência (PEC 6/2019), 1º turno",
+          "rotulo": "Reforma da Previdência na Câmara (PEC 6/2019), 1º turno",
           "data": "2019-07-10",
           "sim": 379,
           "nao": 131,
           "outros": 0,
-          "proposicao": 2192459
+          "proposicao": 2192459,
+          "idProcesso": null
         },
         {
           "id": "2192459-786",
-          "rotulo": "Reforma da Previdência (PEC 6/2019), 2º turno",
+          "rotulo": "Reforma da Previdência na Câmara (PEC 6/2019), 2º turno",
           "data": "2019-08-07",
           "sim": 370,
           "nao": 124,
           "outros": 1,
-          "proposicao": 2192459
+          "proposicao": 2192459,
+          "idProcesso": null
+        },
+        {
+          "id": "SF-6024",
+          "rotulo": "Reforma da Previdência no Senado (PEC 6/2019), 1º turno",
+          "data": "2019-10-01",
+          "sim": 56,
+          "nao": 19,
+          "outros": 2,
+          "proposicao": "SF-6024",
+          "idProcesso": 7786066
+        },
+        {
+          "id": "SF-6046",
+          "rotulo": "Reforma da Previdência no Senado (PEC 6/2019), 2º turno",
+          "data": "2019-10-22",
+          "sim": 60,
+          "nao": 19,
+          "outros": 1,
+          "proposicao": "SF-6046",
+          "idProcesso": 7786066
         }
       ]
     },
@@ -341,12 +393,23 @@
       "votacoes": [
         {
           "id": "2270789-73",
-          "rotulo": "Privatização da Eletrobras (MP 1.031/2021)",
+          "rotulo": "Privatização da Eletrobras na Câmara (MP 1.031/2021)",
           "data": "2021-05-19",
           "sim": 313,
           "nao": 166,
           "outros": 6,
-          "proposicao": 2270789
+          "proposicao": 2270789,
+          "idProcesso": null
+        },
+        {
+          "id": "SF-6377",
+          "rotulo": "Privatização da Eletrobras no Senado (MPV 1031/2021)",
+          "data": "2021-06-16",
+          "sim": 42,
+          "nao": 37,
+          "outros": 1,
+          "proposicao": "SF-6377",
+          "idProcesso": 8025319
         }
       ]
     },
@@ -365,7 +428,8 @@
           "sim": 323,
           "nao": 119,
           "outros": 2,
-          "proposicao": 2383287
+          "proposicao": 2383287,
+          "idProcesso": null
         }
       ]
     }
@@ -379,7 +443,8 @@
       "sim": 493,
       "nao": 0,
       "outros": 1,
-      "proposicao": 2487436
+      "proposicao": 2487436,
+      "idProcesso": null
     },
     {
       "id": "2422697-69",
@@ -389,7 +454,19 @@
       "sim": 266,
       "nao": 139,
       "outros": 2,
-      "proposicao": 2422697
+      "proposicao": 2422697,
+      "idProcesso": null
+    },
+    {
+      "id": "SF-6836",
+      "rotulo": "Taxa das blusinhas no Senado: aprovação da taxação de 20% (PL 914/2024)",
+      "nota": "Aprovado no Senado em 05/06/2024.",
+      "data": "2024-06-05",
+      "sim": 67,
+      "nao": 0,
+      "outros": 1,
+      "proposicao": "SF-6836",
+      "idProcesso": 8672212
     }
   ],
   "pesquisa": {
@@ -400,152 +477,152 @@
     "totalPesquisados": 10,
     "totalComPublicacao": 2,
     "totalAguardandoRevisao": 8,
-    "geradoEm": "2026-08-27T18:46:56.831Z"
+    "geradoEm": "2026-09-05T11:22:55.459Z"
   },
   "ufs": [
     {
       "sigla": "AC",
       "nome": "ACRE",
       "candidatos": 385,
-      "comFicha": 15
+      "comFicha": 19
     },
     {
       "sigla": "AL",
       "nome": "ALAGOAS",
       "candidatos": 283,
-      "comFicha": 12
+      "comFicha": 16
     },
     {
       "sigla": "AM",
       "nome": "AMAZONAS",
       "candidatos": 468,
-      "comFicha": 17
+      "comFicha": 19
     },
     {
       "sigla": "AP",
       "nome": "AMAPÁ",
       "candidatos": 318,
-      "comFicha": 18
+      "comFicha": 22
     },
     {
       "sigla": "BA",
       "nome": "BAHIA",
       "candidatos": 1222,
-      "comFicha": 48
+      "comFicha": 50
     },
     {
       "sigla": "BR",
       "nome": "BRASIL",
       "candidatos": 26,
-      "comFicha": 2
+      "comFicha": 5
     },
     {
       "sigla": "CE",
       "nome": "CEARÁ",
       "candidatos": 708,
-      "comFicha": 35
+      "comFicha": 39
     },
     {
       "sigla": "DF",
       "nome": "DISTRITO FEDERAL",
       "candidatos": 657,
-      "comFicha": 18
+      "comFicha": 21
     },
     {
       "sigla": "ES",
       "nome": "ESPÍRITO SANTO",
       "candidatos": 588,
-      "comFicha": 15
+      "comFicha": 19
     },
     {
       "sigla": "GO",
       "nome": "GOIÁS",
       "candidatos": 895,
-      "comFicha": 27
+      "comFicha": 30
     },
     {
       "sigla": "MA",
       "nome": "MARANHÃO",
       "candidatos": 604,
-      "comFicha": 36
+      "comFicha": 38
     },
     {
       "sigla": "MG",
       "nome": "MINAS GERAIS",
       "candidatos": 1822,
-      "comFicha": 72
+      "comFicha": 74
     },
     {
       "sigla": "MS",
       "nome": "MATO GROSSO DO SUL",
       "candidatos": 421,
-      "comFicha": 12
+      "comFicha": 14
     },
     {
       "sigla": "MT",
       "nome": "MATO GROSSO",
       "candidatos": 445,
-      "comFicha": 18
+      "comFicha": 23
     },
     {
       "sigla": "PA",
       "nome": "PARÁ",
       "candidatos": 729,
-      "comFicha": 25
+      "comFicha": 27
     },
     {
       "sigla": "PB",
       "nome": "PARAÍBA",
       "candidatos": 443,
-      "comFicha": 21
+      "comFicha": 23
     },
     {
       "sigla": "PE",
       "nome": "PERNAMBUCO",
       "candidatos": 957,
-      "comFicha": 34
+      "comFicha": 35
     },
     {
       "sigla": "PI",
       "nome": "PIAUÍ",
       "candidatos": 397,
-      "comFicha": 12
+      "comFicha": 14
     },
     {
       "sigla": "PR",
       "nome": "PARANÁ",
       "candidatos": 1079,
-      "comFicha": 48
+      "comFicha": 50
     },
     {
       "sigla": "RJ",
       "nome": "RIO DE JANEIRO",
       "candidatos": 2029,
-      "comFicha": 72
+      "comFicha": 73
     },
     {
       "sigla": "RN",
       "nome": "RIO GRANDE DO NORTE",
       "candidatos": 325,
-      "comFicha": 12
+      "comFicha": 14
     },
     {
       "sigla": "RO",
       "nome": "RONDÔNIA",
       "candidatos": 435,
-      "comFicha": 15
+      "comFicha": 17
     },
     {
       "sigla": "RR",
       "nome": "RORAIMA",
       "candidatos": 401,
-      "comFicha": 14
+      "comFicha": 18
     },
     {
       "sigla": "RS",
       "nome": "RIO GRANDE DO SUL",
       "candidatos": 1051,
-      "comFicha": 40
+      "comFicha": 41
     },
     {
       "sigla": "SC",
@@ -557,19 +634,19 @@
       "sigla": "SE",
       "nome": "SERGIPE",
       "candidatos": 406,
-      "comFicha": 14
+      "comFicha": 17
     },
     {
       "sigla": "SP",
       "nome": "SÃO PAULO",
       "candidatos": 2618,
-      "comFicha": 96
+      "comFicha": 97
     },
     {
       "sigla": "TO",
       "nome": "TOCANTINS",
       "candidatos": 358,
-      "comFicha": 16
+      "comFicha": 19
     }
   ]
 }

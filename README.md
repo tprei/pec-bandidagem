@@ -2,7 +2,7 @@
 
 Site estático (sem frameworks, sem dependências, sem build) que lista os **356 deputados federais** que votaram **Sim** na PEC 3/2021 — a chamada PEC da Blindagem — em pelo menos um dos dois turnos de votação de **16/09/2025** na Câmara dos Deputados, com filtros por nome, partido, estado e turno.
 
-Desde então o repositório ganhou um segundo aplicativo: o **[Catálogo 2026](#catálogo-2026-dexhtml)** (`dex.html`), um guia offline das 20.765 candidaturas de 2026 com o número na urna em destaque e o histórico de votação de 708 delas.
+Desde então o repositório ganhou um segundo aplicativo: o **[Catálogo 2026](#catálogo-2026-dexhtml)** (`dex.html`), um guia offline das 20.765 candidaturas de 2026 com o número na urna em destaque e o histórico de votação no Congresso Nacional (Câmara e Senado) de 861 delas.
 
 ## O dataset
 
@@ -162,9 +162,9 @@ node scripts/build-pokedex.mjs
 
 Os resultados publicados vão para 256 shards em `data/dex/pesquisa/` e são carregados apenas ao abrir uma ficha. A ausência de pesquisa ou de evidência não é nota, absolvição nem condenação.
 
-## Votações nominais da Câmara (2021-2026)
+## Votações nominais da Câmara (2017-2026)
 
-`data/votacoes-camara.json` traz as **3.138 votações nominais** do plenário e das comissões da Câmara entre 2021 e 2026, com o voto individual de 887 cadastros de deputado — 990.153 registros de voto. É a base do histórico exibido no Catálogo 2026 (`dex.html`).
+`data/votacoes-camara.json` traz as **4.241 votações nominais** do plenário e das comissões da Câmara entre 2017 e 2026, com o voto individual de 1.194 cadastros de deputado — 1.393.285 registros de voto. É a base do histórico exibido no Catálogo 2026 (`dex.html`).
 
 Regenerar:
 
@@ -215,6 +215,25 @@ Aplicado ao período: 2.625 das 3.138 votações passam do corte de 5% de minori
 - `proposicao` é `null` em 776 votações — o dump usa `"0"` para "não vinculada a proposição", e requerimentos e questões de ordem caem nesse caso.
 - `proposicao` é a **última proposição apresentada**, não necessariamente a matéria principal: na PEC 3/2021 ela aponta para o substitutivo (2561347), não para a PEC (2270800). O id da matéria principal é o prefixo do id da votação.
 
+## Votações nominais do Senado (2017-2026)
+
+`data/votacoes-senado.json` traz as **1.401 votações nominais** do plenário do Senado Federal entre 2017 e 2026, com o voto individual de 283 cadastros de senador — 62.809 registros de voto. Vem da [API de Dados Abertos do Senado](https://legis.senado.leg.br/dadosabertos), que não publica dumps em CSV: o script consulta o serviço `/votacao` por ano.
+
+Regenerar:
+
+```
+node scripts/fetch-votacoes-senado.mjs
+```
+
+Cada resposta anual é guardada em `.cache/senado/votacoes-{ano}.json` (fora do git), então rodar de novo é barato. O script também baixa o cadastro dos senadores que exerceram mandato no período (legislaturas 55, 56 e 57) e guarda em `.cache/senado/senadores-detalhe.json`.
+
+Duas restrições do serviço do Senado pesam na implementação:
+
+- **IPv4 obrigatório.** O DNS de `legis.senado.leg.br` devolve um endereço IPv6 sem rota em ambientes típicos de WSL2; a requisição fica travada até dar timeout. O script chama o `curl` com `-4` em vez do `fetch` nativo.
+- **Sem CPF.** A API do Senado não expõe o CPF do parlamentar. O cruzamento com as candidaturas de 2026 é por `(nome completo, data de nascimento)` normalizados, com fallback para nome único exato quando não há ambiguidade.
+
+O esquema é o mesmo de `votacoes-camara.json`: elenco posicional de senadores, e o voto de cada votação é uma string com um dígito por senador. `id` tem o prefixo `SF-` e o resto é o `codigoSessaoVotacao` da fonte. A sigla do voto do Senado é mais rica que a da Câmara e mapeia assim: `Sim`→1, `Não`→2, `Abstenção`→3, `Obstrução` e `P-NRV`→4, `Presidente (art. 51 RISF)`→5, o resto (`AP`, `LS`, `LP`, `MIS`, `NA`, `NCom`)→0 sem registro. Como bancadas de senador são menores, `minimoBancadaAferivel` aqui é 3 (na Câmara, 5).
+
 ## Catálogo 2026 (`dex.html`)
 
 O catálogo é um segundo aplicativo no mesmo repositório, mobile-first e offline-first, pensado para quem está no ônibus com sinal ruim e precisa lembrar do número na urna. `index.html` continua sendo o mural da PEC da Blindagem e não mudou de função.
@@ -226,6 +245,7 @@ Gerar os dados do catálogo:
 ```
 node scripts/fetch-candidatos-2026.mjs
 node scripts/fetch-votacoes-camara.mjs
+node scripts/fetch-votacoes-senado.mjs
 node scripts/build-pokedex.mjs
 ```
 
@@ -241,13 +261,13 @@ O service worker pré-carrega só a casca e o índice. Os arquivos por estado en
 
 ### Quem tem ficha, e quem não tem
 
-Das 20.765 candidaturas, **708 têm histórico de votação** na Câmara entre 2021 e 2026 — 3,4%. São os deputados em exercício que disputam a reeleição ou outro cargo, mais os que passaram pela Casa no período. As outras 20.057 não têm ficha, e isso é a decisão de produto mais importante do catálogo: **ausência de registro nunca vira nota zero**. Quem nunca foi deputado federal aparece como "Sem histórico na Câmara", que é informação, não demérito. Inventar um número para 97% das candidaturas destruiria a credibilidade do resto.
+Das 20.765 candidaturas, **861 têm histórico de votação** no Congresso entre 2017 e 2026 — 791 na Câmara e 91 no Senado, com 21 que passaram pelas duas casas. São os deputados e senadores em exercício que disputam a reeleição ou outro cargo, mais os que passaram pelo Congresso no período. As outras 19.904 não têm ficha, e isso é a decisão de produto mais importante do catálogo: **ausência de registro nunca vira nota zero**. Quem nunca foi deputado federal nem senador aparece como "Sem histórico no Congresso", que é informação, não demérito. Inventar um número para 96% das candidaturas destruiria a credibilidade do resto.
 
-A mesma regra vale um nível abaixo: quem tem ficha mas não votou numa votação específica recebe "sem registro" naquele eixo, não 0%. Capitão Derrite (SP) é o caso exemplar: participou de 1.249 votações nominais no período, mas estava fora da Casa nas quatro votações curadas, então os dois eixos dele aparecem em branco.
+A mesma regra vale um nível abaixo: quem tem ficha mas não votou numa votação específica recebe "sem registro" naquele eixo, não 0%. Renan Filho (AL) é o caso exemplar: tem 13 participações nominais no Senado no período, mas nenhuma delas cai nas 19 votações curadas, então os eixos dele aparecem em branco.
 
 ### Os eixos são opinião declarada
 
-`data/curadoria.json` é a camada editorial, e é curta de propósito. Cada eixo declara uma posição e aponta as votações nominais que a sustentam; placares, datas e votos individuais vêm de `data/votacoes-camara.json`, e o build aborta se um id curado não existir lá.
+`data/curadoria.json` é a camada editorial, e é curta de propósito. Cada eixo declara uma posição e aponta as votações nominais que a sustentam; placares, datas e votos individuais vêm de `data/votacoes-camara.json` e de `data/votacoes-senado.json`, e o build aborta se um id curado não existir lá.
 
 - **Blindagem parlamentar** — PEC 3/2021, dois turnos. Votar Sim é votar a favor do privilégio. Discrimina de verdade: minoria de 27,5%, o PT rachou 12 a 51 e o PSDB 6 a 6. **339 candidaturas de 2026 votaram a favor da blindagem.**
 - **Jornada de trabalho** — PEC 221/2019, dois turnos, o veículo do fim da escala 6x1 aprovado em 27/05/2026. Aqui só 21 candidaturas votaram contra, e a maioria delas em Santa Catarina. Com minoria abaixo de 5% o eixo não gradua todo mundo: ele identifica os poucos que se expuseram.
@@ -255,11 +275,11 @@ A mesma regra vale um nível abaixo: quem tem ficha mas não votou numa votaçã
 
 A cor de cada voto segue o **significado no eixo**, não o código bruto: o mesmo "Sim" aparece vermelho na blindagem e verde na jornada. Colorir por Sim/Não faria "votou a favor da blindagem" parecer elogio.
 
-A fidelidade partidária aparece como fato, nunca como virtude: "votou com o próprio partido em 96% das 1.775 votações mensuráveis". Voto independente não é automaticamente bom nem ruim, e o eixo é que dá direção.
+A fidelidade partidária aparece como fato, nunca como virtude: "votou com o próprio partido em 96% das 262 votações mensuráveis" (Flávio Bolsonaro, no Senado). Voto independente não é automaticamente bom nem ruim, e o eixo é que dá direção.
 
 ### O que o app faz
 
-Busca por nome ou número (sem acento, sem caixa), filtro por cargo e por perfil de ocupação, e um recorte de "só quem já votou na Câmara". Cada carta abre uma ficha com a composição da coligação traduzida em "votar aqui também ajuda a eleger", cada votação curada com placar, o voto daquela pessoa e link para a ata oficial. "Minha lista" guarda candidaturas no `localStorage` e funciona como cola de votação sem sinal nenhum, que é a situação real na fila da seção eleitoral.
+Busca por nome ou número (sem acento, sem caixa), filtro por cargo e por perfil de ocupação, e um recorte de "só quem já votou no Congresso". Cada carta abre uma ficha com a composição da coligação traduzida em "votar aqui também ajuda a eleger", cada votação curada com placar, o voto daquela pessoa e link para a ata oficial — na Câmara ou no Senado, conforme a casa da votação. "Minha lista" guarda candidaturas no `localStorage` e funciona como cola de votação sem sinal nenhum, que é a situação real na fila da seção eleitoral.
 
 Os badges de perfil saem da ocupação declarada ao TSE e cobrem 73,5% das candidaturas. Ocupações sem carga política clara (OUTROS, ENGENHEIRO, ESTUDANTE, DONA DE CASA) ficam sem badge de propósito: um badge só vale se significar algo.
 
@@ -275,4 +295,4 @@ O mural da PEC fica em <http://localhost:8000> e o catálogo em <http://localhos
 
 ## Atribuição
 
-Dados das votações: [API de Dados Abertos da Câmara dos Deputados](https://dadosabertos.camara.leg.br), termo de reutilização e licenciamento paralelo da Câmara. Dados das candidaturas de 2026: [Portal de Dados Abertos do TSE](https://dadosabertos.tse.jus.br). Ideia e divulgação original: vídeo ["NÃO VOTE neles! A lista dos Deputados que votaram para se BLINDAR"](https://www.youtube.com/watch?v=aDjuRLF4cIo), de Gabriel Salazar.
+Dados das votações: [API de Dados Abertos da Câmara dos Deputados](https://dadosabertos.camara.leg.br), termo de reutilização e licenciamento paralelo da Câmara, e [Serviço de Dados Abertos do Senado Federal](https://legis.senado.leg.br/dadosabertos). Dados das candidaturas de 2026: [Portal de Dados Abertos do TSE](https://dadosabertos.tse.jus.br). Ideia e divulgação original: vídeo ["NÃO VOTE neles! A lista dos Deputados que votaram para se BLINDAR"](https://www.youtube.com/watch?v=aDjuRLF4cIo), de Gabriel Salazar.
