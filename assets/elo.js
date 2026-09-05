@@ -66,6 +66,38 @@ export function extrairRota(texto) {
   if (mPost) return { postura: mPost[1], id: mPost[2].toUpperCase() };
   return null;
 }
+function codificarGrade(letra, modeloIdx, eixos, faces) {
+  let eixosBits = 0;
+  for (const e of eixos) {
+    if (typeof e !== "number" || e < 0 || e > 7) throw new RangeError(`eixo inválido: ${e}`);
+    eixosBits |= (1 << e);
+  }
+  const n = faces.length;
+  if (n < 1 || n > 9) throw new RangeError("faces deve ter entre 1 e 9 itens");
+  let val = (BigInt(modeloIdx) << BigInt(12 + 27 * n)) | (BigInt(eixosBits) << BigInt(4 + 27 * n)) | (BigInt(n) << BigInt(27 * n));
+  for (let i = 0; i < n; i++) val |= (codificarRef(faces[i]) << BigInt(27 * (n - 1 - i)));
+  return letra + b32Encode(val, Math.ceil((13 + 27 * n) / 5));
+}
+
+function decodificarGrade(tipo, val, payloadLen) {
+  let n = 0;
+  for (let k = 1; k <= 9; k++) if (Math.ceil((13 + 27 * k) / 5) === payloadLen) { n = k; break; }
+  if (n === 0) return null;
+  if (val >= (1n << BigInt(13 + 27 * n))) return null;
+  const modelo = MODELOS[Number((val >> BigInt(12 + 27 * n)) & 1n)];
+  const eixosBits = Number((val >> BigInt(4 + 27 * n)) & 255n);
+  const eixos = [];
+  for (let i = 0; i < 8; i++) if ((eixosBits & (1 << i)) !== 0) eixos.push(i);
+  if (Number((val >> BigInt(27 * n)) & 15n) !== n) return null;
+  const faces = [];
+  for (let i = 0; i < n; i++) {
+    const sq = decodificarRef((val >> BigInt(27 * (n - 1 - i))) & ((1n << 27n) - 1n));
+    if (sq === null) return null;
+    faces.push(sq);
+  }
+  return { tipo, modelo, eixos, faces };
+}
+
 
 export function codificar(post) {
   if (!post || typeof post !== "object") throw new TypeError("post inválido");
@@ -93,31 +125,15 @@ export function codificar(post) {
   }
 
   if (post.tipo === "pauta") {
-    const eixo = Number(post.eixo ?? 0);
-    if (eixo < 0 || eixo > 15) throw new RangeError(`eixo inválido: ${eixo}`);
-    const faces = post.faces ?? [];
-    const n = faces.length;
-    if (n < 1 || n > 9) throw new RangeError("faces deve ter entre 1 e 9 itens");
-    let val = (BigInt(modeloIdx) << BigInt(8 + 27 * n)) | (BigInt(eixo) << BigInt(4 + 27 * n)) | (BigInt(n) << BigInt(27 * n));
-    for (let i = 0; i < n; i++) {
-      const ref = codificarRef(faces[i]);
-      val |= (ref << BigInt(27 * (n - 1 - i)));
-    }
-    const len = Math.ceil((9 + 27 * n) / 5);
-    return "P" + b32Encode(val, len);
+    const eixos = post.eixos ?? [];
+    if (eixos.length < 1 || eixos.length > 8) throw new RangeError("eixos deve ter entre 1 e 8 itens");
+    return codificarGrade("P", modeloIdx, eixos, post.faces ?? []);
   }
 
   if (post.tipo === "lista") {
-    const faces = post.faces ?? [];
-    const n = faces.length;
-    if (n < 1 || n > 9) throw new RangeError("faces deve ter entre 1 e 9 itens");
-    let val = (BigInt(modeloIdx) << BigInt(4 + 27 * n)) | (BigInt(n) << BigInt(27 * n));
-    for (let i = 0; i < n; i++) {
-      const ref = codificarRef(faces[i]);
-      val |= (ref << BigInt(27 * (n - 1 - i)));
-    }
-    const len = Math.ceil((5 + 27 * n) / 5);
-    return "L" + b32Encode(val, len);
+    const eixos = post.eixos ?? [];
+    if (eixos.length > 8) throw new RangeError("eixos excede o limite de 8");
+    return codificarGrade("L", modeloIdx, eixos, post.faces ?? []);
   }
 
   throw new RangeError(`tipo de post desconhecido: ${post.tipo}`);
@@ -163,52 +179,12 @@ export function decodificar(id) {
   }
 
   if (tipoChar === "P") {
-    let n = 0;
-    for (let candidate = 1; candidate <= 9; candidate++) {
-      if (Math.ceil((9 + 27 * candidate) / 5) === payload.length) {
-        n = candidate;
-        break;
-      }
-    }
-    if (n === 0) return null;
-    const totalBits = 9 + 27 * n;
-    if (val >= (1n << BigInt(totalBits))) return null;
-    const modelo = MODELOS[Number((val >> BigInt(8 + 27 * n)) & 1n)];
-    const eixo = Number((val >> BigInt(4 + 27 * n)) & 15n);
-    const decodedN = Number((val >> BigInt(27 * n)) & 15n);
-    if (decodedN !== n) return null;
-    const faces = [];
-    for (let i = 0; i < n; i++) {
-      const ref = (val >> BigInt(27 * (n - 1 - i))) & ((1n << 27n) - 1n);
-      const sq = decodificarRef(ref);
-      if (sq === null) return null;
-      faces.push(sq);
-    }
-    return { tipo: "pauta", modelo, eixo, faces };
+    const g = decodificarGrade("pauta", val, payload.length);
+    return g && g.eixos.length > 0 ? g : null;
   }
 
   if (tipoChar === "L") {
-    let n = 0;
-    for (let candidate = 1; candidate <= 9; candidate++) {
-      if (Math.ceil((5 + 27 * candidate) / 5) === payload.length) {
-        n = candidate;
-        break;
-      }
-    }
-    if (n === 0) return null;
-    const totalBits = 5 + 27 * n;
-    if (val >= (1n << BigInt(totalBits))) return null;
-    const modelo = MODELOS[Number((val >> BigInt(4 + 27 * n)) & 1n)];
-    const decodedN = Number((val >> BigInt(27 * n)) & 15n);
-    if (decodedN !== n) return null;
-    const faces = [];
-    for (let i = 0; i < n; i++) {
-      const ref = (val >> BigInt(27 * (n - 1 - i))) & ((1n << 27n) - 1n);
-      const sq = decodificarRef(ref);
-      if (sq === null) return null;
-      faces.push(sq);
-    }
-    return { tipo: "lista", modelo, faces };
+    return decodificarGrade("lista", val, payload.length);
   }
 
   return null;

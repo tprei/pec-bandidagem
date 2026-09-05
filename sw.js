@@ -1,4 +1,4 @@
-const VERSAO = "voto-v1";
+const VERSAO = "voto-v2";
 
 const CONCHA = [
   "index.html",

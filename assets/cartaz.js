@@ -29,7 +29,7 @@ export function envolver(ctx, texto, maxLargura, maxLinhas) {
       atual = palavra;
     }
   }
-  if (linhas.length < maxLinhas && atual !== "") linhas.push(atual);
+  if (atual !== "") linhas.push(atual);
   if (linhas.length > maxLinhas) {
     linhas.length = maxLinhas;
     let ultima = linhas[maxLinhas - 1];
@@ -497,10 +497,17 @@ export async function desenharCartao(canvas, post) {
     ctx.fillStyle = accent;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    const titLinhas = envolver(ctx, g.titulo || "NÃO VOTO EM NENHUM DESTES", 324, 2);
+    const tituloTexto = g.titulo || "NÃO VOTO EM NENHUM DESTES";
+    let titLinhas = envolver(ctx, tituloTexto, 324, 2);
+    let lineAdvance = 22;
+    if (titLinhas.length > 0 && titLinhas[titLinhas.length - 1].endsWith("…")) {
+      ctx.font = "16px Anton, sans-serif";
+      titLinhas = envolver(ctx, tituloTexto, 324, 3);
+      lineAdvance = 18;
+    }
     for (const tl of titLinhas) {
       ctx.fillText(tl, 18, dy);
-      dy += 22;
+      dy += lineAdvance;
     }
 
     dy += 6;
@@ -551,14 +558,36 @@ export async function desenharCartao(canvas, post) {
     }
 
     if (g.fonteBadges?.length) {
-      let by = 358;
       ctx.font = "800 9px Archivo, sans-serif";
-      ctx.fillStyle = muted;
-      ctx.fillText((g.fonteRotulo || "Eles apoiaram").toUpperCase(), 18, by);
-      let bx = 18 + ctx.measureText((g.fonteRotulo || "Eles apoiaram").toUpperCase()).width + 8;
+      const rotulo = (g.fonteRotulo || "Eles apoiaram").toUpperCase();
+      const rotuloW = ctx.measureText(rotulo).width + 8;
+
+      let totalW = 18 + rotuloW;
+      let cabeEmUmaLinha = true;
       for (const badge of g.fonteBadges) {
         const bw = ctx.measureText(badge.toUpperCase()).width + 8;
-        if (bx + bw > 342) break;
+        if (totalW + bw > 342) {
+          cabeEmUmaLinha = false;
+          break;
+        }
+        totalW += bw + 4;
+      }
+
+      let by = cabeEmUmaLinha ? 358 : 338;
+      ctx.fillStyle = muted;
+      ctx.fillText(rotulo, 18, by);
+      let bx = 18 + rotuloW;
+
+      for (const badge of g.fonteBadges) {
+        const bw = ctx.measureText(badge.toUpperCase()).width + 8;
+        if (bx + bw > 342) {
+          if (by === 338) {
+            by = 356;
+            bx = 18;
+          } else {
+            break;
+          }
+        }
         ctx.fillStyle = accent;
         retanguloArredondado(ctx, bx, by - 2, bw, 15, 3);
         ctx.fill();
@@ -602,9 +631,8 @@ export async function gerarCartao(post) {
   return new Promise((resolve) => c.toBlob(resolve, "image/jpeg", 0.92));
 }
 
-export async function gerarStory(post) {
+export async function desenharStory(canvas, post) {
   await fontes;
-  const canvas = document.createElement("canvas");
   canvas.width = 1080;
   canvas.height = 1920;
   const ctx = canvas.getContext("2d");
@@ -627,12 +655,22 @@ export async function gerarStory(post) {
   await desenharCartao(cardCanvas, post);
   ctx.drawImage(cardCanvas, 0, 420, 1080, 1350);
 
-  ctx.font = "700 39px Archivo, sans-serif";
+  const footerTexto = `Escaneie o QR ou abra ${post.link || "votosecreto.com.br"}`;
+  let footerFs = 39;
+  ctx.font = `700 ${footerFs}px Archivo, sans-serif`;
+  while (footerFs > 16 && ctx.measureText(footerTexto).width > 960) {
+    footerFs -= 1;
+    ctx.font = `700 ${footerFs}px Archivo, sans-serif`;
+  }
   ctx.fillStyle = "#a9a3b5";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(`Escaneie o QR ou abra ${post.link || "votosecreto.com.br"}`, 540, 1830);
+  ctx.fillText(ajustar(ctx, footerTexto, 960), 540, 1830);
+}
 
+export async function gerarStory(post) {
+  const canvas = document.createElement("canvas");
+  await desenharStory(canvas, post);
   return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
 }
 

@@ -82,22 +82,23 @@ test("tipo P (pauta) round-trip", () => {
   const post = {
     tipo: "pauta",
     modelo: "cabine",
-    eixo: 3,
+    eixos: [3, 0],
     faces: [SQ_SP, SQ_AC, SQ_BR],
   };
   const id = codificar(post);
+  assert.equal(id.length, 20);
   assert.equal(id[0], "P");
 
   const dec = decodificar(id);
   assert.deepEqual(dec, {
     tipo: "pauta",
     modelo: "cabine",
-    eixo: 3,
+    eixos: [0, 3],
     faces: [SQ_SP, SQ_AC, SQ_BR],
   });
 });
 
-test("tipo L (lista) with 9 faces gives 51 chars and round-trips", () => {
+test("tipo L (lista) with 9 faces gives 53 chars and round-trips", () => {
   const faces = [
     SQ_SP, SQ_AC, SQ_BR,
     SQ_SP, SQ_AC, SQ_BR,
@@ -109,13 +110,29 @@ test("tipo L (lista) with 9 faces gives 51 chars and round-trips", () => {
     faces,
   };
   const id = codificar(post);
-  assert.equal(id.length, 51, "L with 9 faces gives 51 chars");
+  assert.equal(id.length, 53, "L with 9 faces gives 53 chars");
   assert.equal(id[0], "L");
 
   const dec = decodificar(id);
   assert.deepEqual(dec, {
     tipo: "lista",
     modelo: "cabine",
+    eixos: [],
+    faces,
+  });
+
+  const postComEixos = {
+    tipo: "lista",
+    modelo: "cabine",
+    eixos: [1, 7],
+    faces,
+  };
+  const idComEixos = codificar(postComEixos);
+  assert.equal(idComEixos.length, 53);
+  assert.deepEqual(decodificar(idComEixos), {
+    tipo: "lista",
+    modelo: "cabine",
+    eixos: [1, 7],
     faces,
   });
 });
@@ -145,6 +162,12 @@ test("decodificar validation and error cases", () => {
   assert.deepEqual(decodificar(idWithO), canonicalDec);
   assert.deepEqual(decodificar(idWithI), canonicalDec);
   assert.deepEqual(decodificar(idWithL), canonicalDec);
+
+  assert.equal(
+    decodificar(codificar({ tipo: "lista", modelo: "cabine", eixos: [], faces: [SQ_SP] }).replace(/^L/, "P")),
+    null,
+    "pauta without eixos is null",
+  );
 });
 
 test("codificar bounds checks", () => {
@@ -162,6 +185,14 @@ test("codificar bounds checks", () => {
   );
   assert.throws(
     () => codificar({ tipo: "candidato", modelo: "cabine", sq: 990000000000 }),
+    RangeError,
+  );
+  assert.throws(
+    () => codificar({ tipo: "pauta", modelo: "cabine", eixos: [], faces: [SQ_SP] }),
+    RangeError,
+  );
+  assert.throws(
+    () => codificar({ tipo: "pauta", modelo: "cabine", eixos: [8], faces: [SQ_SP] }),
     RangeError,
   );
 });
@@ -193,4 +224,19 @@ test("extrairRota parses URLs and pasted texts", () => {
   assert.equal(extrairRota("https://example.com/outra-coisa"), null);
   assert.equal(extrairRota(""), null);
   assert.equal(extrairRota(null), null);
+});
+
+test("envolver appends ellipsis when text wraps past maxLinhas", async () => {
+  const { envolver } = await import("../assets/cartaz.js");
+  const ctx = {
+    measureText: (str) => ({ width: str.length * 10 }),
+  };
+  const text = "primeira linha aqui segunda linha aqui terceira linha ali";
+  const lines2 = envolver(ctx, text, 200, 2);
+  assert.equal(lines2.length, 2);
+  assert.ok(lines2[1].endsWith("…"), "last line must end with ellipsis when truncated");
+
+  const lines3 = envolver(ctx, text, 200, 3);
+  assert.equal(lines3.length, 3);
+  assert.ok(!lines3[2].endsWith("…"), "3 lines fit without ellipsis");
 });

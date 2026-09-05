@@ -96,8 +96,8 @@ Bit layouts (MSB first, packed in a BigInt, then base32 with fixed length `ceil(
 | --- | --- | --- | --- |
 | `C` | modelo(1) motivos(8) ref(27) | 36 | 1+8 |
 | `D` | modelo(1) refNao(27) refSim(27) | 55 | 1+11 |
-| `P` | modelo(1) eixo(4) n(4) n×ref(27) | 9+27n | 1+ceil((9+27n)/5) |
-| `L` | modelo(1) n(4) n×ref(27) | 5+27n | 1+ceil((5+27n)/5) |
+| `P` | modelo(1) eixos(8) n(4) n×ref(27) | 13+27n | 1+ceil((13+27n)/5) |
+| `L` | same layout; eixos may be empty | 13+27n | 1+ceil((13+27n)/5) |
 
 `eixo` and each `motivos` bit are the position of the eixo in `indice.eixos` (current order: blindagem, jornada, anistia, trabalhista, clt, previdencia, eletrobras, ricos). That order is part of the wire format: `data/curadoria.json` eixos may only be appended, never reordered (state this in README). `n` is 1..9 faces.
 
@@ -113,7 +113,7 @@ export function extrairRota(texto): null | { postura, id } | { sq }  // parses a
 ```
 `decodificar` uppercases input and maps `I`/`L`→`1`, `O`→`0` before lookup; returns `null` on unknown tipo letter, non-alphabet char, wrong length for the tipo, `n` outside 1..9, `ue` not in `UE_PARA_UF`, or motivos with more than 4 bits set. Decoded `motivos` is the sorted list of set bit indexes. `codificar` throws `RangeError` on more than 4 motivos or `faces.length` outside 1..9.
 
-Tests `tests/elo.test.mjs` (`node --test tests/`): round-trip each tipo with real sqs (`250002541303` SP, `10002532416` AC, a BR sq from `data/dex/BR.json`); `C` with motivos `[0,2,5,7]` gives 9 chars; `L` with 9 faces gives 51 chars; `decodificar("Z000")` is `null`; `decodificar` of a `C` id with a trailing char is `null`; lowercase and `O`/`I` substitutions decode equal to canonical; `extrairRota("Veja https://votosecreto.com.br/#/nao/C0ABCDEF1 agora")` returns `{ postura: "nao", id: "C0ABCDEF1" }`.
+Tests `tests/elo.test.mjs` (`node --test tests/`): round-trip each tipo with real sqs (`250002541303` SP, `10002532416` AC, a BR sq from `data/dex/BR.json`); `C` with motivos `[0,2,5,7]` gives 9 chars; `L` with 9 faces gives 53 chars; `decodificar("Z000")` is `null`; `decodificar` of a `C` id with a trailing char is `null`; lowercase and `O`/`I` substitutions decode equal to canonical; `extrairRota("Veja https://votosecreto.com.br/#/nao/C0ABCDEF1 agora")` returns `{ postura: "nao", id: "C0ABCDEF1" }`.
 
 ### Step 4. App shell, tokens, state, data, router
 

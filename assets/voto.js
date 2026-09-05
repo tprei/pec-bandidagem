@@ -14,6 +14,7 @@ import {
 
 import {
   desenharCartao,
+  desenharStory,
   gerarCartao,
   gerarStory,
   gerarAdesivos,
@@ -21,6 +22,8 @@ import {
 } from "./cartaz.js";
 
 const CHAVE_UF = "vs.uf";
+const CHAVE_TODAS = "vs.todasUfs";
+const CHAVE_INSTALAR = "vs.instalarDispensado";
 const LIMITE_INICIAL = 40;
 const LIMIAR_RADAR = 3;
 
@@ -167,6 +170,7 @@ const PERFIL_ROTULO = {
 const estado = {
   indice: null,
   uf: null,
+  todasUfs: false,
   arquivos: new Map(),
   q: "",
   ordem: "contra",
@@ -215,6 +219,12 @@ function titulo(str) {
     .toLowerCase()
     .replace(/(^|\s|-)([a-zà-ú])/g, (m) => m.toUpperCase());
 }
+function juntarE(lista) {
+  if (!lista || lista.length === 0) return "";
+  if (lista.length === 1) return lista[0];
+  return lista.slice(0, -1).join(", ") + " e " + lista[lista.length - 1];
+}
+
 
 async function carregarJson(caminho) {
   const r = await fetch(caminho);
@@ -377,6 +387,10 @@ async function carregarUf(sigla) {
   estado.arquivos.set(s, dados);
   return dados;
 }
+async function carregarTodasUfs() {
+  await Promise.all(estado.indice.ufs.map((u) => carregarUf(u.sigla)));
+}
+
 
 function pool(uf) {
   const arqBr = estado.arquivos.get("BR");
@@ -404,6 +418,12 @@ function poolTodos() {
   }
   return lista;
 }
+function ufDoPost(dados) {
+  const sqs = [dados.sq, dados.nao, dados.sim, ...(dados.faces ?? [])].filter(Boolean);
+  const ufs = sqs.map((sq) => ufDoSq(sq)).filter(Boolean);
+  return ufs.find((u) => u !== "BR") ?? ufs[0] ?? null;
+}
+
 
 function toast(msg) {
   const el = document.getElementById("toast");
@@ -438,16 +458,28 @@ function direcaoIds(ids, ladoT) {
   }
   return { favor, contra };
 }
+function elegivelOponente(c, selSq, postura) {
+  return c.temFicha && c.sq !== selSq && (postura === "nao" ? c.def >= 3 && c.contra === 0 : c.contra >= 3);
+}
+
+function elegivelPauta(c, eixos, lado) {
+  return eixos.length > 0 && eixos.every((e) => c.notas[e] === lado);
+}
+
+function elegivelLista(c, eixos) {
+  return c.temFicha && c.contra >= 1 && eixos.every((e) => c.notas[e] === "contra");
+}
+
 
 function montarPost(dados, poolCandidatos) {
   const tipo = dados.tipo ?? "candidato";
   const postura = dados.postura ?? "nao";
   const modelo = dados.modelo ?? "cabine";
   const lado = postura === "nao" ? "contra" : "defende";
-  const uf = dados.uf || estado.uf || "SP";
+  const uf = dados.uf || ufDoPost(dados) || estado.uf || "SP";
 
   const arqBr = estado.arquivos.get("BR");
-  const arqUf = estado.arquivos.get(uf);
+  const arqUf = uf === "BR" ? null : estado.arquivos.get(uf);
   const pelaBlindagem = aFavorDaBlindagem(arqBr) + aFavorDaBlindagem(arqUf);
 
   let idCodec = dados.id;
@@ -487,7 +519,7 @@ function montarPost(dados, poolCandidatos) {
     } else if (postura === "nao") {
       legenda = `O voto é secreto. O que ${titulo(c.nome)} fez no Congresso, não: votou ${CURTO[motivosSel[0]].contra.toLowerCase()}. NÃO VOTO no ${c.numero}.`;
     } else {
-      legenda = `Enquanto ${pelaBlindagem} candidaturas de ${uf} votavam pela blindagem, ${titulo(c.nome)} votou ${CURTO[motivosSel[0]].defende.toLowerCase()}. VOTO ${c.numero}.`;
+      legenda = `Enquanto ${pelaBlindagem} candidaturas ${uf === "BR" ? "do Brasil" : `de ${uf}`} votavam pela blindagem, ${titulo(c.nome)} votou ${CURTO[motivosSel[0]].defende.toLowerCase()}. VOTO ${c.numero}.`;
     }
 
     return {
@@ -565,18 +597,19 @@ function montarPost(dados, poolCandidatos) {
   }
 
   if (tipo === "pauta") {
-    const eixoIdx = dados.eixo ?? 0;
-    const eixoId = EIXO_ORDEM[eixoIdx] ?? "blindagem";
-    const eixoObj = estado.indice.eixos.find((e) => e.id === eixoId) ?? estado.indice.eixos[0];
+    const eixosIds = (dados.eixos ?? []).map((i) => (typeof i === "number" ? EIXO_ORDEM[i] : i)).filter((id) => id && TEMA_SIM[id]);
+    if (eixosIds.length === 0) eixosIds.push("blindagem");
+    const unico = eixosIds.length === 1 ? eixosIds[0] : null;
+    const faces = (dados.faces ?? []).map((sq) => poolCandidatos.find((x) => x.sq === sq)).filter((f) => f && elegivelPauta(f, eixosIds, lado));
 
-    const faces = (dados.faces ?? []).map((sq) => poolCandidatos.find((x) => x.sq === sq)).filter(Boolean);
-    const codigo = lado === "contra" ? eixoObj.contraOEleitor : eixoObj.defendeOEleitor;
-    const faixa = `VOTOU ${codigo === 1 ? "SIM" : "NÃO"}`;
-    const tituloPauta = PAUTA_TITULO[eixoId][lado];
-    const fonteRotulo = (lado === "contra") !== Boolean(DEFENDE_SIM[eixoId]) ? "Eles apoiaram" : "Eles barraram";
-    const fonteBadges = [TEMA_SIM[eixoId]];
+    const eixoObj = unico ? (estado.indice.eixos.find((e) => e.id === unico) ?? estado.indice.eixos[0]) : null;
+    const codigo = eixoObj ? (lado === "contra" ? eixoObj.contraOEleitor : eixoObj.defendeOEleitor) : null;
+    const faixa = unico ? `VOTOU ${codigo === 1 ? "SIM" : "NÃO"}` : "CONTRA VOCÊ";
+    const tituloPauta = unico ? PAUTA_TITULO[unico][lado] : "QUEM VOTOU " + juntarE(eixosIds.map((e) => CURTO[e][lado])).toUpperCase();
+    const fonteRotulo = "Votaram";
+    const fonteBadges = eixosIds.map((e) => CURTO[e][lado]);
 
-    const legenda = `${titulo(PAUTA_TITULO[eixoId][lado])} em ${uf}. Registro nominal do Congresso, nome por nome. Guarde os números.`;
+    const legenda = `${titulo(tituloPauta)} ${uf === "BR" ? "no Brasil" : `em ${uf}`}. Registro nominal do Congresso, nome por nome. Guarde os números.`;
 
     return {
       tipo,
@@ -601,15 +634,20 @@ function montarPost(dados, poolCandidatos) {
       },
       legenda,
       storyTitulo: "GUARDE OS NÚMEROS.",
-      eixoId,
+      eixosIds,
     };
   }
 
   if (tipo === "lista") {
-    const faces = (dados.faces ?? []).map((sq) => poolCandidatos.find((x) => x.sq === sq)).filter(Boolean);
+    const eixosIds = (dados.eixos ?? []).map((i) => (typeof i === "number" ? EIXO_ORDEM[i] : i)).filter((id) => id && TEMA_SIM[id]);
+    const faces = (dados.faces ?? []).map((sq) => poolCandidatos.find((x) => x.sq === sq)).filter((f) => f && elegivelLista(f, eixosIds));
     const badgesUnion = [...new Set(faces.flatMap((f) => direcao(f, "contra", 8).favor))].slice(0, 6);
+    const fonteRotulo = eixosIds.length ? "Votaram" : "Eles apoiaram";
+    const fonteBadges = eixosIds.length ? eixosIds.map((e) => CURTO[e].contra) : badgesUnion;
 
-    const legenda = `${faces.length} candidaturas de ${uf} que votaram contra quem trabalha, nome por nome, com registro nominal do Congresso. Meu voto é secreto — mas não vai pra nenhum destes.`;
+    const legenda = eixosIds.length
+      ? `${faces.length} candidaturas ${uf === "BR" ? "do Brasil" : `de ${uf}`} que votaram ${juntarE(eixosIds.map((e) => CURTO[e].contra.toLowerCase()))}, nome por nome, com registro nominal do Congresso. Meu voto é secreto — mas não vai pra nenhum destes.`
+      : `${faces.length} candidaturas ${uf === "BR" ? "do Brasil" : `de ${uf}`} que votaram contra quem trabalha, nome por nome, com registro nominal do Congresso. Meu voto é secreto — mas não vai pra nenhum destes.`;
 
     return {
       tipo,
@@ -629,11 +667,12 @@ function montarPost(dados, poolCandidatos) {
           iniciais: f.iniciais,
           matiz: f.matiz,
         })),
-        fonteRotulo: "Eles apoiaram",
-        fonteBadges: badgesUnion,
+        fonteRotulo,
+        fonteBadges,
       },
       legenda,
       storyTitulo: "NENHUM DESTES. 🤭",
+      eixosIds,
     };
   }
 
@@ -649,8 +688,10 @@ function abrirComposer(vm, postura, tipo = "candidato", extra = {}) {
     modelo: "cabine",
     motivos: null,
     oponente: null,
-    eixoPauta: "blindagem",
+    eixosPauta: [],
     listaSel: null,
+    busca: "",
+    buscaAberta: false,
     ...extra,
   };
   location.hash = "#/novo";
@@ -712,10 +753,8 @@ function renderizarOnboarding() {
   let ufSel = estado.uf && estado.uf !== "BR" ? estado.uf : "SP";
 
   function atualizarBotao() {
-    const totalUf = (estado.indice.ufs.find((u) => u.sigla === ufSel)?.candidatos ?? 0) +
-      (estado.indice.ufs.find((u) => u.sigla === "BR")?.candidatos ?? 0);
     document.getElementById("btn-entrar-cabine").textContent = `ENTRAR NA CABINE · ${ufSel}`;
-    document.getElementById("btn-entrar-todos").textContent = `Ver todas as ${numeroBr(totalUf)} candidaturas mesmo assim`;
+    document.getElementById("btn-entrar-todos").textContent = `Ver todas as ${numeroBr(estado.indice.totalCandidatos)} candidaturas do Brasil mesmo assim`;
   }
 
   for (const item of ufsDisponiveis) {
@@ -734,6 +773,8 @@ function renderizarOnboarding() {
 
   document.getElementById("btn-entrar-cabine").onclick = () => {
     estado.uf = ufSel;
+    estado.todasUfs = false;
+    localStorage.removeItem(CHAVE_TODAS);
     localStorage.setItem(CHAVE_UF, ufSel);
     estado.secao = "historico";
     location.hash = "#/catalogo";
@@ -741,6 +782,8 @@ function renderizarOnboarding() {
 
   document.getElementById("btn-entrar-todos").onclick = () => {
     estado.uf = ufSel;
+    estado.todasUfs = true;
+    localStorage.setItem(CHAVE_TODAS, "1");
     localStorage.setItem(CHAVE_UF, ufSel);
     estado.secao = "todos";
     location.hash = "#/catalogo";
@@ -755,17 +798,21 @@ async function renderizarCatalogo() {
     return;
   }
 
-  await carregarUf("BR");
-  await carregarUf(estado.uf);
+  if (estado.todasUfs) {
+    await carregarTodasUfs();
+  } else {
+    await carregarUf("BR");
+    await carregarUf(estado.uf);
+  }
 
   trocarTela("catalogo");
 
   const ufObj = estado.indice.ufs.find((u) => u.sigla === estado.uf) ?? { candidatos: 0, comFicha: 0 };
   const brObj = estado.indice.ufs.find((u) => u.sigla === "BR") ?? { candidatos: 0, comFicha: 0 };
-  const comFichaTotal = ufObj.comFicha + brObj.comFicha;
-  const totalCandidaturas = ufObj.candidatos + brObj.candidatos;
+  const comFichaTotal = estado.todasUfs ? estado.indice.totalComFicha : ufObj.comFicha + brObj.comFicha;
+  const totalCandidaturas = estado.todasUfs ? estado.indice.totalCandidatos : ufObj.candidatos + brObj.candidatos;
 
-  document.getElementById("btn-catalogo-uf").textContent = `${estado.uf} ▾`;
+  document.getElementById("btn-catalogo-uf").textContent = estado.todasUfs ? "Brasil ▾" : `${estado.uf} ▾`;
   document.getElementById("btn-catalogo-uf").onclick = () => {
     location.hash = "#/onboarding";
   };
@@ -941,7 +988,7 @@ function atualizarListaCatalogo() {
   const listaEl = document.getElementById("catalogo-lista");
   const btnMais = document.getElementById("btn-carregar-mais");
 
-  const candidatos = pool(estado.uf);
+  const candidatos = estado.todasUfs ? poolTodos() : pool(estado.uf);
   const q = achatar(estado.q.trim());
   const numerico = /^\d+$/.test(q);
 
@@ -967,13 +1014,13 @@ function atualizarListaCatalogo() {
   const totalFiltrado = filtrados.length;
   const ufObj = estado.indice.ufs.find((u) => u.sigla === estado.uf) ?? { candidatos: 0, comFicha: 0 };
   const brObj = estado.indice.ufs.find((u) => u.sigla === "BR") ?? { candidatos: 0, comFicha: 0 };
-  const comFicha = ufObj.comFicha + brObj.comFicha;
-  const totalUf = ufObj.candidatos + brObj.candidatos;
+  const comFicha = estado.todasUfs ? estado.indice.totalComFicha : ufObj.comFicha + brObj.comFicha;
+  const totalUf = estado.todasUfs ? estado.indice.totalCandidatos : ufObj.candidatos + brObj.candidatos;
 
   if (estado.secao === "historico") {
     contagemEl.textContent = `${totalFiltrado} de ${numeroBr(comFicha)} com histórico no Congresso · ${numeroBr(totalUf)} no total`;
   } else {
-    contagemEl.textContent = `${numeroBr(totalFiltrado)} candidaturas em ${estado.uf} · ${numeroBr(comFicha)} com histórico`;
+    contagemEl.textContent = `${numeroBr(totalFiltrado)} candidaturas ${estado.todasUfs ? "no Brasil" : `em ${estado.uf}`} · ${numeroBr(comFicha)} com histórico`;
   }
 
   listaEl.replaceChildren();
@@ -1020,7 +1067,8 @@ function atualizarListaCatalogo() {
     info.appendChild(linhaNome);
 
     const meta = criar("div", "cartao-meta");
-    const metaTexto = `${c.partido} · ${c.cargoCurto} · ${PERFIL_ROTULO[c.perfil] ?? c.perfil}`;
+    let metaTexto = `${c.partido} · ${c.cargoCurto} · ${PERFIL_ROTULO[c.perfil] ?? c.perfil}`;
+    if (estado.todasUfs) metaTexto += ` · ${c.uf}`;
     meta.appendChild(criar("span", undefined, metaTexto));
     if (c.noRadar) {
       meta.appendChild(criar("span", "selo-radar", "NO RADAR"));
@@ -1231,6 +1279,166 @@ async function renderizarFicha(sqStr) {
     abrirComposer(c, "voto");
   };
 }
+function montarBuscaCandidato(r, { pool, elegivel, aoEscolher, placeholder, vazio }) {
+  const container = criar("div", undefined);
+  container.style.marginTop = "8px";
+
+  if (!r.buscaAberta) {
+    const btnAbrir = criar("button", "btn-carregar-mais", "+ Adicionar outro");
+    btnAbrir.style.borderStyle = "dashed";
+    btnAbrir.style.width = "100%";
+    btnAbrir.onclick = () => {
+      r.buscaAberta = true;
+      renderizarComposer();
+    };
+    container.appendChild(btnAbrir);
+    return container;
+  }
+
+  const caixa = criar("div", undefined);
+  caixa.style.border = "1.5px solid var(--tinta)";
+  caixa.style.borderRadius = "10px";
+  caixa.style.padding = "10px";
+  caixa.style.background = "#fff";
+
+  const topo = criar("div", undefined);
+  topo.style.display = "flex";
+  topo.style.gap = "8px";
+  topo.style.alignItems = "center";
+  topo.style.marginBottom = "8px";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = r.busca ?? "";
+  input.placeholder = placeholder;
+  input.autocomplete = "off";
+  input.style.flex = "1";
+  input.style.padding = "8px 10px";
+  input.style.border = "1px solid rgba(19, 18, 24, 0.2)";
+  input.style.borderRadius = "6px";
+  input.style.fontSize = "13px";
+  input.style.fontFamily = "var(--fonte-corpo)";
+
+  const btnFechar = criar("button", undefined, "Fechar");
+  btnFechar.style.background = "transparent";
+  btnFechar.style.border = "none";
+  btnFechar.style.fontSize = "12.5px";
+  btnFechar.style.fontWeight = "700";
+  btnFechar.style.color = "var(--mudo)";
+  btnFechar.style.cursor = "pointer";
+  btnFechar.style.padding = "4px 8px";
+  btnFechar.onclick = () => {
+    r.buscaAberta = false;
+    r.busca = "";
+    renderizarComposer();
+  };
+
+  topo.appendChild(input);
+  topo.appendChild(btnFechar);
+  caixa.appendChild(topo);
+
+  const containerResultados = criar("div", undefined);
+  containerResultados.style.display = "flex";
+  containerResultados.style.flexDirection = "column";
+  containerResultados.style.gap = "6px";
+  caixa.appendChild(containerResultados);
+
+  function renderizarResultados() {
+    containerResultados.innerHTML = "";
+    const q = achatar((r.busca ?? "").trim());
+    if (!q) {
+      const msgVazio = criar("div", undefined, vazio);
+      msgVazio.style.fontSize = "12px";
+      msgVazio.style.color = "var(--mudo)";
+      msgVazio.style.padding = "6px 0";
+      containerResultados.appendChild(msgVazio);
+      return;
+    }
+
+    const filtrados = pool
+      .filter((c) => elegivel(c) && (/^\d+$/.test(q) ? String(c.numero).startsWith(q) : achatar(c.nome).includes(q) || achatar(c.nomeCompleto).includes(q)))
+      .slice(0, 8);
+
+    if (filtrados.length === 0) {
+      const semResultados = criar("div", undefined, "Nenhuma candidatura elegível bate com essa busca.");
+      semResultados.style.fontSize = "12px";
+      semResultados.style.color = "var(--mudo)";
+      semResultados.style.padding = "6px 0";
+      containerResultados.appendChild(semResultados);
+      return;
+    }
+
+    for (const c of filtrados) {
+      const linha = criar("div", undefined);
+      linha.style.display = "flex";
+      linha.style.alignItems = "center";
+      linha.style.gap = "8px";
+      linha.style.padding = "4px 0";
+      linha.style.borderBottom = "1px solid rgba(19, 18, 24, 0.08)";
+
+      const fotoQuadro = criar("div", "foto-quadro");
+      fotoQuadro.style.width = "36px";
+      fotoQuadro.style.height = "46px";
+      fotoQuadro.style.backgroundColor = `hsl(${c.matiz} 30% 42%)`;
+      fotoQuadro.style.fontSize = "13px";
+      fotoQuadro.textContent = c.iniciais;
+      if (c.fotoSrc) {
+        const fotoImg = criar("div", "foto-imagem");
+        fotoImg.style.backgroundImage = `url("${c.fotoSrc}")`;
+        fotoQuadro.appendChild(fotoImg);
+      }
+      linha.appendChild(fotoQuadro);
+
+      const info = criar("div", undefined);
+      info.style.flex = "1";
+      info.style.minWidth = "0";
+
+      const nomeEl = criar("div", undefined, c.nome);
+      nomeEl.style.fontWeight = "800";
+      nomeEl.style.fontSize = "13px";
+      nomeEl.style.textTransform = "uppercase";
+      nomeEl.style.color = "var(--tinta)";
+      nomeEl.style.overflow = "hidden";
+      nomeEl.style.textOverflow = "ellipsis";
+      nomeEl.style.whiteSpace = "nowrap";
+
+      const subEl = criar("div", undefined, `${c.partido} · ${c.numero} · ${c.uf}`);
+      subEl.style.fontSize = "11.5px";
+      subEl.style.color = "var(--mudo)";
+
+      info.appendChild(nomeEl);
+      info.appendChild(subEl);
+      linha.appendChild(info);
+
+      const btnAdd = criar("button", "btn-pilula", "Adicionar");
+      btnAdd.style.flexShrink = "0";
+      btnAdd.style.padding = "4px 10px";
+      btnAdd.style.fontSize = "11.5px";
+      btnAdd.onclick = () => aoEscolher(c);
+      linha.appendChild(btnAdd);
+
+      containerResultados.appendChild(linha);
+    }
+  }
+
+  input.oninput = () => {
+    r.busca = input.value;
+    renderizarResultados();
+  };
+
+  renderizarResultados();
+  container.appendChild(caixa);
+
+  queueMicrotask(() => {
+    if (input.isConnected) {
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  });
+
+  return container;
+}
+
 
 async function renderizarCriarHub() {
   if (!estado.uf || estado.uf === "BR") estado.uf = "SP";
@@ -1261,7 +1469,7 @@ async function renderizarCriarHub() {
   };
 
   document.getElementById("hub-opcao-pauta").onclick = () => {
-    abrirComposer(top1, "nao", "pauta", { eixoPauta: "blindagem" });
+    abrirComposer(top1, "nao", "pauta", { eixosPauta: ["blindagem"] });
   };
 
   document.getElementById("hub-opcao-scan").onclick = () => {
@@ -1271,7 +1479,7 @@ async function renderizarCriarHub() {
   const miniPostCand = montarPost({ tipo: "candidato", postura: "nao", modelo: "cabine", sq: top1.sq, uf: estado.uf }, cands);
   const miniPostDuelo = montarPost({ tipo: "duelo", postura: "nao", modelo: "cabine", nao: top1.sq, sim: topDef.sq, uf: estado.uf }, cands);
   const miniPostLista = montarPost({ tipo: "lista", postura: "nao", modelo: "cabine", faces: ranking.slice(0, 6).map((c) => c.sq), uf: estado.uf }, cands);
-  const miniPostPauta = montarPost({ tipo: "pauta", postura: "nao", modelo: "cabine", eixo: 0, faces: cands.filter((c) => c.notas.blindagem === "contra").slice(0, 6).map((c) => c.sq), uf: estado.uf }, cands);
+  const miniPostPauta = montarPost({ tipo: "pauta", postura: "nao", modelo: "cabine", eixos: [0], faces: cands.filter((c) => c.notas.blindagem === "contra").slice(0, 6).map((c) => c.sq), uf: estado.uf }, cands);
 
   desenharCartao(document.getElementById("mini-candidato"), miniPostCand).catch(() => {});
   desenharCartao(document.getElementById("mini-duelo"), miniPostDuelo).catch(() => {});
@@ -1289,12 +1497,16 @@ async function renderizarComposer() {
 
   const r = estado.rascunho;
   const uf = r.uf || estado.uf || "SP";
-  await carregarUf("BR");
-  await carregarUf(uf);
+  if (estado.todasUfs) await carregarTodasUfs();
+  else {
+    await carregarUf("BR");
+    await carregarUf(uf);
+  }
 
   trocarTela("novo");
 
   const cands = pool(uf);
+  const candsBusca = estado.todasUfs ? poolTodos() : cands;
   const sel = cands.find((c) => c.sq === r.sq) ?? cands[0];
   const lado = r.postura === "nao" ? "contra" : "defende";
 
@@ -1350,9 +1562,7 @@ async function renderizarComposer() {
     blocoFormato.appendChild(criar("div", "bloco-titulo-eixos", "Formato"));
     const grupoTipos = criar("div", "chip-grupo");
 
-    const oponentesDisp = cands.filter(
-      (c) => c.temFicha && c.sq !== sel.sq && (r.postura === "nao" ? c.def >= 3 && c.contra === 0 : c.contra >= 3),
-    );
+    const oponentesDisp = cands.filter((c) => elegivelOponente(c, sel.sq, r.postura));
 
     const tipos = [
       ["candidato", "Candidato"],
@@ -1370,6 +1580,9 @@ async function renderizarComposer() {
       }
       btn.onclick = () => {
         r.tipo = tKey;
+        if (tKey === "pauta" && (!r.eixosPauta || r.eixosPauta.length === 0)) {
+          r.eixosPauta = ["blindagem"];
+        }
         renderizarComposer();
       };
       grupoTipos.appendChild(btn);
@@ -1422,9 +1635,13 @@ async function renderizarComposer() {
       : "Este não — quem votou contra o eleitor";
     blocoDuelo.appendChild(criar("div", "bloco-titulo-eixos", rotuloDuelo));
 
-    const oponentes = cands
-      .filter((c) => c.temFicha && c.sq !== sel.sq && (r.postura === "nao" ? c.def >= 3 && c.contra === 0 : c.contra >= 3))
-      .slice(0, 8);
+    const elegiveis = cands.filter((c) => elegivelOponente(c, sel.sq, r.postura));
+    const top8 = elegiveis.slice(0, 8);
+    const selOponente = r.oponente ? candsBusca.find((c) => c.sq === r.oponente) : null;
+    const oponentes = [...top8];
+    if (selOponente && elegivelOponente(selOponente, sel.sq, r.postura) && !oponentes.some((c) => c.sq === selOponente.sq)) {
+      oponentes.unshift(selOponente);
+    }
 
     const selOponenteSq = r.oponente ?? oponentes[0]?.sq;
     r.oponente = selOponenteSq;
@@ -1477,34 +1694,62 @@ async function renderizarComposer() {
     }
 
     blocoDuelo.appendChild(carrossel);
+    const buscaDuelo = montarBuscaCandidato(r, {
+      pool: candsBusca,
+      elegivel: (c) => elegivelOponente(c, sel.sq, r.postura),
+      aoEscolher: (c) => {
+        r.oponente = c.sq;
+        r.buscaAberta = false;
+        r.busca = "";
+        renderizarComposer();
+      },
+      placeholder: `Nome ou número — quem ${r.postura === "nao" ? "defendeu" : "votou contra"} o eleitor`,
+      vazio: `Digite para buscar entre as candidaturas com histórico ${estado.todasUfs ? "do Brasil" : `de ${uf}`}.`,
+    });
+    blocoDuelo.appendChild(buscaDuelo);
     controlesEl.appendChild(blocoDuelo);
-  } else if (r.tipo === "pauta") {
-    const blocoPauta = criar("div", "bloco-eixos");
-    blocoPauta.appendChild(criar("div", "bloco-titulo-eixos", `Pauta · quem votou assim em ${uf}`));
-    const grupoEixos = criar("div", "chip-grupo");
+  }
 
+  if (r.tipo === "pauta" || r.tipo === "lista") {
+    const blocoPauta = criar("div", "bloco-eixos");
+    const topoBarra = criar("div", "topo-barra");
+    const tituloTexto = r.tipo === "pauta" ? `Pauta · quem votou assim em ${uf}` : `Motivos · filtra o radar de ${uf}`;
+    topoBarra.appendChild(criar("span", "bloco-titulo-eixos", tituloTexto));
+    topoBarra.appendChild(criar("span", "bloco-titulo-eixos", `${r.eixosPauta.length}/8`));
+    blocoPauta.appendChild(topoBarra);
+
+    const grupoEixos = criar("div", "chip-grupo");
     for (const e of estado.indice.eixos) {
-      const btn = criar("button", "chip-opcao" + (r.eixoPauta === e.id ? " ativo" : ""), e.nome);
+      const ativo = r.eixosPauta.includes(e.id);
+      const btn = criar("button", "chip-opcao" + (ativo ? " ativo" : ""), e.nome);
       btn.onclick = () => {
-        r.eixoPauta = e.id;
+        if (ativo && r.tipo === "pauta" && r.eixosPauta.length === 1) {
+          toast("A pauta precisa de pelo menos um motivo.");
+          return;
+        }
+        if (ativo) {
+          r.eixosPauta = r.eixosPauta.filter((id) => id !== e.id);
+        } else if (r.eixosPauta.length < 8) {
+          r.eixosPauta = [...r.eixosPauta, e.id];
+        }
         r.listaSel = null;
+        r.busca = "";
+        r.buscaAberta = false;
         renderizarComposer();
       };
       grupoEixos.appendChild(btn);
     }
     blocoPauta.appendChild(grupoEixos);
     controlesEl.appendChild(blocoPauta);
-  }
 
-  if (r.tipo === "pauta" || r.tipo === "lista") {
     const blocoGrade = criar("div", "bloco-eixos");
     const tituloGrade = r.tipo === "pauta"
       ? `Quem aparece · votaram assim em ${uf}`
       : `Quem entra na lista · ${uf}`;
 
     const gradeBase = r.tipo === "pauta"
-      ? cands.filter((c) => c.notas[r.eixoPauta] === lado)
-      : cands.filter((c) => c.temFicha && c.contra >= 1).sort((a, b) => b.contra - a.contra || a.def - b.def);
+      ? cands.filter((c) => elegivelPauta(c, r.eixosPauta, lado))
+      : cands.filter((c) => elegivelLista(c, r.eixosPauta)).sort((a, b) => b.contra - a.contra || a.def - b.def);
 
     const listaSel = r.listaSel ?? gradeBase.slice(0, 6).map((c) => c.sq);
     r.listaSel = listaSel;
@@ -1514,61 +1759,94 @@ async function renderizarComposer() {
     headerGrade.appendChild(criar("span", "bloco-titulo-eixos", `${listaSel.length}/9`));
     blocoGrade.appendChild(headerGrade);
 
-    const grid = criar("div", undefined);
-    grid.style.display = "grid";
-    grid.style.gridTemplateColumns = "repeat(4, 1fr)";
-    grid.style.gap = "8px";
+    if (gradeBase.length === 0 && listaSel.length === 0) {
+      const vazioGrid = criar(
+        "div",
+        "cartao-sem-ficha",
+        `Ninguém em ${uf} votou assim em todos os motivos escolhidos. Tire um motivo ou busque em outro estado.`,
+      );
+      vazioGrid.style.padding = "24px 0";
+      vazioGrid.style.textAlign = "center";
+      blocoGrade.appendChild(vazioGrid);
+    } else {
+      const grid = criar("div", undefined);
+      grid.style.display = "grid";
+      grid.style.gridTemplateColumns = "repeat(4, 1fr)";
+      grid.style.gap = "8px";
 
-    const exibidosGrade = gradeBase.slice(0, 12);
-    for (const c of exibidosGrade) {
-      const ativo = listaSel.includes(c.sq);
-      const card = criar("button", undefined);
-      card.style.padding = "0";
-      card.style.border = ativo ? "2.5px solid var(--vermelho)" : "1.5px solid rgba(19,18,24,.15)";
-      card.style.borderRadius = "8px";
-      card.style.background = "#fff";
-      card.style.cursor = "pointer";
-      card.style.overflow = "hidden";
-      card.style.textAlign = "left";
-      card.style.opacity = ativo ? "1" : "0.55";
+      const top12 = gradeBase.slice(0, 12);
+      const adicionaisSq = listaSel.filter((sq) => !top12.some((c) => c.sq === sq));
+      const adicionaisCands = adicionaisSq.map((sq) => candsBusca.find((c) => c.sq === sq)).filter(Boolean);
+      const exibidosGrade = [...top12, ...adicionaisCands];
 
-      const foto = criar("div", undefined);
-      foto.style.width = "100%";
-      foto.style.height = "76px";
-      foto.style.backgroundColor = `hsl(${c.matiz} 30% 42%)`;
-      if (c.fotoSrc) {
-        foto.style.backgroundImage = `url("${c.fotoSrc}")`;
-        foto.style.backgroundSize = "cover";
-        foto.style.backgroundPosition = "center";
-      }
-      if (r.postura === "nao") foto.style.filter = "grayscale(1)";
-      card.appendChild(foto);
+      for (const c of exibidosGrade) {
+        const ativo = listaSel.includes(c.sq);
+        const card = criar("button", undefined);
+        card.style.padding = "0";
+        card.style.border = ativo ? "2.5px solid var(--vermelho)" : "1.5px solid rgba(19,18,24,.15)";
+        card.style.borderRadius = "8px";
+        card.style.background = "#fff";
+        card.style.cursor = "pointer";
+        card.style.overflow = "hidden";
+        card.style.textAlign = "left";
+        card.style.opacity = ativo ? "1" : "0.55";
 
-      const nome = criar("div", undefined, c.nome);
-      nome.style.padding = "4px 5px";
-      nome.style.fontSize = "9.5px";
-      nome.style.fontWeight = "800";
-      nome.style.lineHeight = "1.15";
-      nome.style.textTransform = "uppercase";
-      nome.style.color = "var(--tinta)";
-      nome.style.height = "30px";
-      nome.style.overflow = "hidden";
-      card.appendChild(nome);
-
-      card.onclick = () => {
-        if (ativo) {
-          if (listaSel.length > 1) {
-            r.listaSel = listaSel.filter((x) => x !== c.sq);
-          }
-        } else if (listaSel.length < 9) {
-          r.listaSel = [...listaSel, c.sq];
+        const foto = criar("div", undefined);
+        foto.style.width = "100%";
+        foto.style.height = "76px";
+        foto.style.backgroundColor = `hsl(${c.matiz} 30% 42%)`;
+        if (c.fotoSrc) {
+          foto.style.backgroundImage = `url("${c.fotoSrc}")`;
+          foto.style.backgroundSize = "cover";
+          foto.style.backgroundPosition = "center";
         }
-        renderizarComposer();
-      };
-      grid.appendChild(card);
+        if (r.postura === "nao") foto.style.filter = "grayscale(1)";
+        card.appendChild(foto);
+
+        const nome = criar("div", undefined, c.nome);
+        nome.style.padding = "4px 5px";
+        nome.style.fontSize = "9.5px";
+        nome.style.fontWeight = "800";
+        nome.style.lineHeight = "1.15";
+        nome.style.textTransform = "uppercase";
+        nome.style.color = "var(--tinta)";
+        nome.style.height = "30px";
+        nome.style.overflow = "hidden";
+        card.appendChild(nome);
+
+        card.onclick = () => {
+          if (ativo) {
+            if (listaSel.length > 1) {
+              r.listaSel = listaSel.filter((x) => x !== c.sq);
+            }
+          } else if (listaSel.length < 9) {
+            r.listaSel = [...listaSel, c.sq];
+          }
+          renderizarComposer();
+        };
+        grid.appendChild(card);
+      }
+      blocoGrade.appendChild(grid);
     }
 
-    blocoGrade.appendChild(grid);
+    const buscaGrade = montarBuscaCandidato(r, {
+      pool: candsBusca,
+      elegivel: (c) => (r.tipo === "pauta" ? elegivelPauta(c, r.eixosPauta, lado) : elegivelLista(c, r.eixosPauta)),
+      aoEscolher: (c) => {
+        if (r.listaSel.includes(c.sq)) return;
+        if (r.listaSel.length >= 9) {
+          toast("A grade aceita no máximo 9 nomes.");
+          return;
+        }
+        r.listaSel = [...r.listaSel, c.sq];
+        r.busca = "";
+        r.buscaAberta = false;
+        renderizarComposer();
+      },
+      placeholder: "Nome ou número — só quem votou assim",
+      vazio: `Digite para buscar entre as candidaturas com histórico ${estado.todasUfs ? "do Brasil" : `de ${uf}`}.`,
+    });
+    blocoGrade.appendChild(buscaGrade);
     controlesEl.appendChild(blocoGrade);
   }
 
@@ -1615,14 +1893,14 @@ async function renderizarComposer() {
 
   clearTimeout(debounceComposerTimer);
   debounceComposerTimer = setTimeout(async () => {
-    const postPayload = prepararDadosPost(r, cands);
-    const postObj = montarPost(postPayload, cands);
-    await desenharCartao(document.getElementById("preview-composer"), postObj);
+    const postPayload = prepararDadosPost(r, candsBusca);
+    const postObj = montarPost(postPayload, candsBusca);
+    await desenharStory(document.getElementById("preview-composer"), postObj);
   }, 80);
 
   document.getElementById("btn-gerar-link-qr").onclick = () => {
     try {
-      const postPayload = prepararDadosPost(r, cands);
+      const postPayload = prepararDadosPost(r, candsBusca);
       const id = codificar(postPayload);
       location.hash = `#/pronto/${r.postura}/${id}`;
     } catch (err) {
@@ -1650,9 +1928,7 @@ function prepararDadosPost(r, cands) {
   }
 
   if (r.tipo === "duelo") {
-    const oponentes = cands.filter(
-      (c) => c.temFicha && c.sq !== sel?.sq && (r.postura === "nao" ? c.def >= 3 && c.contra === 0 : c.contra >= 3),
-    );
+    const oponentes = cands.filter((c) => elegivelOponente(c, sel?.sq, r.postura));
     const oponenteSq = r.oponente ?? oponentes[0]?.sq;
     const nao = r.postura === "nao" ? r.sq : oponenteSq;
     const sim = r.postura === "nao" ? oponenteSq : r.sq;
@@ -1666,22 +1942,24 @@ function prepararDadosPost(r, cands) {
   }
 
   if (r.tipo === "pauta") {
-    const eixoIdx = EIXO_ORDEM.indexOf(r.eixoPauta ?? "blindagem");
+    const eixos = (r.eixosPauta ?? []).map((e) => EIXO_ORDEM.indexOf(e)).filter((i) => i !== -1);
     const faces = r.listaSel ?? [];
     return {
       tipo: "pauta",
       postura: r.postura,
       modelo: r.modelo,
-      eixo: eixoIdx === -1 ? 0 : eixoIdx,
+      eixos,
       faces,
     };
   }
 
   if (r.tipo === "lista") {
+    const eixos = (r.eixosPauta ?? []).map((e) => EIXO_ORDEM.indexOf(e)).filter((i) => i !== -1);
     return {
       tipo: "lista",
       postura: "nao",
       modelo: r.modelo,
+      eixos,
       faces: r.listaSel ?? [],
     };
   }
@@ -1724,7 +2002,7 @@ async function renderizarCompartilhar(postura, id) {
   const qrCtx = qrCanvas.getContext("2d");
   desenharQr(qrCtx, urlCompleta, 0, 0, 116);
 
-  desenharCartao(document.getElementById("preview-pronto"), post).catch(() => {});
+  desenharStory(document.getElementById("preview-pronto"), post).catch(() => {});
   document.getElementById("btn-pronto-fechar").onclick = () => {
     location.hash = "#/catalogo";
   };
@@ -1742,8 +2020,10 @@ async function renderizarCompartilhar(postura, id) {
       modelo: dec.modelo,
       motivos: dec.motivos?.map((idx) => EIXO_ORDEM[idx]) ?? null,
       oponente: dec.tipo === "duelo" ? (postura === "nao" ? dec.sim : dec.nao) : null,
-      eixoPauta: dec.tipo === "pauta" ? EIXO_ORDEM[dec.eixo] : "blindagem",
+      eixosPauta: (dec.eixos ?? []).map((i) => EIXO_ORDEM[i]).filter(Boolean),
       listaSel: dec.faces ?? null,
+      busca: "",
+      buscaAberta: false,
     };
     location.hash = "#/novo";
   };
@@ -1910,10 +2190,12 @@ async function renderizarLinkReceiver(postura, id) {
         }
       }
     }
-  } else if (dec.tipo === "pauta") {
-    const eId = typeof dec.eixo === "number" ? EIXO_ORDEM[dec.eixo] : dec.eixo;
-    const eObj = estado.indice.eixos.find((x) => x.id === eId);
-    if (eObj) eixosApresentar.push(eObj);
+  } else if (dec.tipo === "pauta" || dec.tipo === "lista") {
+    for (const i of dec.eixos ?? []) {
+      const eId = typeof i === "number" ? EIXO_ORDEM[i] : i;
+      const eObj = estado.indice.eixos.find((x) => x.id === eId);
+      if (eObj) eixosApresentar.push(eObj);
+    }
   }
 
   const corLado = postura === "nao" ? "var(--vermelho)" : "var(--verde)";
@@ -2187,6 +2469,7 @@ function renderizarConteudoRadar() {
       btnPost.onclick = () => {
         abrirComposer(ranking[0], "nao", "lista", {
           listaSel: ranking.slice(0, 9).map((c) => c.sq),
+          eixosPauta: estado.filtroPauta ? [estado.filtroPauta] : [],
         });
       };
       container.appendChild(btnPost);
@@ -2399,12 +2682,89 @@ async function navegar() {
   }
 }
 
+function configurarInstalacao() {
+  const botao = document.getElementById("btn-instalar");
+  const ehIos = /iPhone|iPod/i.test(navigator.userAgent);
+  const instalado = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const dispensado = () => localStorage.getItem(CHAVE_INSTALAR) !== null;
+
+  function removerConvite() {
+    const banner = document.querySelector(".convite-instalar");
+    if (banner !== null) banner.remove();
+  }
+
+  function montarConvite(texto, acao) {
+    if (document.querySelector(".convite-instalar") !== null) return;
+    const banner = criar("div", "convite-instalar");
+    banner.setAttribute("role", "region");
+    banner.setAttribute("aria-label", "Instalar o aplicativo");
+
+    const corpo = criar("div", "convite-corpo");
+    corpo.appendChild(criar("p", "convite-titulo", "Instale o Voto Secreto"));
+    corpo.appendChild(criar("p", "convite-texto", texto));
+    banner.appendChild(corpo);
+
+    const acoes = criar("div", "convite-acoes");
+    if (acao !== null) {
+      const instalar = criar("button", "convite-botao", "Instalar");
+      instalar.type = "button";
+      instalar.addEventListener("click", acao);
+      acoes.appendChild(instalar);
+    }
+    const depois = criar("button", "convite-dispensar", "Agora não");
+    depois.type = "button";
+    depois.addEventListener("click", () => {
+      removerConvite();
+      localStorage.setItem(CHAVE_INSTALAR, new Date().toISOString());
+    });
+    acoes.appendChild(depois);
+    banner.appendChild(acoes);
+    document.body.appendChild(banner);
+  }
+
+  let convite = null;
+  window.addEventListener("beforeinstallprompt", (evento) => {
+    evento.preventDefault();
+    convite = evento;
+    if (botao) botao.removeAttribute("hidden");
+    if (!instalado && !dispensado()) {
+      montarConvite("Funciona offline e abre direto na cabine.", () => {
+        convite.prompt();
+        convite = null;
+        if (botao) botao.setAttribute("hidden", "");
+        removerConvite();
+      });
+    }
+  });
+
+  if (botao) {
+    botao.onclick = () => {
+      if (convite === null) return;
+      convite.prompt();
+      convite = null;
+      botao.setAttribute("hidden", "");
+      removerConvite();
+    };
+  }
+
+  window.addEventListener("appinstalled", () => {
+    convite = null;
+    if (botao) botao.setAttribute("hidden", "");
+    removerConvite();
+  });
+
+  if (ehIos && !instalado && !dispensado()) {
+    montarConvite("Toque em Compartilhar e depois em “Adicionar à Tela de Início”. Funciona offline.", null);
+  }
+}
+
 async function iniciar() {
   await carregarIndice();
   const ufSalva = localStorage.getItem(CHAVE_UF);
   if (ufSalva && ufSalva !== "BR" && estado.indice.ufs.some((u) => u.sigla === ufSalva)) {
     estado.uf = ufSalva;
   }
+  estado.todasUfs = localStorage.getItem(CHAVE_TODAS) === "1";
 
   document.getElementById("aba-catalogo").onclick = () => {
     location.hash = "#/catalogo";
@@ -2415,22 +2775,11 @@ async function iniciar() {
   document.getElementById("aba-radar").onclick = () => {
     location.hash = "#/radar";
   };
-  document.getElementById("btn-gerar-link-qr").onclick = () => {
-    const r = estado.rascunho;
-    if (!r) return;
-    try {
-      const cands = pool(r.uf || estado.uf);
-      const postPayload = prepararDadosPost(r, cands);
-      const id = codificar(postPayload);
-      location.hash = `#/pronto/${r.postura}/${id}`;
-    } catch (err) {
-      console.error(err);
-      toast("Não foi possível gerar o link desta candidatura.");
-    }
-  };
 
   window.addEventListener("hashchange", navegar);
   navegar();
+
+  configurarInstalacao();
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {});

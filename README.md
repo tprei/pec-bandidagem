@@ -260,8 +260,8 @@ Os links gerados (`#/nao/<id>` e `#/voto/<id>`) são completamente sem estado: c
 | --- | --- | --- | --- |
 | `C` | Candidato | modelo(1) + motivos(8) + ref(27) = 36 bits | 1+8 (9 chars) |
 | `D` | Duelo | modelo(1) + refNao(27) + refSim(27) = 55 bits | 1+11 (12 chars) |
-| `P` | Pauta | modelo(1) + eixo(4) + n(4) + n×ref(27) = 9+27n bits | 1+ceil((9+27n)/5) |
-| `L` | Lista | modelo(1) + n(4) + n×ref(27) = 5+27n bits | 1+ceil((5+27n)/5) |
+| `P` | Pauta | modelo(1) + eixos(8) + n(4) + n×ref(27) = 13+27n bits | 1+ceil((13+27n)/5) |
+| `L` | Lista | modelo(1) + eixos(8) + n(4) + n×ref(27) = 13+27n bits (eixos opcional) | 1+ceil((13+27n)/5) |
 
 Cada referência `ref(sq)` compacta a Unidade Eleitoral (5 bits, 1 a 28) e a sequência do candidato (22 bits), viabilizando identificadores extremamente concisos e sem necessidade de armazenamento centralizado.
 
