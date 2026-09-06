@@ -177,7 +177,6 @@ function checkEsmImports() {
 }
 
 checkHtmlFile("index.html");
-checkHtmlFile("dex.html");
 checkSw();
 checkManifest();
 checkEsmImports();

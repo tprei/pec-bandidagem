@@ -1,8 +1,8 @@
-# Quem votou a favor da PEC da Blindagem
+# Voto Secreto
 
-Site estático (sem frameworks, sem dependências, sem build) que lista os **356 deputados federais** que votaram **Sim** na PEC 3/2021 — a chamada PEC da Blindagem — em pelo menos um dos dois turnos de votação de **16/09/2025** na Câmara dos Deputados, com filtros por nome, partido, estado e turno.
+Site estático (sem frameworks, sem dependências, sem build) publicado na raiz do repositório: o **[Voto Secreto](#voto-secreto-indexhtml)** (`index.html`), um guia offline das 20.765 candidaturas de 2026 com o número na urna em destaque e o histórico de votação no Congresso Nacional (Câmara e Senado) de 861 delas.
 
-Desde então o repositório ganhou um segundo aplicativo: o **[Catálogo 2026](#catálogo-2026-dexhtml)** (`dex.html`), um guia offline das 20.765 candidaturas de 2026 com o número na urna em destaque e o histórico de votação no Congresso Nacional (Câmara e Senado) de 861 delas.
+O projeto nasceu do registro nominal da PEC 3/2021 — a chamada PEC da Blindagem — votada em **16/09/2025** na Câmara dos Deputados. Esse registro continua versionado aqui como dataset (`data/votos-pec-blindagem.json` e o CSV par), mesmo sem página própria: são os **356 deputados federais** que votaram **Sim** em pelo menos um dos dois turnos.
 
 ## O dataset
 
@@ -18,7 +18,7 @@ O script busca as duas votações na API e reescreve tanto o JSON quanto `data/v
 
 ### Fotos
 
-As fotos dos deputados ficam em `fotos/{id}.jpg` — as miniaturas oficiais (bandep) da Câmara, baixadas uma única vez para dentro do repositório. Para gerá-las ou completá-las, rode `node scripts/fetch-photos-camara.mjs`: ele lê os `urlFoto` de `data/votos-pec-blindagem.json`, pula os arquivos que já existem com conteúdo e baixa o resto limitado a 6 requisições simultâneas para não sobrecarregar o CDN. O site serve essas cópias locais (`assets/app.js` aponta o `<img>` direto para `fotos/{id}.jpg`); o JSON segue carregando o `urlFoto` original como referência upstream.
+As fotos dos deputados ficam em `fotos/{id}.jpg` — as miniaturas oficiais (bandep) da Câmara, baixadas uma única vez para dentro do repositório. Para gerá-las ou completá-las, rode `node scripts/fetch-photos-camara.mjs`: ele lê os `urlFoto` de `data/votos-pec-blindagem.json`, pula os arquivos que já existem com conteúdo e baixa o resto limitado a 6 requisições simultâneas para não sobrecarregar o CDN. As cópias locais ficam no repositório como registro arquivado da votação de 2025; o JSON segue carregando o `urlFoto` original como referência upstream.
 
 ## Esquema do JSON
 
@@ -233,7 +233,7 @@ Os resultados publicados vão para 256 shards em `data/dex/pesquisa/` e são car
 
 ## Votações nominais da Câmara (2017-2026)
 
-`data/votacoes-camara.json` traz as **4.241 votações nominais** do plenário e das comissões da Câmara entre 2017 e 2026, com o voto individual de 1.194 cadastros de deputado — 1.393.285 registros de voto. É a base do histórico exibido no Catálogo 2026 (`dex.html`).
+`data/votacoes-camara.json` traz as **4.241 votações nominais** do plenário e das comissões da Câmara entre 2017 e 2026, com o voto individual de 1.194 cadastros de deputado — 1.393.285 registros de voto. É a base do histórico exibido no Voto Secreto (`index.html`).
 
 Regenerar:
 
@@ -358,9 +358,9 @@ Duas restrições do serviço do Senado pesam na implementação:
 
 O esquema é o mesmo de `votacoes-camara.json`: elenco posicional de senadores, e o voto de cada votação é uma string com um dígito por senador. `id` tem o prefixo `SF-` e o resto é o `codigoSessaoVotacao` da fonte. A sigla do voto do Senado é mais rica que a da Câmara e mapeia assim: `Sim`→1, `Não`→2, `Abstenção`→3, `Obstrução` e `P-NRV`→4, `Presidente (art. 51 RISF)`→5, o resto (`AP`, `LS`, `LP`, `MIS`, `NA`, `NCom`)→0 sem registro. Como bancadas de senador são menores, `minimoBancadaAferivel` aqui é 3 (na Câmara, 5).
 
-## Voto Secreto (`dex.html`)
+## Voto Secreto (`index.html`)
 
-O Voto Secreto é uma aplicação mobile-first e offline-first pensada para permitir a declaração individual de voto ou rejeição de candidaturas em 2026 com base nas votações nominais do Congresso Nacional como prova. `index.html` permanece como o mural histórico da PEC da Blindagem.
+O Voto Secreto é uma aplicação mobile-first e offline-first pensada para permitir a declaração individual de voto ou rejeição de candidaturas em 2026 com base nas votações nominais do Congresso Nacional como prova. Ela é servida na raiz do site, o que mantém os links compartilháveis no formato `votosecreto.com.br/#/nao/<id>` e `votosecreto.com.br/#/voto/<id>`.
 
 A premissa central é que o voto é secreto na cabine, mas a manifestação de preferência ou recusa é pública e garantida por lei. A aplicação não possui cadastro, servidor de banco de dados ou rastreamento.
 
@@ -416,13 +416,13 @@ O projeto Voto Secreto foi concebido com rigorosa observância à legislação e
 
 ## Rodando localmente
 
-Nenhuma das duas páginas funciona abrindo o arquivo direto pelo sistema de arquivos, porque os browsers bloqueiam `fetch` sobre `file://` e o service worker exige origem HTTP. Sirva a raiz do projeto:
+A aplicação não funciona abrindo o arquivo direto pelo sistema de arquivos, porque os browsers bloqueiam `fetch` sobre `file://` e o service worker exige origem HTTP. Sirva a raiz do projeto:
 
 ```
 python3 -m http.server 8000
 ```
 
-O mural da PEC fica em <http://localhost:8000> e o app em <http://localhost:8000/dex.html>.
+O app fica em <http://localhost:8000>.
 
 ### Verificações e testes
 

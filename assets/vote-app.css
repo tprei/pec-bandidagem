@@ -123,7 +123,8 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
 }
 
 .logo-small {
@@ -237,10 +238,12 @@ textarea {
   border-radius: 999px;
   padding: 3px;
   gap: 2px;
+  min-width: 0;
 }
 
 .segmented-control button {
   flex: 1;
+  min-width: 0;
   height: 30px;
   border-radius: 999px;
   border: none;
@@ -250,6 +253,8 @@ textarea {
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition:
     background 0.15s ease,
     color 0.15s ease;

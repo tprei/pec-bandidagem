@@ -4,7 +4,7 @@
   "description": "Declare NÃO VOTO ou VOTO com a votação nominal do Congresso como prova. Dados públicos do TSE, da Câmara e do Senado.",
   "lang": "pt-BR",
   "dir": "ltr",
-  "start_url": "dex.html",
+  "start_url": ".",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait",

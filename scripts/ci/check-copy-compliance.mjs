@@ -23,7 +23,6 @@ function collectAssetFiles(dir) {
 
 const targets = [
   path.join(REPO_ROOT, "index.html"),
-  path.join(REPO_ROOT, "dex.html"),
   ...collectAssetFiles(path.join(REPO_ROOT, "assets")),
 ];
 

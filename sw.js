@@ -1,10 +1,7 @@
-const CACHE_VERSION = "vote-v3";
+const CACHE_VERSION = "vote-v5";
 
 const PRECACHE = [
   "index.html",
-  "dex.html",
-  "assets/styles.css",
-  "assets/app.js",
   "assets/vote-app.css",
   "assets/vote-app.js",
   "assets/share-link.js",
@@ -22,14 +19,10 @@ const PRECACHE = [
   "manifest.webmanifest",
   "data/dex/indice.json",
   "data/dex/BR.json",
-  "data/votos-pec-blindagem.json",
 ];
 
 const OWN_ASSETS = [
   "index.html",
-  "dex.html",
-  "assets/styles.css",
-  "assets/app.js",
   "assets/vote-app.css",
   "assets/vote-app.js",
   "assets/share-link.js",
@@ -78,7 +71,7 @@ async function networkFirst(request, event) {
   }
   const cached = await cache.match(request);
   if (cached !== undefined) return cached;
-  const shell = await cache.match(toScopePath("dex.html"));
+  const shell = await cache.match(toScopePath("index.html"));
   if (shell !== undefined) return shell;
   if (fromNetwork !== null) return fromNetwork;
   return new Response("Sem conexão e sem cópia salva do aplicativo.", {
@@ -150,12 +143,7 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     const p = url.pathname;
-    if (
-      p === toScopePath("dex.html") ||
-      p === toScopePath("index.html") ||
-      p === toScopePath("") ||
-      p === toScopePath("/")
-    ) {
+    if (p === toScopePath("index.html") || p === toScopePath("") || p === toScopePath("/")) {
       event.respondWith(networkFirst(request, event));
     }
     return;

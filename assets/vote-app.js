@@ -727,8 +727,7 @@ function buildPost(dados, poolCandidatos) {
       legenda = `Enquanto ${pelaBlindagem} candidaturas ${uf === "BR" ? "do Brasil" : `de ${uf}`} votavam pela blindagem, ${titleCase(c.name ?? c.nome)} votou ${SHORT_LABEL[motivosSel[0]].defende.toLowerCase()}. VOTO ${c.ballotNumber ?? c.numero}.`;
     }
 
-    const storyTitle =
-      stance === "nao" ? "MEU VOTO É SECRETO. MAS NESSE NÃO VOTO." : "MEU VOTO É SECRETO. MAS NESSE EU VOTO.";
+    const storyTitle = "MEU VOTO É SECRETO MAS NESSE EU… 🤭";
 
     return {
       type,
@@ -839,15 +838,23 @@ function buildPost(dados, poolCandidatos) {
     const dirNao = getDirection(naoCand, "against", 3);
     const dirSim = getDirection(simCand, "in-favor", 3);
 
-    const primeiroContra =
-      AXIS_ORDER.find((id) => (naoCand.notes ?? naoCand.notas)[id] === "against") ?? "blindagem";
+    const notasNao = naoCand.notes ?? naoCand.notas;
+    const notasSim = simCand.notes ?? simCand.notas;
+    const badgesNao = AXIS_ORDER.filter((id) => notasNao[id] === "against")
+      .slice(0, 2)
+      .map((id) => SHORT_LABEL[id].against);
+    const badgesSim = AXIS_ORDER.filter((id) => notasSim[id] === "in-favor")
+      .slice(0, 2)
+      .map((id) => SHORT_LABEL[id].inFavor);
+
+    const primeiroContra = AXIS_ORDER.find((id) => notasNao[id] === "against") ?? "blindagem";
     const acaoNao =
-      (naoCand.notes ?? naoCand.notas).blindagem === "against"
+      notasNao.blindagem === "against"
         ? "votou pela blindagem"
         : `votou ${SHORT_LABEL[primeiroContra].contra.toLowerCase()}`;
 
     const legenda = `O voto é secreto, a escolha não: ${titleCase(simCand.name ?? simCand.nome)} defendeu quem trabalha. ${titleCase(naoCand.name ?? naoCand.nome)} ${acaoNao}. Este não, este sim.`;
-    const storyTitle = "MEU VOTO É SECRETO. 🤭";
+    const storyTitle = "MEU VOTO É SECRETO MAS… 🤭";
 
     const rejectedObj = {
       name: naoCand.name ?? naoCand.nome,
@@ -870,6 +877,7 @@ function buildPost(dados, poolCandidatos) {
       contra: dirNao.against,
       notes: naoCand.notes ?? naoCand.notas,
       notas: naoCand.notes ?? naoCand.notas,
+      badges: badgesNao,
     };
 
     const chosenObj = {
@@ -893,6 +901,7 @@ function buildPost(dados, poolCandidatos) {
       contra: dirSim.against,
       notes: simCand.notes ?? simCand.notas,
       notas: simCand.notes ?? simCand.notas,
+      badges: badgesSim,
     };
 
     return {

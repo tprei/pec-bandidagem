@@ -72,6 +72,7 @@ export function drawCover(ctx, img, x, y, w, h) {
 }
 
 const imageCache = new Map();
+export const DISCLAIMER = "Manifestação individual de preferência do eleitor. Não é recomendação de voto.";
 export function loadImage(src) {
   if (!src) return Promise.resolve(null);
   let p = imageCache.get(src);
@@ -406,15 +407,16 @@ export async function drawCard(canvas, post) {
     const wReject = ctx.measureText("ESTE NÃO. ").width;
     ctx.fillStyle = green;
     ctx.fillText("ESTE SIM.", 18 + wReject, dy);
-    dy += 34;
+    dy += 36;
 
     const colW = 156;
     const col1X = 18;
     const col2X = 186;
+    const faceH = 168;
 
     ctx.lineWidth = 4;
     ctx.strokeStyle = red;
-    ctx.strokeRect(col1X, dy, colW, 118);
+    ctx.strokeRect(col1X, dy, colW, faceH);
     drawPortraitOrMonogram(
       ctx,
       images.get("rejected"),
@@ -423,13 +425,13 @@ export async function drawCard(canvas, post) {
       col1X,
       dy,
       colW,
-      118,
+      faceH,
       true,
     );
-    drawRejectBanner(ctx, col1X, dy, colW, 118, "NÃO", 22);
+    drawRejectBanner(ctx, col1X, dy, colW, faceH, "NÃO", 26);
 
     ctx.strokeStyle = green;
-    ctx.strokeRect(col2X, dy, colW, 118);
+    ctx.strokeRect(col2X, dy, colW, faceH);
     drawPortraitOrMonogram(
       ctx,
       images.get("chosen"),
@@ -438,22 +440,22 @@ export async function drawCard(canvas, post) {
       col2X,
       dy,
       colW,
-      118,
+      faceH,
       false,
     );
-    drawGreenCheck(ctx, col2X + colW - 4, dy + 118 - 4, 20, isDark ? "#15131b" : "#f4efe3");
+    drawGreenCheck(ctx, col2X + colW - 4, dy + faceH - 4, 22, isDark ? "#15131b" : "#f4efe3");
 
-    dy += 124;
+    dy += faceH + 10;
 
     drawLcdBox(ctx, dRejected.ballotNumber || "", col1X, dy, 24, lcdBg, lcdFg);
     drawLcdBox(ctx, dChosen.ballotNumber || "", col2X, dy, 24, lcdBg, lcdFg);
-    dy += 34;
+    dy += 40;
 
-    ctx.font = "14px Anton, sans-serif";
+    ctx.font = "15px Anton, sans-serif";
     ctx.fillStyle = fg;
     ctx.fillText(fitText(ctx, String(dRejected.name || "").toUpperCase(), colW), col1X, dy);
     ctx.fillText(fitText(ctx, String(dChosen.name || "").toUpperCase(), colW), col2X, dy);
-    dy += 16;
+    dy += 18;
 
     ctx.font = "600 10.5px Archivo, sans-serif";
     ctx.fillStyle = muted;
@@ -461,31 +463,28 @@ export async function drawCard(canvas, post) {
     ctx.fillText(`${dChosen.party || ""} · ${post.state || "SP"}`, col2X, dy);
     dy += 16;
 
-    if (dRejected.against?.length) {
-      let bx = col1X;
-      for (const badge of dRejected.against.slice(0, 3)) {
-        ctx.font = "800 8.5px Archivo, sans-serif";
-        const bw = ctx.measureText(badge.toUpperCase()).width + 8;
-        ctx.fillStyle = red;
-        roundedRect(ctx, bx, dy, bw, 15, 3);
-        ctx.fill();
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(badge.toUpperCase(), bx + 4, dy + 3);
-        bx += bw + 4;
-      }
-    }
+    const rejectedBadges = (
+      dRejected.badges ?? [...(dRejected.against ?? []), ...(dRejected.inFavor ?? [])]
+    ).slice(0, 2);
+    const chosenBadges = (
+      dChosen.badges ?? [...(dChosen.inFavor ?? []), ...(dChosen.against ?? [])]
+    ).slice(0, 2);
 
-    if (dChosen.inFavor?.length) {
-      let bx = col2X;
-      for (const badge of dChosen.inFavor.slice(0, 3)) {
-        ctx.font = "800 8.5px Archivo, sans-serif";
-        const bw = ctx.measureText(badge.toUpperCase()).width + 8;
-        ctx.fillStyle = green;
-        roundedRect(ctx, bx, dy, bw, 15, 3);
+    ctx.font = "800 8.5px Archivo, sans-serif";
+    for (const [colX, badges, badgeColor] of [
+      [col1X, rejectedBadges, red],
+      [col2X, chosenBadges, green],
+    ]) {
+      let by = dy;
+      for (const badge of badges) {
+        const text = fitText(ctx, badge.toUpperCase(), colW - 8);
+        const bw = ctx.measureText(text).width + 8;
+        ctx.fillStyle = badgeColor;
+        roundedRect(ctx, colX, by, bw, 15, 3);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(badge.toUpperCase(), bx + 4, dy + 3);
-        bx += bw + 4;
+        ctx.fillText(text, colX + 4, by + 3);
+        by += 19;
       }
     }
   } else if (type === "issue" || type === "list") {
@@ -493,9 +492,6 @@ export async function drawCard(canvas, post) {
     const faces = g.faces || [];
     const faceCount = faces.length;
     const many = faceCount > 6;
-    const faceH = many ? 40 : 66;
-    const faceGap = many ? 4 : 6;
-    const bannerFs = many ? 9 : 11;
     const lcdFs = many ? 12 : 13;
 
     let dy = 44;
@@ -516,16 +512,48 @@ export async function drawCard(canvas, post) {
       dy += lineAdvance;
     }
 
-    dy += 6;
+    dy += 10;
     const colW = 104;
     const gapX = 6;
+    const rowGap = 10;
+    const rows = Math.ceil(faceCount / 3);
+    const labelH = lcdFs + 24;
+
+    const sourceBadges = g.sourceBadges || g.badges;
+    const sourceLabel = (g.sourceLabel || g.label || "Eles apoiaram").toUpperCase();
+    let sourceFitsOneLine = true;
+    let sourceLabelW = 0;
+    if (sourceBadges?.length) {
+      ctx.font = "800 9px Archivo, sans-serif";
+      sourceLabelW = ctx.measureText(sourceLabel).width + 8;
+      let totalW = 18 + sourceLabelW;
+      for (const badge of sourceBadges) {
+        const bw = ctx.measureText(badge.toUpperCase()).width + 8;
+        if (totalW + bw > 342) {
+          sourceFitsOneLine = false;
+          break;
+        }
+        totalW += bw + 4;
+      }
+    }
+
+    const sourceRowY = sourceFitsOneLine ? 362 : 344;
+    const gridBottom = sourceBadges?.length ? sourceRowY - 12 : 378;
+
+    const faceH = Math.max(
+      34,
+      Math.min(96, Math.floor((gridBottom - dy - (rows - 1) * rowGap) / rows) - labelH),
+    );
+    const bannerFs = faceH >= 78 ? 13 : faceH >= 56 ? 11 : 9;
+    const blockH = rows * (faceH + labelH) + (rows - 1) * rowGap;
+    const gridTop = dy + Math.max(0, Math.floor((gridBottom - dy - blockH) / 2));
 
     for (let i = 0; i < faceCount; i++) {
       const f = faces[i];
       const col = i % 3;
       const row = Math.floor(i / 3);
       const fx = 18 + col * (colW + gapX);
-      const fy = dy + row * (faceH + 28 + faceGap);
+      const fy = gridTop + row * (faceH + labelH + rowGap);
 
       ctx.lineWidth = 3;
       ctx.strokeStyle = accent;
@@ -548,13 +576,13 @@ export async function drawCard(canvas, post) {
       }
 
       ctx.fillStyle = lcdBg;
-      roundedRect(ctx, fx, fy + faceH + 2, colW, lcdFs + 4, 3);
+      roundedRect(ctx, fx, fy + faceH + 4, colW, lcdFs + 5, 3);
       ctx.fill();
       ctx.font = `${lcdFs}px DSEG7Classic, monospace`;
       ctx.fillStyle = lcdFg;
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
-      ctx.fillText(String(f.ballotNumber || ""), fx + colW / 2, fy + faceH + 4);
+      ctx.fillText(String(f.ballotNumber || ""), fx + colW / 2, fy + faceH + 6);
 
       ctx.font = "800 8.5px Archivo, sans-serif";
       ctx.fillStyle = fg;
@@ -563,36 +591,22 @@ export async function drawCard(canvas, post) {
         .split(/\s+/)
         .slice(0, 2)
         .join(" ");
-      ctx.fillText(fitText(ctx, shortName.toUpperCase(), colW), fx, fy + faceH + lcdFs + 8);
+      ctx.fillText(fitText(ctx, shortName.toUpperCase(), colW), fx, fy + faceH + lcdFs + 13);
     }
 
-    const sourceBadges = g.sourceBadges || g.badges;
     if (sourceBadges?.length) {
       ctx.font = "800 9px Archivo, sans-serif";
-      const label = (g.sourceLabel || g.label || "Eles apoiaram").toUpperCase();
-      const labelW = ctx.measureText(label).width + 8;
-
-      let totalW = 18 + labelW;
-      let fitsInOneLine = true;
-      for (const badge of sourceBadges) {
-        const bw = ctx.measureText(badge.toUpperCase()).width + 8;
-        if (totalW + bw > 342) {
-          fitsInOneLine = false;
-          break;
-        }
-        totalW += bw + 4;
-      }
-
-      let by = fitsInOneLine ? 358 : 338;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      let by = sourceRowY;
+      let bx = 18 + sourceLabelW;
       ctx.fillStyle = muted;
-      ctx.fillText(label, 18, by);
-      let bx = 18 + labelW;
-
+      ctx.fillText(sourceLabel, 18, by);
       for (const badge of sourceBadges) {
         const bw = ctx.measureText(badge.toUpperCase()).width + 8;
         if (bx + bw > 342) {
-          if (by === 338) {
-            by = 356;
+          if (by === 344) {
+            by = 362;
             bx = 18;
           } else {
             break;
@@ -608,30 +622,39 @@ export async function drawCard(canvas, post) {
     }
   }
 
-  const isGrid = type === "issue" || type === "list";
-  const qrSize = isGrid ? 56 : 66;
-  const footY = 450 - 14 - qrSize;
+  const qrSize = 44;
+  const footerLineY = 386;
+  const qrX = 342 - qrSize;
+  const textW = qrX - 10 - 18;
 
   ctx.strokeStyle = line;
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(18, footY - 8);
-  ctx.lineTo(342, footY - 8);
+  ctx.moveTo(18, footerLineY);
+  ctx.lineTo(342, footerLineY);
   ctx.stroke();
 
-  ctx.font = "700 13px ui-monospace, Menlo, monospace";
-  ctx.fillStyle = fg;
+  drawQr(ctx, post.url || `https://${post.link || "votosecreto.com.br"}`, qrX, footerLineY + 6, qrSize);
+
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.fillText(post.link || "votosecreto.com.br", 18, footY + 4);
-
-  ctx.font = "600 10px Archivo, sans-serif";
+  ctx.font = "600 7.5px Archivo, sans-serif";
   ctx.fillStyle = muted;
-  ctx.fillText("Escaneie e veja a prova: votação nominal do Congresso.", 18, footY + 24);
+  let noteY = footerLineY + 6;
+  for (const noteLine of wrapText(ctx, DISCLAIMER, textW, 2)) {
+    ctx.fillText(noteLine, 18, noteY);
+    noteY += 10;
+  }
 
-  const qrX = 342 - qrSize;
-  drawQr(ctx, post.url || `https://${post.link || "votosecreto.com.br"}`, qrX, footY, qrSize);
-
+  const linkStr = post.link || "votosecreto.com.br";
+  let linkFs = 9;
+  ctx.font = `700 ${linkFs}px ui-monospace, Menlo, monospace`;
+  while (linkFs > 6.5 && ctx.measureText(linkStr).width > textW) {
+    linkFs -= 0.5;
+    ctx.font = `700 ${linkFs}px ui-monospace, Menlo, monospace`;
+  }
+  ctx.fillStyle = fg;
+  ctx.fillText(fitText(ctx, linkStr, textW), 18, 424);
   ctx.restore();
 }
 
@@ -654,7 +677,7 @@ export async function drawStory(canvas, post) {
   ctx.fillStyle = "#f4efe3";
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  const titleLines = wrapText(ctx, post.storyTitle || "MEU VOTO É SECRETO. 🤭", 960, 3);
+  const titleLines = wrapText(ctx, post.storyTitle || "MEU VOTO É SECRETO MAS… 🤭", 960, 3);
   let ty = 140;
   for (const lt of titleLines) {
     ctx.fillText(lt, 540, ty);
@@ -665,17 +688,11 @@ export async function drawStory(canvas, post) {
   await drawCard(cardCanvas, post);
   ctx.drawImage(cardCanvas, 0, 420, 1080, 1350);
 
-  const footerText = `Escaneie o QR ou abra ${post.link || "votosecreto.com.br"}`;
-  let footerFs = 39;
-  ctx.font = `700 ${footerFs}px Archivo, sans-serif`;
-  while (footerFs > 16 && ctx.measureText(footerText).width > 960) {
-    footerFs -= 1;
-    ctx.font = `700 ${footerFs}px Archivo, sans-serif`;
-  }
+  ctx.font = "700 39px Archivo, sans-serif";
   ctx.fillStyle = "#a9a3b5";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(fitText(ctx, footerText, 960), 540, 1830);
+  ctx.fillText("Escaneie para mais informações", 540, 1840);
 }
 
 export async function renderStory(post) {
@@ -775,12 +792,15 @@ export async function renderStickerSheet(post) {
 
   sCtx.font = "700 8px ui-monospace, monospace";
   sCtx.fillStyle = "#131218";
-  sCtx.fillText(post.link || "votosecreto.com.br", 10, 202);
+  sCtx.fillText(fitText(sCtx, post.link || "votosecreto.com.br", 160), 10, 198);
 
-  sCtx.font = "600 7px Archivo, sans-serif";
+  sCtx.font = "600 6.5px Archivo, sans-serif";
   sCtx.fillStyle = "#6b6675";
-  sCtx.fillText("Votação nominal da Câmara", 10, 214);
-
+  let stickerNoteY = 210;
+  for (const noteLine of wrapText(sCtx, DISCLAIMER, 160, 2)) {
+    sCtx.fillText(noteLine, 10, stickerNoteY);
+    stickerNoteY += 9;
+  }
   drawQr(sCtx, post.url || `https://${post.link || "votosecreto.com.br"}`, 176, 178, 54);
 
   sCtx.restore();
