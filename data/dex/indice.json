@@ -3,7 +3,7 @@
     "candidaturas": "https://dadosabertos.tse.jus.br/dataset/candidatos-2026",
     "votacoesCamara": "https://dadosabertos.camara.leg.br/arquivos",
     "votacoesSenado": "https://legis.senado.leg.br/dadosabertos",
-    "geradoEm": "2026-09-05T11:22:55.459Z"
+    "geradoEm": "2026-09-05T18:14:21.679Z"
   },
   "eleicao": {
     "ano": 2026,
@@ -191,6 +191,11 @@
     "servidor": "Servidor público",
     "sindical": "Sindical",
     "trabalhador": "Trabalhador"
+  },
+  "perfis": {
+    "novo": "Estreante",
+    "reeleicao": "Reeleição",
+    "outro": "Já teve mandato"
   },
   "eixos": [
     {
@@ -477,176 +482,316 @@
     "totalPesquisados": 10,
     "totalComPublicacao": 2,
     "totalAguardandoRevisao": 8,
-    "geradoEm": "2026-09-05T11:22:55.459Z"
+    "geradoEm": "2026-09-05T18:14:21.677Z"
   },
   "ufs": [
     {
       "sigla": "AC",
       "nome": "ACRE",
       "candidatos": 385,
-      "comFicha": 19
+      "comFicha": 19,
+      "porPerfil": {
+        "novo": 339,
+        "reeleicao": 10,
+        "outro": 36
+      }
     },
     {
       "sigla": "AL",
       "nome": "ALAGOAS",
       "candidatos": 283,
-      "comFicha": 16
+      "comFicha": 16,
+      "porPerfil": {
+        "novo": 252,
+        "reeleicao": 9,
+        "outro": 22
+      }
     },
     {
       "sigla": "AM",
       "nome": "AMAZONAS",
       "candidatos": 468,
-      "comFicha": 19
+      "comFicha": 19,
+      "porPerfil": {
+        "novo": 410,
+        "reeleicao": 12,
+        "outro": 46
+      }
     },
     {
       "sigla": "AP",
       "nome": "AMAPÁ",
       "candidatos": 318,
-      "comFicha": 22
+      "comFicha": 22,
+      "porPerfil": {
+        "novo": 276,
+        "reeleicao": 14,
+        "outro": 28
+      }
     },
     {
       "sigla": "BA",
       "nome": "BAHIA",
       "candidatos": 1222,
-      "comFicha": 50
+      "comFicha": 50,
+      "porPerfil": {
+        "novo": 1106,
+        "reeleicao": 41,
+        "outro": 75
+      }
     },
     {
       "sigla": "BR",
       "nome": "BRASIL",
       "candidatos": 26,
-      "comFicha": 5
+      "comFicha": 5,
+      "porPerfil": {
+        "novo": 21,
+        "reeleicao": 0,
+        "outro": 5
+      }
     },
     {
       "sigla": "CE",
       "nome": "CEARÁ",
       "candidatos": 708,
-      "comFicha": 39
+      "comFicha": 39,
+      "porPerfil": {
+        "novo": 632,
+        "reeleicao": 28,
+        "outro": 48
+      }
     },
     {
       "sigla": "DF",
       "nome": "DISTRITO FEDERAL",
       "candidatos": 657,
-      "comFicha": 21
+      "comFicha": 21,
+      "porPerfil": {
+        "novo": 624,
+        "reeleicao": 9,
+        "outro": 24
+      }
     },
     {
       "sigla": "ES",
       "nome": "ESPÍRITO SANTO",
       "candidatos": 588,
-      "comFicha": 19
+      "comFicha": 19,
+      "porPerfil": {
+        "novo": 528,
+        "reeleicao": 10,
+        "outro": 50
+      }
     },
     {
       "sigla": "GO",
       "nome": "GOIÁS",
       "candidatos": 895,
-      "comFicha": 30
+      "comFicha": 30,
+      "porPerfil": {
+        "novo": 826,
+        "reeleicao": 18,
+        "outro": 51
+      }
     },
     {
       "sigla": "MA",
       "nome": "MARANHÃO",
       "candidatos": 604,
-      "comFicha": 38
+      "comFicha": 38,
+      "porPerfil": {
+        "novo": 524,
+        "reeleicao": 26,
+        "outro": 54
+      }
     },
     {
       "sigla": "MG",
       "nome": "MINAS GERAIS",
       "candidatos": 1822,
-      "comFicha": 74
+      "comFicha": 74,
+      "porPerfil": {
+        "novo": 1624,
+        "reeleicao": 55,
+        "outro": 143
+      }
     },
     {
       "sigla": "MS",
       "nome": "MATO GROSSO DO SUL",
       "candidatos": 421,
-      "comFicha": 14
+      "comFicha": 14,
+      "porPerfil": {
+        "novo": 391,
+        "reeleicao": 9,
+        "outro": 21
+      }
     },
     {
       "sigla": "MT",
       "nome": "MATO GROSSO",
       "candidatos": 445,
-      "comFicha": 23
+      "comFicha": 23,
+      "porPerfil": {
+        "novo": 390,
+        "reeleicao": 12,
+        "outro": 43
+      }
     },
     {
       "sigla": "PA",
       "nome": "PARÁ",
       "candidatos": 729,
-      "comFicha": 27
+      "comFicha": 27,
+      "porPerfil": {
+        "novo": 647,
+        "reeleicao": 17,
+        "outro": 65
+      }
     },
     {
       "sigla": "PB",
       "nome": "PARAÍBA",
       "candidatos": 443,
-      "comFicha": 23
+      "comFicha": 23,
+      "porPerfil": {
+        "novo": 391,
+        "reeleicao": 18,
+        "outro": 34
+      }
     },
     {
       "sigla": "PE",
       "nome": "PERNAMBUCO",
       "candidatos": 957,
-      "comFicha": 35
+      "comFicha": 35,
+      "porPerfil": {
+        "novo": 870,
+        "reeleicao": 22,
+        "outro": 65
+      }
     },
     {
       "sigla": "PI",
       "nome": "PIAUÍ",
       "candidatos": 397,
-      "comFicha": 14
+      "comFicha": 14,
+      "porPerfil": {
+        "novo": 356,
+        "reeleicao": 12,
+        "outro": 29
+      }
     },
     {
       "sigla": "PR",
       "nome": "PARANÁ",
       "candidatos": 1079,
-      "comFicha": 50
+      "comFicha": 50,
+      "porPerfil": {
+        "novo": 939,
+        "reeleicao": 31,
+        "outro": 109
+      }
     },
     {
       "sigla": "RJ",
       "nome": "RIO DE JANEIRO",
       "candidatos": 2029,
-      "comFicha": 73
+      "comFicha": 73,
+      "porPerfil": {
+        "novo": 1834,
+        "reeleicao": 48,
+        "outro": 147
+      }
     },
     {
       "sigla": "RN",
       "nome": "RIO GRANDE DO NORTE",
       "candidatos": 325,
-      "comFicha": 14
+      "comFicha": 14,
+      "porPerfil": {
+        "novo": 279,
+        "reeleicao": 10,
+        "outro": 36
+      }
     },
     {
       "sigla": "RO",
       "nome": "RONDÔNIA",
       "candidatos": 435,
-      "comFicha": 17
+      "comFicha": 17,
+      "porPerfil": {
+        "novo": 395,
+        "reeleicao": 6,
+        "outro": 34
+      }
     },
     {
       "sigla": "RR",
       "nome": "RORAIMA",
       "candidatos": 401,
-      "comFicha": 18
+      "comFicha": 18,
+      "porPerfil": {
+        "novo": 357,
+        "reeleicao": 8,
+        "outro": 36
+      }
     },
     {
       "sigla": "RS",
       "nome": "RIO GRANDE DO SUL",
       "candidatos": 1051,
-      "comFicha": 41
+      "comFicha": 41,
+      "porPerfil": {
+        "novo": 893,
+        "reeleicao": 29,
+        "outro": 129
+      }
     },
     {
       "sigla": "SC",
       "nome": "SANTA CATARINA",
       "candidatos": 695,
-      "comFicha": 27
+      "comFicha": 27,
+      "porPerfil": {
+        "novo": 608,
+        "reeleicao": 19,
+        "outro": 68
+      }
     },
     {
       "sigla": "SE",
       "nome": "SERGIPE",
       "candidatos": 406,
-      "comFicha": 17
+      "comFicha": 17,
+      "porPerfil": {
+        "novo": 369,
+        "reeleicao": 12,
+        "outro": 25
+      }
     },
     {
       "sigla": "SP",
       "nome": "SÃO PAULO",
       "candidatos": 2618,
-      "comFicha": 97
+      "comFicha": 97,
+      "porPerfil": {
+        "novo": 2296,
+        "reeleicao": 69,
+        "outro": 253
+      }
     },
     {
       "sigla": "TO",
       "nome": "TOCANTINS",
       "candidatos": 358,
-      "comFicha": 19
+      "comFicha": 19,
+      "porPerfil": {
+        "novo": 316,
+        "reeleicao": 5,
+        "outro": 37
+      }
     }
   ]
 }

@@ -5,8 +5,8 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const API = "https://dadosabertos.camara.leg.br/api/v2";
 const CACHE = join(ROOT, ".cache", "camara");
-const SAIDA = join(ROOT, "data", "dex");
-const SIMULTANEAS = 8;
+const OUTPUT_DIR = join(ROOT, "data", "dex");
+const CONCURRENCY = 8;
 
 const BADGES = {
   politico: "Político de carreira",
@@ -24,39 +24,63 @@ const BADGES = {
   trabalhador: "Trabalhador",
 };
 
-const REGRAS_BADGE = [
-  ["politico", /^(DEPUTADO|SENADOR|VEREADOR|PRESIDENTE DA REP|GOVERNADOR|VICE-|PREFEITO|MEMBRO DO PODER|OCUPANTE DE CARGO)/],
+const BADGE_RULES = [
+  [
+    "politico",
+    /^(DEPUTADO|SENADOR|VEREADOR|PRESIDENTE DA REP|GOVERNADOR|VICE-|PREFEITO|MEMBRO DO PODER|OCUPANTE DE CARGO)/,
+  ],
   ["seguranca", /(POLICIAL|MILITAR|BOMBEIRO|FORÇAS ARMADAS|VIGILANTE|DELEGADO|POLÍCIA)/],
   ["religioso", /(SACERDOTE|RELIGIOS|MISSION|MEMBRO DE ORDEM)/],
-  ["saude", /(MÉDICO|ENFERMEIR|ODONTÓLOGO|PSICÓLOGO|FISIOTERAPEUTA|FARMACÊUTICO|NUTRICIONISTA|FONOAUDIÓLOGO|TERAPEUTA|SANITARISTA|VETERINÁRIO)/],
+  [
+    "saude",
+    /(MÉDICO|ENFERMEIR|ODONTÓLOGO|PSICÓLOGO|FISIOTERAPEUTA|FARMACÊUTICO|NUTRICIONISTA|FONOAUDIÓLOGO|TERAPEUTA|SANITARISTA|VETERINÁRIO)/,
+  ],
   ["educacao", /(PROFESSOR|PEDAGOGO|DIRETOR DE ESTABELECIMENTO DE ENSINO|BIBLIOTEC)/],
   ["juridico", /(ADVOGADO|JUIZ|PROMOTOR|DEFENSOR|PROCURADOR|MAGISTRAD|TABELIÃO|OFICIAL DE JUSTIÇA)/],
   ["comunicacao", /(JORNALISTA|LOCUTOR|RADIALISTA|PUBLICIT|RELAÇÕES PÚBLICAS|FOTÓGRAFO|CINEAST)/],
   ["agro", /(AGRICULTOR|AGROPECU|PECUARISTA|TRABALHADOR RURAL|PESCADOR|AGRÔNOMO|EXTRATIV)/],
   ["artista", /(MÚSICO|CANTOR|ATOR |ARTIST|ESCRITOR|BAILARIN|APRESENTADOR)/],
-  ["empresario", /(EMPRESÁRIO|COMERCIANTE|GERENTE|DIRIGENTE DE EMPRESA|DIRETOR DE EMPRESAS|PROPRIETÁRIO|CORRETOR|BANCÁRIO|EMPRESARI)/],
+  [
+    "empresario",
+    /(EMPRESÁRIO|COMERCIANTE|GERENTE|DIRIGENTE DE EMPRESA|DIRETOR DE EMPRESAS|PROPRIETÁRIO|CORRETOR|BANCÁRIO|EMPRESARI)/,
+  ],
   ["servidor", /(SERVIDOR PÚBLICO|AGENTE ADMINISTRATIVO|FISCAL|AUDITOR)/],
   ["sindical", /(SINDICAL|SINDICATO)/],
-  ["trabalhador", /(TRABALHADOR|MOTORISTA|MOTOBOY|COMERCIÁRIO|ELETRICISTA|MECÂNICO|CONSTRUÇÃO|OPERADOR|VENDEDOR|CABELEIREIRO|COSTUREIR|COZINHEIR|PEDREIRO|SERVENTE|MARCENEIR|SOLDADOR|PORTEIRO|GARÇOM|FEIRANTE|ARTESÃO|BORRACHEIRO|PINTOR|CARPINTEIR)/],
+  [
+    "trabalhador",
+    /(TRABALHADOR|MOTORISTA|MOTOBOY|COMERCIÁRIO|ELETRICISTA|MECÂNICO|CONSTRUÇÃO|OPERADOR|VENDEDOR|CABELEIREIRO|COSTUREIR|COZINHEIR|PEDREIRO|SERVENTE|MARCENEIR|SOLDADOR|PORTEIRO|GARÇOM|FEIRANTE|ARTESÃO|BORRACHEIRO|PINTOR|CARPINTEIR)/,
+  ],
 ];
 
-function ler(caminho, dica) {
-  if (!existsSync(caminho)) throw new Error(`${caminho} não existe. Rode ${dica} primeiro.`);
-  return JSON.parse(readFileSync(caminho, "utf8"));
+const CURRENT_LEGISLATURE_START = "2023-02-01";
+const OFFICE_BY_CHAMBER = { camara: 6, senado: 5 };
+const POLITICAL_OCCUPATION = new Set([
+  "MINISTRO DE ESTADO",
+  "GOVERNADOR",
+  "PREFEITO",
+  "SENADOR",
+  "DEPUTADO",
+  "VEREADOR",
+]);
+const PROFILES = { novo: "Estreante", reeleicao: "Reeleição", outro: "Já teve mandato" };
+
+function readJson(filePath, hint) {
+  if (!existsSync(filePath)) throw new Error(`${filePath} não existe. Rode ${hint} primeiro.`);
+  return JSON.parse(readFileSync(filePath, "utf8"));
 }
 
-function escreverAtomico(caminho, dados) {
-  const temporario = `${caminho}.${process.pid}.tmp`;
-  writeFileSync(temporario, `${JSON.stringify(dados, null, 2)}\n`);
-  renameSync(temporario, caminho);
+function writeAtomic(filePath, data) {
+  const tmp = `${filePath}.${process.pid}.tmp`;
+  writeFileSync(tmp, `${JSON.stringify(data, null, 2)}\n`);
+  renameSync(tmp, filePath);
 }
 
-function posicional(dados, chaveColunas) {
-  return Object.fromEntries(dados[chaveColunas].map((nome, indice) => [nome, indice]));
+function byPosition(data, columnsKey) {
+  return Object.fromEntries(data[columnsKey].map((name, index) => [name, index]));
 }
 
-function normalizarTexto(texto) {
-  return (texto || "")
+function normalizeText(text) {
+  return (text || "")
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase()
@@ -64,505 +88,649 @@ function normalizarTexto(texto) {
     .trim();
 }
 
-function badge(ocupacao) {
-  for (const [nome, regra] of REGRAS_BADGE) if (regra.test(ocupacao)) return nome;
+function computeBadge(occupation) {
+  for (const [name, rule] of BADGE_RULES) if (rule.test(occupation)) return name;
   return null;
 }
 
-function limparDescricao(texto) {
-  if (!texto || typeof texto !== "string") return texto;
-  const limpo = texto
-    .replace(/\s*(?:(?:resultado(?:\s+final)?\s*[:\.]\s*|\.?\s*votaram\s+)?(?:sim|n[aã]o|abstenç[oõ]es?|total)\s*[:,\d-]|Resultado\s*[:\.]\s*\d+\s+votos?\b)[^]*$/i, "")
+function computeProfile(office, occupation, dossier) {
+  if (dossier !== null && dossier.mandatoAtual !== null && OFFICE_BY_CHAMBER[dossier.mandatoAtual] === office)
+    return "reeleicao";
+  if (occupation === "GOVERNADOR" && office === 3) return "reeleicao";
+  if (dossier !== null || POLITICAL_OCCUPATION.has(occupation)) return "outro";
+  return "novo";
+}
+
+function cleanDescription(text) {
+  if (!text || typeof text !== "string") return text;
+  const cleaned = text
+    .replace(
+      /\s*(?:(?:resultado(?:\s+final)?\s*[:.]\s*|\.?\s*votaram\s+)?(?:sim|n[aã]o|abstenç[oõ]es?|total)\s*[:,\d-]|Resultado\s*[:.]\s*\d+\s+votos?\b)[^]*$/i,
+      "",
+    )
     .trim();
-  return limpo.length > 0 ? limpo : texto;
+  return cleaned.length > 0 ? cleaned : text;
 }
 
-function formatarBytes(bytes) {
-  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  return `${(bytes / 1024).toFixed(1)} KB`;
-}
+const SENSITIVE_RESEARCH_TYPES = new Set([
+  "licitacao_contrato",
+  "corrupcao_improbidade",
+  "processo_investigacao",
+  "conflito_interesses_familia",
+  "conduta_pessoal",
+]);
 
-const TIPOS_PESQUISA_SENSIVEIS = new Set(["licitacao_contrato", "corrupcao_improbidade", "processo_investigacao", "conflito_interesses_familia", "conduta_pessoal"]);
-
-function carregarPesquisas(candidatos) {
-  const origem = join(ROOT, "data", "pesquisa-candidatos-2026");
-  if (!existsSync(origem)) return { registros: new Map(), aguardandoRevisao: 0 };
-  const decisoes = existsSync(join(origem, "revisoes.json")) ? ler(join(origem, "revisoes.json"), "scripts/research-candidatos-2026.mjs").decisoes ?? {} : {};
-  const conhecidos = new Set(candidatos.candidatos.map((candidato) => candidato[0]));
-  const registros = new Map();
-  let aguardandoRevisao = 0;
-  for (const nome of readdirSync(origem).filter((arquivo) => arquivo.endsWith(".json") && arquivo !== "revisoes.json")) {
-    const dados = ler(join(origem, nome), "scripts/research-candidatos-2026.mjs");
-    for (const registro of dados.candidatos ?? []) {
-      if (!conhecidos.has(registro.sq) || registros.has(registro.sq)) throw new Error(`pesquisa duplicada ou desconhecida: ${registro.sq}`);
-      const publicar = (item) => {
-        if (!item.id || !item.titulo || !item.fato || !item.trecho || !item.leituraEditorial || !item.papel?.descricao || !item.resultado?.descricao || !Array.isArray(item.fontes) || item.fontes.length === 0) throw new Error(`pesquisa inválida para ${registro.sq}`);
-        if (item.fontes.some((fonte) => !/^https?:\/\//.test(fonte.url) || !fonte.titulo || !fonte.dominio || !Object.hasOwn(fonte, "publicadoEm"))) throw new Error(`fonte inválida para ${registro.sq}`);
-        const sensivel = TIPOS_PESQUISA_SENSIVEIS.has(item.tipo) || item.conflito !== "confirmado";
-        const decisao = decisoes[item.id];
-        if (sensivel && decisao?.estado !== "aprovada") { aguardandoRevisao += 1; return false; }
-        return decisao?.estado !== "rejeitada";
+function loadResearch(candidates) {
+  const sourceDir = join(ROOT, "data", "pesquisa-candidatos-2026");
+  if (!existsSync(sourceDir)) return { records: new Map(), pendingReview: 0 };
+  const decisions = existsSync(join(sourceDir, "revisoes.json"))
+    ? (readJson(join(sourceDir, "revisoes.json"), "scripts/research-candidates-2026.mjs").decisoes ?? {})
+    : {};
+  const known = new Set(candidates.candidatos.map((candidate) => candidate[0]));
+  const records = new Map();
+  let pendingReview = 0;
+  for (const name of readdirSync(sourceDir).filter(
+    (file) => file.endsWith(".json") && file !== "revisoes.json",
+  )) {
+    const data = readJson(join(sourceDir, name), "scripts/research-candidates-2026.mjs");
+    for (const record of data.candidatos ?? []) {
+      if (!known.has(record.sq) || records.has(record.sq))
+        throw new Error(`pesquisa duplicada ou desconhecida: ${record.sq}`);
+      const shouldPublish = (item) => {
+        if (
+          !item.id ||
+          !item.titulo ||
+          !item.fato ||
+          !item.trecho ||
+          !item.leituraEditorial ||
+          !item.papel?.descricao ||
+          !item.resultado?.descricao ||
+          !Array.isArray(item.fontes) ||
+          item.fontes.length === 0
+        )
+          throw new Error(`pesquisa inválida para ${record.sq}`);
+        if (
+          item.fontes.some(
+            (source) =>
+              !/^https?:\/\//.test(source.url) ||
+              !source.titulo ||
+              !source.dominio ||
+              !Object.hasOwn(source, "publicadoEm"),
+          )
+        )
+          throw new Error(`fonte inválida para ${record.sq}`);
+        const sensitive = SENSITIVE_RESEARCH_TYPES.has(item.tipo) || item.conflito !== "confirmado";
+        const decision = decisions[item.id];
+        if (sensitive && decision?.estado !== "aprovada") {
+          pendingReview += 1;
+          return false;
+        }
+        return decision?.estado !== "rejeitada";
       };
-      registros.set(registro.sq, { ...registro, favoraveis: (registro.favoraveis ?? []).filter(publicar), desfavoraveis: (registro.desfavoraveis ?? []).filter(publicar) });
+      records.set(record.sq, {
+        ...record,
+        favoraveis: (record.favoraveis ?? []).filter(shouldPublish),
+        desfavoraveis: (record.desfavoraveis ?? []).filter(shouldPublish),
+      });
     }
   }
-  return { registros, aguardandoRevisao };
+  return { records, pendingReview };
 }
 
-async function comRepeticao(endereco) {
-  for (let tentativa = 1; tentativa <= 5; tentativa += 1) {
+async function withRetry(url) {
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
     try {
-      const resposta = await fetch(endereco, { headers: { accept: "application/json", "user-agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(60_000) });
-      if (resposta.ok) return resposta.json();
-      if (resposta.status === 404) return null;
-      throw new Error(`respondeu ${resposta.status}`);
-    } catch (erro) {
-      if (tentativa === 5) throw new Error(`${endereco} falhou: ${erro.message}`);
-      await new Promise((resolver) => setTimeout(resolver, 500 * tentativa));
+      const response = await fetch(url, {
+        headers: { accept: "application/json", "user-agent": "Mozilla/5.0" },
+        signal: AbortSignal.timeout(60_000),
+      });
+      if (response.ok) return response.json();
+      if (response.status === 404) return null;
+      throw new Error(`respondeu ${response.status}`);
+    } catch (err) {
+      if (attempt === 5) throw new Error(`${url} falhou: ${err.message}`, { cause: err });
+      await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
     }
   }
   return null;
 }
 
-async function emParalelo(itens, quantas, tarefa) {
-  const saida = new Array(itens.length);
-  let proximo = 0;
+async function inParallel(items, concurrency, task) {
+  const output = new Array(items.length);
+  let next = 0;
   await Promise.all(
-    Array.from({ length: quantas }, async () => {
-      while (proximo < itens.length) {
-        const indice = proximo;
-        proximo += 1;
-        saida[indice] = await tarefa(itens[indice]);
+    Array.from({ length: concurrency }, async () => {
+      while (next < items.length) {
+        const index = next;
+        next += 1;
+        output[index] = await task(items[index]);
       }
     }),
   );
-  return saida;
+  return output;
 }
 
-async function cpfDosDeputados(ids) {
-  const arquivo = join(CACHE, "deputados-cpf.json");
-  const cache = existsSync(arquivo) ? JSON.parse(readFileSync(arquivo, "utf8")) : {};
-  const faltando = ids.filter((id) => cache[id] === undefined);
-  if (faltando.length > 0) {
-    console.log(`buscando CPF de ${faltando.length} deputados na API da Câmara`);
-    const respostas = await emParalelo(faltando, SIMULTANEAS, (id) => comRepeticao(`${API}/deputados/${id}`));
-    faltando.forEach((id, indice) => {
-      const corpo = respostas[indice];
-      if (corpo === null) throw new Error(`deputado ${id} não existe na API`);
-      const cpf = corpo.dados.cpf;
+async function fetchDeputyCpfs(ids) {
+  const filePath = join(CACHE, "deputados-cpf.json");
+  const cache = existsSync(filePath) ? JSON.parse(readFileSync(filePath, "utf8")) : {};
+  const missing = ids.filter((id) => cache[id] === undefined);
+  if (missing.length > 0) {
+    console.log(`buscando CPF de ${missing.length} deputados na API da Câmara`);
+    const responses = await inParallel(missing, CONCURRENCY, (id) => withRetry(`${API}/deputados/${id}`));
+    missing.forEach((id, index) => {
+      const body = responses[index];
+      if (body === null) throw new Error(`deputado ${id} não existe na API`);
+      const cpf = body.dados.cpf;
       cache[id] = cpf === null || cpf === undefined ? null : String(cpf).replace(/\D/g, "").padStart(11, "0");
     });
     mkdirSync(CACHE, { recursive: true });
-    writeFileSync(arquivo, `${JSON.stringify(cache)}\n`);
+    writeFileSync(filePath, `${JSON.stringify(cache)}\n`);
   }
   return cache;
 }
 
-const candidatos = ler(join(ROOT, "data", "candidatos-2026.json"), "node scripts/fetch-candidatos-2026.mjs");
-const votacoesCamara = ler(join(ROOT, "data", "votacoes-camara.json"), "node scripts/fetch-votacoes-camara.mjs");
-const votacoesSenado = ler(join(ROOT, "data", "votacoes-senado.json"), "node scripts/fetch-votacoes-senado.mjs");
-const curadoria = ler(join(ROOT, "data", "curadoria.json"), "nada");
-const cpfParaSq = ler(join(ROOT, ".cache", "tse", "cpf-sq.json"), "node scripts/fetch-candidatos-2026.mjs");
+const candidates = readJson(
+  join(ROOT, "data", "candidatos-2026.json"),
+  "node scripts/fetch-candidates-2026.mjs",
+);
+const camaraRollCalls = readJson(
+  join(ROOT, "data", "votacoes-camara.json"),
+  "node scripts/fetch-rollcalls-camara.mjs",
+);
+const senadoRollCalls = readJson(
+  join(ROOT, "data", "votacoes-senado.json"),
+  "node scripts/fetch-rollcalls-senado.mjs",
+);
+const curation = readJson(join(ROOT, "data", "curadoria.json"), "nada");
+const cpfToSq = readJson(
+  join(ROOT, ".cache", "tse", "cpf-sq.json"),
+  "node scripts/fetch-candidates-2026.mjs",
+);
 
-const ic = posicional(candidatos, "colunas");
-const ivc = posicional(votacoesCamara, "colunas");
-const idc = posicional(votacoesCamara, "colunasDeputado");
-const ivs = posicional(votacoesSenado, "colunas");
-const ids = posicional(votacoesSenado, "colunasSenador");
+const ic = byPosition(candidates, "colunas");
+const ivc = byPosition(camaraRollCalls, "colunas");
+const idc = byPosition(camaraRollCalls, "colunasDeputado");
+const ivs = byPosition(senadoRollCalls, "colunas");
+const ids = byPosition(senadoRollCalls, "colunasSenador");
 
-const porIdCamara = new Map(votacoesCamara.votacoes.map((v) => [v[ivc.id], v]));
-const porIdSenado = new Map(votacoesSenado.votacoes.map((v) => [v[ivs.id], v]));
+const byCamaraId = new Map(camaraRollCalls.votacoes.map((v) => [v[ivc.id], v]));
+const bySenadoId = new Map(senadoRollCalls.votacoes.map((v) => [v[ivs.id], v]));
 
-const curadas = [];
-for (const eixo of curadoria.eixos) {
-  for (const referencia of eixo.votacoes) {
-    const ehSenado = referencia.id.startsWith("SF-");
-    const votacao = ehSenado ? porIdSenado.get(referencia.id) : porIdCamara.get(referencia.id);
-    if (votacao === undefined) throw new Error(`votação curada ${referencia.id} não existe no dataset`);
-    curadas.push({ eixo: eixo.id, ...referencia, votacao, casa: ehSenado ? "senado" : "camara" });
+const curatedRollCalls = [];
+for (const axis of curation.eixos) {
+  for (const reference of axis.votacoes) {
+    const isSenado = reference.id.startsWith("SF-");
+    const rollCall = isSenado ? bySenadoId.get(reference.id) : byCamaraId.get(reference.id);
+    if (rollCall === undefined) throw new Error(`votação curada ${reference.id} não existe no dataset`);
+    curatedRollCalls.push({ axis: axis.id, ...reference, rollCall, chamber: isSenado ? "senado" : "camara" });
   }
 }
-for (const referencia of curadoria.contexto) {
-  const ehSenado = referencia.id.startsWith("SF-");
-  const votacao = ehSenado ? porIdSenado.get(referencia.id) : porIdCamara.get(referencia.id);
-  if (votacao === undefined) throw new Error(`votação de contexto ${referencia.id} não existe no dataset`);
-  curadas.push({ eixo: null, ...referencia, votacao, casa: ehSenado ? "senado" : "camara" });
+for (const reference of curation.contexto) {
+  const isSenado = reference.id.startsWith("SF-");
+  const rollCall = isSenado ? bySenadoId.get(reference.id) : byCamaraId.get(reference.id);
+  if (rollCall === undefined) throw new Error(`votação de contexto ${reference.id} não existe no dataset`);
+  curatedRollCalls.push({ axis: null, ...reference, rollCall, chamber: isSenado ? "senado" : "camara" });
 }
-const pesquisas = carregarPesquisas(candidatos);
+const researches = loadResearch(candidates);
 
-const idsDeputado = votacoesCamara.deputados.map((deputado) => deputado[idc.id]);
-const cpfs = await cpfDosDeputados(idsDeputado);
+const deputyIds = camaraRollCalls.deputados.map((deputy) => deputy[idc.id]);
+const cpfs = await fetchDeputyCpfs(deputyIds);
 
-const sqParaDeputado = new Map();
-const semCpf = [];
-votacoesCamara.deputados.forEach((deputado, indice) => {
-  const cpf = cpfs[deputado[idc.id]];
+const sqToDeputy = new Map();
+const missingCpf = [];
+camaraRollCalls.deputados.forEach((deputy, index) => {
+  const cpf = cpfs[deputy[idc.id]];
   if (cpf === null) {
-    semCpf.push(deputado[idc.nome]);
+    missingCpf.push(deputy[idc.nome]);
     return;
   }
-  for (const sq of cpfParaSq[cpf] ?? []) {
-    const anterior = sqParaDeputado.get(sq);
-    if (anterior === undefined || votacoesCamara.deputados[anterior][idc.participacoes] < deputado[idc.participacoes]) {
-      sqParaDeputado.set(sq, indice);
+  for (const sq of cpfToSq[cpf] ?? []) {
+    const previous = sqToDeputy.get(sq);
+    if (
+      previous === undefined ||
+      camaraRollCalls.deputados[previous][idc.participacoes] < deputy[idc.participacoes]
+    ) {
+      sqToDeputy.set(sq, index);
     }
   }
 });
-if (semCpf.length > 0) throw new Error(`sem CPF na API: ${semCpf.join(", ")}`);
+if (missingCpf.length > 0) throw new Error(`sem CPF na API: ${missingCpf.join(", ")}`);
 
-const porNomeNasc = new Map();
-const porNome = new Map();
-for (const c of candidatos.candidatos) {
-  const n = normalizarTexto(c[ic.nome]);
+const byNameBirth = new Map();
+const byName = new Map();
+for (const c of candidates.candidatos) {
+  const n = normalizeText(c[ic.nome]);
   const d = c[ic.nascimento];
-  if (d) porNomeNasc.set(`${n}|${d}`, c);
-  if (!porNome.has(n)) porNome.set(n, []);
-  porNome.get(n).push(c);
+  if (d) byNameBirth.set(`${n}|${d}`, c);
+  if (!byName.has(n)) byName.set(n, []);
+  byName.get(n).push(c);
 }
 
-const sqParaSenador = new Map();
-votacoesSenado.senadores.forEach((senador, indice) => {
-  const nomeCompleto = normalizarTexto(senador[ids.nomeCompleto]);
-  const dataNasc = senador[ids.dataNascimento];
-  let candMatch = null;
-  if (dataNasc && porNomeNasc.has(`${nomeCompleto}|${dataNasc}`)) {
-    candMatch = porNomeNasc.get(`${nomeCompleto}|${dataNasc}`);
-  } else if (porNome.has(nomeCompleto) && porNome.get(nomeCompleto).length === 1) {
-    candMatch = porNome.get(nomeCompleto)[0];
+const sqToSenator = new Map();
+senadoRollCalls.senadores.forEach((senator, index) => {
+  const fullName = normalizeText(senator[ids.nomeCompleto]);
+  const birthDate = senator[ids.dataNascimento];
+  let candidateMatch = null;
+  if (birthDate && byNameBirth.has(`${fullName}|${birthDate}`)) {
+    candidateMatch = byNameBirth.get(`${fullName}|${birthDate}`);
+  } else if (byName.has(fullName) && byName.get(fullName).length === 1) {
+    candidateMatch = byName.get(fullName)[0];
   }
-  if (candMatch) {
-    const sq = candMatch[ic.sq];
-    const anterior = sqParaSenador.get(sq);
-    if (anterior === undefined || votacoesSenado.senadores[anterior][ids.participacoes] < senador[ids.participacoes]) {
-      sqParaSenador.set(sq, indice);
+  if (candidateMatch) {
+    const sq = candidateMatch[ic.sq];
+    const previous = sqToSenator.get(sq);
+    if (
+      previous === undefined ||
+      senadoRollCalls.senadores[previous][ids.participacoes] < senator[ids.participacoes]
+    ) {
+      sqToSenator.set(sq, index);
     }
   }
 });
 
-const todosSqs = new Set([...sqParaDeputado.keys(), ...sqParaSenador.keys()]);
-const fichas = new Map();
+const allSqs = new Set([...sqToDeputy.keys(), ...sqToSenator.keys()]);
+const dossiers = new Map();
 
-for (const sq of todosSqs) {
-  const indiceDeputado = sqParaDeputado.get(sq);
-  const indiceSenador = sqParaSenador.get(sq);
-  const deputado = indiceDeputado !== undefined ? votacoesCamara.deputados[indiceDeputado] : null;
-  const senador = indiceSenador !== undefined ? votacoesSenado.senadores[indiceSenador] : null;
+for (const sq of allSqs) {
+  const deputyIndex = sqToDeputy.get(sq);
+  const senatorIndex = sqToSenator.get(sq);
+  const deputy = deputyIndex !== undefined ? camaraRollCalls.deputados[deputyIndex] : null;
+  const senator = senatorIndex !== undefined ? senadoRollCalls.senadores[senatorIndex] : null;
 
-  const votos = {};
-  for (const curada of curadas) {
-    if (curada.casa === "senado") {
-      votos[curada.id] = indiceSenador !== undefined ? Number(curada.votacao[ivs.votos][indiceSenador]) : 0;
+  const votes = {};
+  for (const curated of curatedRollCalls) {
+    if (curated.chamber === "senado") {
+      votes[curated.id] = senatorIndex !== undefined ? Number(curated.rollCall[ivs.votos][senatorIndex]) : 0;
     } else {
-      votos[curada.id] = indiceDeputado !== undefined ? Number(curada.votacao[ivc.votos][indiceDeputado]) : 0;
+      votes[curated.id] = deputyIndex !== undefined ? Number(curated.rollCall[ivc.votos][deputyIndex]) : 0;
     }
   }
 
-  if (deputado && senador) {
-    fichas.set(sq, {
+  const votedInCurrentCamara =
+    deputyIndex !== undefined &&
+    camaraRollCalls.votacoes.some(
+      (v) => v[ivc.dataHora] >= CURRENT_LEGISLATURE_START && v[ivc.votos][deputyIndex] !== "0",
+    );
+  const votedInCurrentSenado =
+    senatorIndex !== undefined &&
+    senadoRollCalls.votacoes.some(
+      (v) => v[ivs.dataHora] >= CURRENT_LEGISLATURE_START && v[ivs.votos][senatorIndex] !== "0",
+    );
+  const currentTerm = votedInCurrentSenado ? "senado" : votedInCurrentCamara ? "camara" : null;
+
+  if (deputy && senator) {
+    dossiers.set(sq, {
       casa: "ambas",
-      camaraId: deputado[idc.id],
-      senadoId: senador[ids.id],
-      nomeCamara: deputado[idc.nome],
-      nomeSenado: senador[ids.nome],
-      nomeParlamentar: deputado[idc.nome],
-      participacoes: deputado[idc.participacoes] + senador[ids.participacoes],
-      participacoesCamara: deputado[idc.participacoes],
-      participacoesSenado: senador[ids.participacoes],
-      bancadaAferivel: deputado[idc.votosEmBancadaAferivel] + senador[ids.votosEmBancadaAferivel],
-      comMaioria: deputado[idc.votosComMaioriaDoPartido] + senador[ids.votosComMaioriaDoPartido],
-      votos,
+      mandatoAtual: currentTerm,
+      camaraId: deputy[idc.id],
+      senadoId: senator[ids.id],
+      nomeCamara: deputy[idc.nome],
+      nomeSenado: senator[ids.nome],
+      nomeParlamentar: deputy[idc.nome],
+      participacoes: deputy[idc.participacoes] + senator[ids.participacoes],
+      participacoesCamara: deputy[idc.participacoes],
+      participacoesSenado: senator[ids.participacoes],
+      bancadaAferivel: deputy[idc.votosEmBancadaAferivel] + senator[ids.votosEmBancadaAferivel],
+      comMaioria: deputy[idc.votosComMaioriaDoPartido] + senator[ids.votosComMaioriaDoPartido],
+      votos: votes,
     });
-  } else if (senador) {
-    fichas.set(sq, {
+  } else if (senator) {
+    dossiers.set(sq, {
       casa: "senado",
-      senadoId: senador[ids.id],
-      nomeSenado: senador[ids.nome],
-      nomeCamara: senador[ids.nome],
-      nomeParlamentar: senador[ids.nome],
-      participacoes: senador[ids.participacoes],
-      participacoesSenado: senador[ids.participacoes],
-      bancadaAferivel: senador[ids.votosEmBancadaAferivel],
-      comMaioria: senador[ids.votosComMaioriaDoPartido],
-      votos,
+      mandatoAtual: currentTerm,
+      senadoId: senator[ids.id],
+      nomeSenado: senator[ids.nome],
+      nomeCamara: senator[ids.nome],
+      nomeParlamentar: senator[ids.nome],
+      participacoes: senator[ids.participacoes],
+      participacoesSenado: senator[ids.participacoes],
+      bancadaAferivel: senator[ids.votosEmBancadaAferivel],
+      comMaioria: senator[ids.votosComMaioriaDoPartido],
+      votos: votes,
     });
-  } else if (deputado) {
-    fichas.set(sq, {
+  } else if (deputy) {
+    dossiers.set(sq, {
       casa: "camara",
-      camaraId: deputado[idc.id],
-      nomeCamara: deputado[idc.nome],
-      nomeParlamentar: deputado[idc.nome],
-      participacoes: deputado[idc.participacoes],
-      participacoesCamara: deputado[idc.participacoes],
-      bancadaAferivel: deputado[idc.votosEmBancadaAferivel],
-      comMaioria: deputado[idc.votosComMaioriaDoPartido],
-      votos,
+      mandatoAtual: currentTerm,
+      camaraId: deputy[idc.id],
+      nomeCamara: deputy[idc.nome],
+      nomeParlamentar: deputy[idc.nome],
+      participacoes: deputy[idc.participacoes],
+      participacoesCamara: deputy[idc.participacoes],
+      bancadaAferivel: deputy[idc.votosEmBancadaAferivel],
+      comMaioria: deputy[idc.votosComMaioriaDoPartido],
+      votos: votes,
     });
   }
 }
 
-const porUf = new Map();
-for (const candidato of candidatos.candidatos) {
-  const [sigla] = candidatos.dicionarios.unidadeEleitoral[candidato[ic.ue]];
-  const lista = porUf.get(sigla);
-  if (lista === undefined) porUf.set(sigla, [candidato]);
-  else lista.push(candidato);
+const byState = new Map();
+for (const candidate of candidates.candidatos) {
+  const [stateCode] = candidates.dicionarios.unidadeEleitoral[candidate[ic.ue]];
+  const candidateList = byState.get(stateCode);
+  if (candidateList === undefined) byState.set(stateCode, [candidate]);
+  else candidateList.push(candidate);
 }
 
-const COLUNAS = ["sq", "numero", "nome", "nomeCompleto", "cargo", "partido", "coligacao", "badge", "foto", "ficha"];
-const votacoesCamaraOrdenadas = [...votacoesCamara.votacoes].sort((a, b) => (a[ivc.dataHora] < b[ivc.dataHora] ? -1 : a[ivc.dataHora] > b[ivc.dataHora] ? 1 : 0));
-const totalVotacoesCamara = votacoesCamaraOrdenadas.length;
+const COLUMNS = [
+  "sq",
+  "numero",
+  "nome",
+  "nomeCompleto",
+  "cargo",
+  "partido",
+  "coligacao",
+  "badge",
+  "foto",
+  "perfil",
+  "ficha",
+];
+const sortedCamaraRollCalls = [...camaraRollCalls.votacoes].sort((a, b) =>
+  a[ivc.dataHora] < b[ivc.dataHora] ? -1 : a[ivc.dataHora] > b[ivc.dataHora] ? 1 : 0,
+);
+const totalCamaraRollCalls = sortedCamaraRollCalls.length;
 
-const votacoesSenadoOrdenadas = [...votacoesSenado.votacoes].sort((a, b) => (a[ivs.dataHora] < b[ivs.dataHora] ? -1 : a[ivs.dataHora] > b[ivs.dataHora] ? 1 : 0));
-const totalVotacoesSenado = votacoesSenadoOrdenadas.length;
+const sortedSenadoRollCalls = [...senadoRollCalls.votacoes].sort((a, b) =>
+  a[ivs.dataHora] < b[ivs.dataHora] ? -1 : a[ivs.dataHora] > b[ivs.dataHora] ? 1 : 0,
+);
+const totalSenadoRollCalls = sortedSenadoRollCalls.length;
 
-const totalVotacoesGeral = totalVotacoesCamara + totalVotacoesSenado;
-const ufs = [];
-let totalFotoTse = 0;
-let totalFotoCamara = 0;
+const totalRollCalls = totalCamaraRollCalls + totalSenadoRollCalls;
+const states = [];
 
-mkdirSync(SAIDA, { recursive: true });
+mkdirSync(OUTPUT_DIR, { recursive: true });
 
-for (const [sigla, lista] of [...porUf].sort(([a], [b]) => (a < b ? -1 : 1))) {
-  const nomeUf = candidatos.dicionarios.unidadeEleitoral.find(([atual]) => atual === sigla)[1];
-  const coligacoesUsadas = new Map();
-  const linhas = lista
-    .map((candidato) => {
-      const sq = candidato[ic.sq];
-      const indiceColigacao = candidato[ic.coligacao];
-      if (!coligacoesUsadas.has(indiceColigacao)) {
-        coligacoesUsadas.set(indiceColigacao, coligacoesUsadas.size);
+for (const [stateCode, candidateList] of [...byState].sort(([a], [b]) => (a < b ? -1 : 1))) {
+  const stateName = candidates.dicionarios.unidadeEleitoral.find(([current]) => current === stateCode)[1];
+  const usedCoalitions = new Map();
+  const rows = candidateList
+    .map((candidate) => {
+      const sq = candidate[ic.sq];
+      const coalitionIndex = candidate[ic.coligacao];
+      if (!usedCoalitions.has(coalitionIndex)) {
+        usedCoalitions.set(coalitionIndex, usedCoalitions.size);
       }
-      const ocupacao = candidatos.dicionarios.ocupacao[candidato[ic.ocupacao]];
-      const ficha = fichas.get(sq) ?? null;
-      let foto = null;
+      const occupation = candidates.dicionarios.ocupacao[candidate[ic.ocupacao]];
+      const dossier = dossiers.get(sq) ?? null;
+      let photo = null;
       if (existsSync(join(ROOT, "fotos-tse", `${sq}.jpg`))) {
-        foto = "t";
-        totalFotoTse += 1;
-      } else if (ficha !== null && ficha.camaraId && existsSync(join(ROOT, "fotos", `${ficha.camaraId}.jpg`))) {
-        foto = "c";
-        totalFotoCamara += 1;
+        photo = "t";
+      } else if (
+        dossier !== null &&
+        dossier.camaraId &&
+        existsSync(join(ROOT, "fotos", `${dossier.camaraId}.jpg`))
+      ) {
+        photo = "c";
       }
       return [
         sq,
-        candidato[ic.numero],
-        candidato[ic.nomeUrna],
-        candidato[ic.nome],
-        candidato[ic.cargo],
-        candidato[ic.partido],
-        coligacoesUsadas.get(indiceColigacao),
-        badge(ocupacao),
-        foto,
-        ficha,
+        candidate[ic.numero],
+        candidate[ic.nomeUrna],
+        candidate[ic.nome],
+        candidate[ic.cargo],
+        candidate[ic.partido],
+        usedCoalitions.get(coalitionIndex),
+        computeBadge(occupation),
+        photo,
+        computeProfile(candidate[ic.cargo], occupation, dossier),
+        dossier,
       ];
     })
     .sort((a, b) => a[4] - b[4] || a[1] - b[1] || (a[2] < b[2] ? -1 : 1));
 
-  const coligacoes = [...coligacoesUsadas.keys()].map((indice) => {
-    const original = candidatos.dicionarios.coligacao[indice];
+  const coalitions = [...usedCoalitions.keys()].map((index) => {
+    const original = candidates.dicionarios.coligacao[index];
     return { nome: original.nome, tipo: original.tipo, composicao: original.composicao };
   });
 
-  const comFicha = linhas.filter((linha) => linha[9] !== null).length;
+  const withDossier = rows.filter((row) => row[10] !== null).length;
+  const byProfile = { novo: 0, reeleicao: 0, outro: 0 };
+  for (const row of rows) {
+    const p = row[9];
+    if (byProfile[p] !== undefined) byProfile[p] += 1;
+  }
   writeFileSync(
-    join(SAIDA, `${sigla}.json`),
-    `${JSON.stringify({ uf: sigla, nome: nomeUf, coligacoes, colunas: COLUNAS, candidatos: linhas })}\n`,
+    join(OUTPUT_DIR, `${stateCode}.json`),
+    `${JSON.stringify({ uf: stateCode, nome: stateName, coligacoes: coalitions, colunas: COLUMNS, candidatos: rows })}\n`,
   );
-  ufs.push({ sigla, nome: nomeUf, candidatos: linhas.length, comFicha });
+  states.push({
+    sigla: stateCode,
+    nome: stateName,
+    candidatos: rows.length,
+    comFicha: withDossier,
+    porPerfil: byProfile,
+  });
 }
 
-const eixos = curadoria.eixos.map((eixo) => ({
-  id: eixo.id,
-  nome: eixo.nome,
-  pergunta: eixo.pergunta,
-  posicao: eixo.posicao,
-  defendeOEleitor: eixo.defendeOEleitor,
-  contraOEleitor: eixo.contraOEleitor,
-  votacoes: eixo.votacoes.map((referencia) => {
-    const ehSenado = referencia.id.startsWith("SF-");
-    const votacao = ehSenado ? porIdSenado.get(referencia.id) : porIdCamara.get(referencia.id);
-    const iv = ehSenado ? ivs : ivc;
+const axes = curation.eixos.map((axis) => ({
+  id: axis.id,
+  nome: axis.nome,
+  pergunta: axis.pergunta,
+  posicao: axis.posicao,
+  defendeOEleitor: axis.defendeOEleitor,
+  contraOEleitor: axis.contraOEleitor,
+  votacoes: axis.votacoes.map((reference) => {
+    const isSenado = reference.id.startsWith("SF-");
+    const rollCall = isSenado ? bySenadoId.get(reference.id) : byCamaraId.get(reference.id);
+    const colIndex = isSenado ? ivs : ivc;
     return {
-      id: referencia.id,
-      rotulo: referencia.rotulo,
-      data: votacao[iv.dataHora].slice(0, 10),
-      sim: votacao[iv.sim],
-      nao: votacao[iv.nao],
-      outros: votacao[iv.abstencao] + votacao[iv.obstrucao] + votacao[iv.artigo17],
-      proposicao: ehSenado ? referencia.id : Number(referencia.id.split("-")[0]),
-      idProcesso: ehSenado ? votacao[ivs.idProcesso] : null,
+      id: reference.id,
+      rotulo: reference.rotulo,
+      data: rollCall[colIndex.dataHora].slice(0, 10),
+      sim: rollCall[colIndex.sim],
+      nao: rollCall[colIndex.nao],
+      outros: rollCall[colIndex.abstencao] + rollCall[colIndex.obstrucao] + rollCall[colIndex.artigo17],
+      proposicao: isSenado ? reference.id : Number(reference.id.split("-")[0]),
+      idProcesso: isSenado ? rollCall[ivs.idProcesso] : null,
     };
   }),
 }));
 
-const contexto = curadoria.contexto.map((referencia) => {
-  const ehSenado = referencia.id.startsWith("SF-");
-  const votacao = ehSenado ? porIdSenado.get(referencia.id) : porIdCamara.get(referencia.id);
-  const iv = ehSenado ? ivs : ivc;
+const context = curation.contexto.map((reference) => {
+  const isSenado = reference.id.startsWith("SF-");
+  const rollCall = isSenado ? bySenadoId.get(reference.id) : byCamaraId.get(reference.id);
+  const colIndex = isSenado ? ivs : ivc;
   return {
-    id: referencia.id,
-    rotulo: referencia.rotulo,
-    nota: referencia.nota,
-    data: votacao[iv.dataHora].slice(0, 10),
-    sim: votacao[iv.sim],
-    nao: votacao[iv.nao],
-    outros: votacao[iv.abstencao] + votacao[iv.obstrucao] + votacao[iv.artigo17],
-    proposicao: ehSenado ? referencia.id : Number(referencia.id.split("-")[0]),
-    idProcesso: ehSenado ? votacao[ivs.idProcesso] : null,
+    id: reference.id,
+    rotulo: reference.rotulo,
+    nota: reference.nota,
+    data: rollCall[colIndex.dataHora].slice(0, 10),
+    sim: rollCall[colIndex.sim],
+    nao: rollCall[colIndex.nao],
+    outros: rollCall[colIndex.abstencao] + rollCall[colIndex.obstrucao] + rollCall[colIndex.artigo17],
+    proposicao: isSenado ? reference.id : Number(reference.id.split("-")[0]),
+    idProcesso: isSenado ? rollCall[ivs.idProcesso] : null,
   };
 });
 
-const pesquisaSaida = join(SAIDA, "pesquisa");
-mkdirSync(pesquisaSaida, { recursive: true });
+const researchOutputDir = join(OUTPUT_DIR, "pesquisa");
+mkdirSync(researchOutputDir, { recursive: true });
 for (let shard = 0; shard < 256; shard += 1) {
-  const candidatosShard = [...pesquisas.registros.values()]
-    .filter((registro) => registro.sq % 256 === shard)
-    .map((registro) => {
-      const { execucao, ...publico } = registro;
-      return [String(registro.sq), publico];
+  const shardCandidates = [...researches.records.values()]
+    .filter((record) => record.sq % 256 === shard)
+    .map((record) => {
+      const { execucao: _execucao, ...publicData } = record;
+      return [String(record.sq), publicData];
     })
     .sort(([a], [b]) => Number(a) - Number(b));
-  escreverAtomico(join(pesquisaSaida, `${shard.toString(16).padStart(2, "0")}.json`), { schema: 1, candidatos: Object.fromEntries(candidatosShard) });
+  writeAtomic(join(researchOutputDir, `${shard.toString(16).padStart(2, "0")}.json`), {
+    schema: 1,
+    candidatos: Object.fromEntries(shardCandidates),
+  });
 }
 
-const pesquisaPublicada = [...pesquisas.registros.values()].filter((registro) => registro.favoraveis.length > 0 || registro.desfavoraveis.length > 0).length;
-const indicePesquisa = {
+const publishedResearchCount = [...researches.records.values()].filter(
+  (record) => record.favoraveis.length > 0 || record.desfavoraveis.length > 0,
+).length;
+const researchIndex = {
   schema: 1,
-  rubrica: curadoria.pesquisa.id,
-  lente: curadoria.pesquisa.lente,
+  rubrica: curation.pesquisa.id,
+  lente: curation.pesquisa.lente,
   shards: 256,
-  totalPesquisados: pesquisas.registros.size,
-  totalComPublicacao: pesquisaPublicada,
-  totalAguardandoRevisao: pesquisas.aguardandoRevisao,
+  totalPesquisados: researches.records.size,
+  totalComPublicacao: publishedResearchCount,
+  totalAguardandoRevisao: researches.pendingReview,
   geradoEm: new Date().toISOString(),
 };
 
-const indice = {
+const index = {
   fonte: {
-    candidaturas: candidatos.fonte.portal,
-    votacoesCamara: votacoesCamara.fonte.portal,
-    votacoesSenado: votacoesSenado.fonte.portal,
+    candidaturas: candidates.fonte.portal,
+    votacoesCamara: camaraRollCalls.fonte.portal,
+    votacoesSenado: senadoRollCalls.fonte.portal,
     geradoEm: new Date().toISOString(),
   },
-  eleicao: candidatos.eleicao,
-  totalCandidatos: candidatos.candidatos.length,
-  totalComFicha: ufs.reduce((soma, uf) => soma + uf.comFicha, 0),
-  votacoesNoHistorico: totalVotacoesGeral,
-  votacoesNoHistoricoCamara: totalVotacoesCamara,
-  votacoesNoHistoricoSenado: totalVotacoesSenado,
-  cargos: Object.fromEntries(Object.entries(candidatos.dicionarios.cargo).map(([codigo, valor]) => [codigo, valor.nome])),
-  partidos: candidatos.dicionarios.partido,
-  federacoes: candidatos.dicionarios.federacao,
+  eleicao: candidates.eleicao,
+  totalCandidatos: candidates.candidatos.length,
+  totalComFicha: states.reduce((sum, state) => sum + state.comFicha, 0),
+  votacoesNoHistorico: totalRollCalls,
+  votacoesNoHistoricoCamara: totalCamaraRollCalls,
+  votacoesNoHistoricoSenado: totalSenadoRollCalls,
+  cargos: Object.fromEntries(
+    Object.entries(candidates.dicionarios.cargo).map(([code, value]) => [code, value.nome]),
+  ),
+  partidos: candidates.dicionarios.partido,
+  federacoes: candidates.dicionarios.federacao,
   badges: BADGES,
-  eixos,
-  contexto,
-  pesquisa: indicePesquisa,
-  ufs,
+  perfis: PROFILES,
+  eixos: axes,
+  contexto: context,
+  pesquisa: researchIndex,
+  ufs: states,
 };
-escreverAtomico(join(SAIDA, "indice.json"), indice);
+writeAtomic(join(OUTPUT_DIR, "indice.json"), index);
 
-const linhasVotacoesCamara = votacoesCamaraOrdenadas.map((votacao) => [
-  votacao[ivc.id],
-  votacao[ivc.dataHora].slice(0, 10),
-  votacao[ivc.orgao],
-  Number(votacao[ivc.id].split("-")[0]),
-  limparDescricao(votacao[ivc.descricao]),
-  votacao[ivc.aprovada],
-  votacao[ivc.sim],
-  votacao[ivc.nao],
-  votacao[ivc.abstencao],
-  votacao[ivc.obstrucao],
+const camaraRollCallRows = sortedCamaraRollCalls.map((rollCall) => [
+  rollCall[ivc.id],
+  rollCall[ivc.dataHora].slice(0, 10),
+  rollCall[ivc.orgao],
+  Number(rollCall[ivc.id].split("-")[0]),
+  cleanDescription(rollCall[ivc.descricao]),
+  rollCall[ivc.aprovada],
+  rollCall[ivc.sim],
+  rollCall[ivc.nao],
+  rollCall[ivc.abstencao],
+  rollCall[ivc.obstrucao],
   null,
 ]);
 
-const catalogoVotacoesCamara = {
+const camaraRollCallCatalog = {
   sobre: "Catálogo completo de votações nominais da Câmara dos Deputados",
   periodo: {
-    de: Number(votacoesCamaraOrdenadas[0][ivc.dataHora].slice(0, 4)),
-    ate: Number(votacoesCamaraOrdenadas[totalVotacoesCamara - 1][ivc.dataHora].slice(0, 4)),
+    de: Number(sortedCamaraRollCalls[0][ivc.dataHora].slice(0, 4)),
+    ate: Number(sortedCamaraRollCalls[totalCamaraRollCalls - 1][ivc.dataHora].slice(0, 4)),
   },
-  colunas: ["id", "data", "orgao", "proposicao", "descricao", "aprovada", "sim", "nao", "abstencao", "obstrucao", "idProcesso"],
-  votacoes: linhasVotacoesCamara,
+  colunas: [
+    "id",
+    "data",
+    "orgao",
+    "proposicao",
+    "descricao",
+    "aprovada",
+    "sim",
+    "nao",
+    "abstencao",
+    "obstrucao",
+    "idProcesso",
+  ],
+  votacoes: camaraRollCallRows,
 };
-writeFileSync(join(SAIDA, "votacoes.json"), `${JSON.stringify(catalogoVotacoesCamara)}\n`);
+writeFileSync(join(OUTPUT_DIR, "votacoes.json"), `${JSON.stringify(camaraRollCallCatalog)}\n`);
 
-const linhasVotacoesSenado = votacoesSenadoOrdenadas.map((votacao) => [
-  votacao[ivs.id],
-  votacao[ivs.dataHora].slice(0, 10),
-  votacao[ivs.orgao],
-  votacao[ivs.proposicao] ?? votacao[ivs.id],
-  limparDescricao(votacao[ivs.descricao]),
-  votacao[ivs.aprovada],
-  votacao[ivs.sim],
-  votacao[ivs.nao],
-  votacao[ivs.abstencao],
-  votacao[ivs.obstrucao],
-  votacao[ivs.idProcesso],
+const senadoRollCallRows = sortedSenadoRollCalls.map((rollCall) => [
+  rollCall[ivs.id],
+  rollCall[ivs.dataHora].slice(0, 10),
+  rollCall[ivs.orgao],
+  rollCall[ivs.proposicao] ?? rollCall[ivs.id],
+  cleanDescription(rollCall[ivs.descricao]),
+  rollCall[ivs.aprovada],
+  rollCall[ivs.sim],
+  rollCall[ivs.nao],
+  rollCall[ivs.abstencao],
+  rollCall[ivs.obstrucao],
+  rollCall[ivs.idProcesso],
 ]);
 
-const catalogoVotacoesSenado = {
+const senadoRollCallCatalog = {
   sobre: "Catálogo completo de votações nominais do Senado Federal",
   periodo: {
-    de: Number(votacoesSenadoOrdenadas[0][ivs.dataHora].slice(0, 4)),
-    ate: Number(votacoesSenadoOrdenadas[totalVotacoesSenado - 1][ivs.dataHora].slice(0, 4)),
+    de: Number(sortedSenadoRollCalls[0][ivs.dataHora].slice(0, 4)),
+    ate: Number(sortedSenadoRollCalls[totalSenadoRollCalls - 1][ivs.dataHora].slice(0, 4)),
   },
-  colunas: ["id", "data", "orgao", "proposicao", "descricao", "aprovada", "sim", "nao", "abstencao", "obstrucao", "idProcesso"],
-  votacoes: linhasVotacoesSenado,
+  colunas: [
+    "id",
+    "data",
+    "orgao",
+    "proposicao",
+    "descricao",
+    "aprovada",
+    "sim",
+    "nao",
+    "abstencao",
+    "obstrucao",
+    "idProcesso",
+  ],
+  votacoes: senadoRollCallRows,
 };
-writeFileSync(join(SAIDA, "votacoes-senado.json"), `${JSON.stringify(catalogoVotacoesSenado)}\n`);
+writeFileSync(join(OUTPUT_DIR, "votacoes-senado.json"), `${JSON.stringify(senadoRollCallCatalog)}\n`);
 
-const PASTA_VOTOS = join(SAIDA, "votos");
-mkdirSync(PASTA_VOTOS, { recursive: true });
+const ROLLCALLS_DIR = join(OUTPUT_DIR, "votos");
+mkdirSync(ROLLCALLS_DIR, { recursive: true });
 
-const deputadosComFicha = new Map();
-for (const [sq, indice] of sqParaDeputado) {
-  const dep = votacoesCamara.deputados[indice];
-  if (dep !== undefined) deputadosComFicha.set(dep[idc.id], indice);
+const deputiesWithDossier = new Map();
+for (const index of sqToDeputy.values()) {
+  const dep = camaraRollCalls.deputados[index];
+  if (dep !== undefined) deputiesWithDossier.set(dep[idc.id], index);
 }
 
-const votosPorCamaraId = new Map();
-for (const [camaraId] of deputadosComFicha) {
-  votosPorCamaraId.set(camaraId, new Array(totalVotacoesCamara));
+const votesByCamaraId = new Map();
+for (const [camaraId] of deputiesWithDossier) {
+  votesByCamaraId.set(camaraId, new Array(totalCamaraRollCalls));
 }
 
-for (let i = 0; i < totalVotacoesCamara; i += 1) {
-  const votacao = votacoesCamaraOrdenadas[i];
-  const stringVotos = votacao[ivc.votos];
-  for (const [camaraId, indice] of deputadosComFicha) {
-    votosPorCamaraId.get(camaraId)[i] = stringVotos[indice] ?? "0";
+for (let i = 0; i < totalCamaraRollCalls; i += 1) {
+  const rollCall = sortedCamaraRollCalls[i];
+  const voteString = rollCall[ivc.votos];
+  for (const [camaraId, index] of deputiesWithDossier) {
+    votesByCamaraId.get(camaraId)[i] = voteString[index] ?? "0";
   }
 }
 
-for (const [camaraId, arrayVotos] of votosPorCamaraId) {
-  const conteudoVotos = `${JSON.stringify({ camaraId, votos: arrayVotos.join("") })}\n`;
-  writeFileSync(join(PASTA_VOTOS, `${camaraId}.json`), conteudoVotos);
+for (const [camaraId, voteArray] of votesByCamaraId) {
+  const voteContent = `${JSON.stringify({ camaraId, votos: voteArray.join("") })}\n`;
+  writeFileSync(join(ROLLCALLS_DIR, `${camaraId}.json`), voteContent);
 }
 
-const senadoresComFicha = new Map();
-for (const [sq, indice] of sqParaSenador) {
-  const sen = votacoesSenado.senadores[indice];
-  if (sen !== undefined) senadoresComFicha.set(sen[ids.id], indice);
+const senatorsWithDossier = new Map();
+for (const index of sqToSenator.values()) {
+  const sen = senadoRollCalls.senadores[index];
+  if (sen !== undefined) senatorsWithDossier.set(sen[ids.id], index);
 }
 
-const votosPorSenadoId = new Map();
-for (const [senadoId] of senadoresComFicha) {
-  votosPorSenadoId.set(senadoId, new Array(totalVotacoesSenado));
+const votesBySenadoId = new Map();
+for (const [senadoId] of senatorsWithDossier) {
+  votesBySenadoId.set(senadoId, new Array(totalSenadoRollCalls));
 }
 
-for (let i = 0; i < totalVotacoesSenado; i += 1) {
-  const votacao = votacoesSenadoOrdenadas[i];
-  const stringVotos = votacao[ivs.votos];
-  for (const [senadoId, indice] of senadoresComFicha) {
-    votosPorSenadoId.get(senadoId)[i] = stringVotos[indice] ?? "0";
+for (let i = 0; i < totalSenadoRollCalls; i += 1) {
+  const rollCall = sortedSenadoRollCalls[i];
+  const voteString = rollCall[ivs.votos];
+  for (const [senadoId, index] of senatorsWithDossier) {
+    votesBySenadoId.get(senadoId)[i] = voteString[index] ?? "0";
   }
 }
 
-for (const [senadoId, arrayVotos] of votosPorSenadoId) {
-  const conteudoVotos = `${JSON.stringify({ senadoId, votos: arrayVotos.join("") })}\n`;
-  writeFileSync(join(PASTA_VOTOS, `sf-${senadoId}.json`), conteudoVotos);
+for (const [senadoId, voteArray] of votesBySenadoId) {
+  const voteContent = `${JSON.stringify({ senadoId, votos: voteArray.join("") })}\n`;
+  writeFileSync(join(ROLLCALLS_DIR, `sf-${senadoId}.json`), voteContent);
 }
 
 console.log(`\nCatálogo gerado em data/dex/`);
-console.log(`Candidaturas: ${candidatos.candidatos.length} em ${ufs.length} unidades eleitorais`);
-console.log(`Com ficha de votação: ${indice.totalComFicha} (${sqParaDeputado.size} da Câmara, ${sqParaSenador.size} do Senado)`);
-console.log(`Votações no catálogo: ${totalVotacoesGeral} (${totalVotacoesCamara} Câmara, ${totalVotacoesSenado} Senado)`);
-console.log(`Históricos de voto salvos: ${votosPorCamaraId.size} Câmara, ${votosPorSenadoId.size} Senado`);
+console.log(`Candidaturas: ${candidates.candidatos.length} em ${states.length} unidades eleitorais`);
+console.log(
+  `Com ficha de votação: ${index.totalComFicha} (${sqToDeputy.size} da Câmara, ${sqToSenator.size} do Senado)`,
+);
+console.log(
+  `Votações no catálogo: ${totalRollCalls} (${totalCamaraRollCalls} Câmara, ${totalSenadoRollCalls} Senado)`,
+);
+console.log(`Históricos de voto salvos: ${votesByCamaraId.size} Câmara, ${votesBySenadoId.size} Senado`);

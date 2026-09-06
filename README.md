@@ -18,16 +18,31 @@ O script busca as duas votações na API e reescreve tanto o JSON quanto `data/v
 
 ### Fotos
 
-As fotos dos deputados ficam em `fotos/{id}.jpg` — as miniaturas oficiais (bandep) da Câmara, baixadas uma única vez para dentro do repositório. Para gerá-las ou completá-las, rode `node scripts/fetch-fotos.mjs`: ele lê os `urlFoto` de `data/votos-pec-blindagem.json`, pula os arquivos que já existem com conteúdo e baixa o resto limitado a 6 requisições simultâneas para não sobrecarregar o CDN. O site serve essas cópias locais (`assets/app.js` aponta o `<img>` direto para `fotos/{id}.jpg`); o JSON segue carregando o `urlFoto` original como referência upstream.
+As fotos dos deputados ficam em `fotos/{id}.jpg` — as miniaturas oficiais (bandep) da Câmara, baixadas uma única vez para dentro do repositório. Para gerá-las ou completá-las, rode `node scripts/fetch-photos-camara.mjs`: ele lê os `urlFoto` de `data/votos-pec-blindagem.json`, pula os arquivos que já existem com conteúdo e baixa o resto limitado a 6 requisições simultâneas para não sobrecarregar o CDN. O site serve essas cópias locais (`assets/app.js` aponta o `<img>` direto para `fotos/{id}.jpg`); o JSON segue carregando o `urlFoto` original como referência upstream.
 
 ## Esquema do JSON
 
 ```json
 {
-  "proposicao": { "id": 2270800, "sigla": "PEC 3/2021", "apelido": "PEC da Blindagem", "ementa": "...", "urlFicha": "https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800" },
+  "proposicao": {
+    "id": 2270800,
+    "sigla": "PEC 3/2021",
+    "apelido": "PEC da Blindagem",
+    "ementa": "...",
+    "urlFicha": "https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800"
+  },
   "fonte": { "api": "https://dadosabertos.camara.leg.br/api/v2", "coletadoEm": "<ISO>" },
   "votacoes": [
-    { "turno": 1, "votacaoId": "2270800-135", "dataHora": "2025-09-16T21:04:35", "descricao": "...", "sim": 353, "nao": 134, "abstencao": 1, "ausente": 25 }
+    {
+      "turno": 1,
+      "votacaoId": "2270800-135",
+      "dataHora": "2025-09-16T21:04:35",
+      "descricao": "...",
+      "sim": 353,
+      "nao": 134,
+      "abstencao": 1,
+      "ausente": 25
+    }
   ],
   "resumo": { "totalDeputados": 493, "simEmAlgumTurno": 356, "simNosDoisTurnos": 341 },
   "deputados": [
@@ -63,7 +78,7 @@ Em `deputados[]`, `turno1` e `turno2` assumem exatamente um destes quatro valore
 Regenerar:
 
 ```
-node scripts/fetch-candidatos-2026.mjs
+node scripts/fetch-candidates-2026.mjs
 ```
 
 O script baixa `consulta_cand_2026.zip` do CDN do TSE, descompacta `consulta_cand_2026_BRASIL.csv` em memória (leitor ZIP próprio sobre `node:zlib`, sem dependências), converte de ISO-8859-1 para UTF-8 e reescreve o JSON. Ele aborta se `SG_UF` divergir de `SG_UE`, se algum código descrever dois rótulos diferentes, se houver `SQ_CANDIDATO` repetido ou se o ano não for 2026.
@@ -76,25 +91,79 @@ O CSV do TSE tem 50 colunas e 10,8 MB; o JSON tem 2,7 MB. A compactação vem de
 
 ```json
 {
-  "fonte": { "portal": "...", "arquivo": "...", "membro": "consulta_cand_2026_BRASIL.csv", "geradoEm": "2026-08-26T19:30:44", "coletadoEm": "<ISO>" },
+  "fonte": {
+    "portal": "...",
+    "arquivo": "...",
+    "membro": "consulta_cand_2026_BRASIL.csv",
+    "geradoEm": "2026-08-26T19:30:44",
+    "coletadoEm": "<ISO>"
+  },
   "eleicao": { "ano": 2026, "turno": 1, "tipo": "ELEIÇÃO ORDINÁRIA", "data": "2026-10-04" },
   "eleicoes": { "6257": { "descricao": "Eleição Geral Federal 2026", "abrangencia": "FEDERAL" } },
-  "resumo": { "totalCandidatos": 20765, "porCargo": { "PRESIDENTE": 13 }, "porUnidadeEleitoral": { "BR": 26 } },
+  "resumo": {
+    "totalCandidatos": 20765,
+    "porCargo": { "PRESIDENTE": 13 },
+    "porUnidadeEleitoral": { "BR": 26 }
+  },
   "dicionarios": {
     "cargo": { "1": { "nome": "PRESIDENTE", "eleicao": 6257 } },
-    "unidadeEleitoral": [["AC", "ACRE"], ["AL", "ALAGOAS"], ["BR", "BRASIL"]],
+    "unidadeEleitoral": [
+      ["AC", "ACRE"],
+      ["AL", "ALAGOAS"],
+      ["BR", "BRASIL"]
+    ],
     "ufNascimento": ["AC", "AL", "AM", "ZZ"],
     "partido": { "13": { "sigla": "PT", "nome": "PARTIDO DOS TRABALHADORES" } },
     "federacao": { "101": { "sigla": "PT/PC do B/PV", "nome": "...", "composicao": "PT/PC do B/PV" } },
-    "coligacao": [{ "sq": 260001801179, "nome": "PARTIDO ISOLADO", "tipo": "PARTIDO ISOLADO", "composicao": "PDT" }],
+    "coligacao": [
+      { "sq": 260001801179, "nome": "PARTIDO ISOLADO", "tipo": "PARTIDO ISOLADO", "composicao": "PDT" }
+    ],
     "genero": { "2": "MASCULINO" },
     "instrucao": { "8": "SUPERIOR COMPLETO" },
     "estadoCivil": { "3": "CASADO(A)" },
     "corRaca": { "1": "BRANCA" },
     "ocupacao": { "999": "OUTROS" }
   },
-  "colunas": ["sq", "cargo", "ue", "numero", "nome", "nomeUrna", "nomeSocial", "partido", "federacao", "coligacao", "ufNascimento", "nascimento", "genero", "instrucao", "estadoCivil", "corRaca", "ocupacao"],
-  "candidatos": [[280002542548, 1, 5, 13, "LUIZ INÁCIO LULA DA SILVA", "LULA", null, 13, 101, 1293, 15, "1945-10-06", 2, 4, 3, 1, 249]]
+  "colunas": [
+    "sq",
+    "cargo",
+    "ue",
+    "numero",
+    "nome",
+    "nomeUrna",
+    "nomeSocial",
+    "partido",
+    "federacao",
+    "coligacao",
+    "ufNascimento",
+    "nascimento",
+    "genero",
+    "instrucao",
+    "estadoCivil",
+    "corRaca",
+    "ocupacao"
+  ],
+  "candidatos": [
+    [
+      280002542548,
+      1,
+      5,
+      13,
+      "LUIZ INÁCIO LULA DA SILVA",
+      "LULA",
+      null,
+      13,
+      101,
+      1293,
+      15,
+      "1945-10-06",
+      2,
+      4,
+      3,
+      1,
+      249
+    ]
+  ]
 }
 ```
 
@@ -121,7 +190,7 @@ Fora esses campos, o JSON reproduz o CSV linha por linha.
 
 ## Pesquisa de vida pública
 
-`scripts/research-candidatos-2026.mjs` coordena a pesquisa das 20.765 candidaturas por `sq`. Exa e Brave fazem a descoberta paralela das fontes; o Gemini API sintetiza e classifica o registro de fontes fornecido. A pesquisa não roda no navegador.
+`scripts/research-candidates-2026.mjs` coordena a pesquisa das 20.765 candidaturas por `sq`. Exa e Brave fazem a descoberta paralela das fontes; o Gemini API sintetiza e classifica o registro de fontes fornecido. A pesquisa não roda no navegador.
 
 Instale as dependências uma vez:
 
@@ -136,8 +205,8 @@ O estado durável fica em `.cache/pesquisa-candidatos-2026/state.sqlite`. O banc
 Pesquisar uma candidatura ou uma coorte:
 
 ```
-node scripts/research-candidatos-2026.mjs pesquisar --sq 280002551933 --max-cost-usd 1
-node scripts/research-candidatos-2026.mjs pesquisar --uf SP --limit 10 --search-providers exa,brave --candidate-concurrency 8 --max-cost-usd 2
+node scripts/research-candidates-2026.mjs pesquisar --sq 280002551933 --max-cost-usd 1
+node scripts/research-candidates-2026.mjs pesquisar --uf SP --limit 10 --search-providers exa,brave --candidate-concurrency 8 --max-cost-usd 2
 ```
 
 Sem seletor, o comando percorre toda a lista em ordem de `sq`. `--max-cost-usd` é sempre obrigatório e reserva custo antes de iniciar síntese; o processo para novas reservas ao atingir o limite, sem cancelar requisições já iniciadas. `p-queue` separa as filas dos provedores e `p-retry` aplica backoff limitado; 429 pausa apenas a fila afetada e respeita `Retry-After`/janelas de rate limit disponíveis.
@@ -145,10 +214,10 @@ Sem seletor, o comando percorre toda a lista em ordem de `sq`. `--max-cost-usd` 
 Comandos operacionais:
 
 ```
-node scripts/research-candidatos-2026.mjs migrate
-node scripts/research-candidatos-2026.mjs status --sq 280002551933
-node scripts/research-candidatos-2026.mjs retry --sq 280002551933
-node scripts/research-candidatos-2026.mjs recover --sq 280002551933 --resubmit-uncertain
+node scripts/research-candidates-2026.mjs migrate
+node scripts/research-candidates-2026.mjs status --sq 280002551933
+node scripts/research-candidates-2026.mjs retry --sq 280002551933
+node scripts/research-candidates-2026.mjs recover --sq 280002551933 --resubmit-uncertain
 ```
 
 A rubrica `trabalhador-v1` é uma lente editorial de esquerda com prioridade para o efeito material sobre quem trabalha. Direitos trabalhistas, redistribuição, serviços públicos e propriedade pública podem ser favoráveis; privatização, austeridade, repressão trabalhista, corrupção, sobrepreço e conflitos familiares de interesse podem ser desfavoráveis. O texto separa fato, trecho de evidência, papel da pessoa, resultado e leitura editorial. Obra anunciada, verba federal ou conclusão herdada não é mérito sem autoria, financiamento, entrega e contexto comprovados.
@@ -156,7 +225,7 @@ A rubrica `trabalhador-v1` é uma lente editorial de esquerda com prioridade par
 Itens de licitação, corrupção, investigação, conflito familiar, conduta pessoal ou evidência contestada aguardam revisão:
 
 ```
-node scripts/research-candidatos-2026.mjs revisar --reviewer NOME --sq 280002551933
+node scripts/research-candidates-2026.mjs revisar --reviewer NOME --sq 280002551933
 node scripts/build-pokedex.mjs
 ```
 
@@ -169,7 +238,7 @@ Os resultados publicados vão para 256 shards em `data/dex/pesquisa/` e são car
 Regenerar:
 
 ```
-node scripts/fetch-votacoes-camara.mjs
+node scripts/fetch-rollcalls-camara.mjs
 ```
 
 O script baixa os 12 dumps anuais (`votacoes-{ano}.csv` e `votacoesVotos-{ano}.csv`, 349 MB no total) para `.cache/camara/`, que fica fora do git. Cada arquivo é medido por `HEAD` antes de baixar e o download é retomável: o manifesto (`.cache/camara/manifesto.json`) guarda tamanho, `etag` e o sha256 do prefixo já verificado, então uma execução interrompida continua de onde parou e um arquivo corrompido no lugar — mesmo preservando o tamanho — é detectado e rebaixado. Uma retomada só é aceita se o `content-range` da resposta casar exatamente com o deslocamento pedido.
@@ -181,14 +250,69 @@ O script baixa os 12 dumps anuais (`votacoes-{ano}.csv` e `votacoesVotos-{ano}.c
 
 ```json
 {
-  "resumo": { "votacoes": 3138, "registrosDeVoto": 990153, "cadastrosDeDeputado": 887, "partidos": 29, "cadastrosComMaisDeUmaSigla": 345 },
+  "resumo": {
+    "votacoes": 3138,
+    "registrosDeVoto": 990153,
+    "cadastrosDeDeputado": 887,
+    "partidos": 29,
+    "cadastrosComMaisDeUmaSigla": 345
+  },
   "minimoBancadaAferivel": 5,
   "partidos": ["PSL", "REPUBLICANOS", "PDT", "PSDB", "PSD", "..."],
-  "colunasDeputado": ["id", "nome", "uf", "participacoes", "votosComMaioriaDoPartido", "votosEmBancadaAferivel"],
+  "colunasDeputado": [
+    "id",
+    "nome",
+    "uf",
+    "participacoes",
+    "votosComMaioriaDoPartido",
+    "votosEmBancadaAferivel"
+  ],
   "deputados": [[220639, "Guilherme Boulos", "SP", 720, 699, 703]],
-  "filiacoes": [[[0, 1], [25, 1013], [10, 1085]]],
-  "colunas": ["id", "dataHora", "orgao", "proposicao", "aprovada", "sim", "nao", "abstencao", "obstrucao", "artigo17", "participantes", "minoria", "rice", "desercoes", "descricao", "votos"],
-  "votacoes": [["2270800-135", "2025-09-16T21:04:35", "PLEN", 2561347, true, 353, 134, 1, 0, 0, 488, 0.2752, 0.7325, 57, "Aprovado, em primeiro turno...", "111110100002..."]]
+  "filiacoes": [
+    [
+      [0, 1],
+      [25, 1013],
+      [10, 1085]
+    ]
+  ],
+  "colunas": [
+    "id",
+    "dataHora",
+    "orgao",
+    "proposicao",
+    "aprovada",
+    "sim",
+    "nao",
+    "abstencao",
+    "obstrucao",
+    "artigo17",
+    "participantes",
+    "minoria",
+    "rice",
+    "desercoes",
+    "descricao",
+    "votos"
+  ],
+  "votacoes": [
+    [
+      "2270800-135",
+      "2025-09-16T21:04:35",
+      "PLEN",
+      2561347,
+      true,
+      353,
+      134,
+      1,
+      0,
+      0,
+      488,
+      0.2752,
+      0.7325,
+      57,
+      "Aprovado, em primeiro turno...",
+      "111110100002..."
+    ]
+  ]
 }
 ```
 
@@ -222,7 +346,7 @@ Aplicado ao período: 2.625 das 3.138 votações passam do corte de 5% de minori
 Regenerar:
 
 ```
-node scripts/fetch-votacoes-senado.mjs
+node scripts/fetch-rollcalls-senado.mjs
 ```
 
 Cada resposta anual é guardada em `.cache/senado/votacoes-{ano}.json` (fora do git), então rodar de novo é barato. O script também baixa o cadastro dos senadores que exerceram mandato no período (legislaturas 55, 56 e 57) e guarda em `.cache/senado/senadores-detalhe.json`.
@@ -234,54 +358,61 @@ Duas restrições do serviço do Senado pesam na implementação:
 
 O esquema é o mesmo de `votacoes-camara.json`: elenco posicional de senadores, e o voto de cada votação é uma string com um dígito por senador. `id` tem o prefixo `SF-` e o resto é o `codigoSessaoVotacao` da fonte. A sigla do voto do Senado é mais rica que a da Câmara e mapeia assim: `Sim`→1, `Não`→2, `Abstenção`→3, `Obstrução` e `P-NRV`→4, `Presidente (art. 51 RISF)`→5, o resto (`AP`, `LS`, `LP`, `MIS`, `NA`, `NCom`)→0 sem registro. Como bancadas de senador são menores, `minimoBancadaAferivel` aqui é 3 (na Câmara, 5).
 
-## Catálogo 2026 (`dex.html`)
+## Voto Secreto (`dex.html`)
 
-O catálogo é um segundo aplicativo no mesmo repositório, mobile-first e offline-first, pensado para quem está no ônibus com sinal ruim e precisa lembrar do número na urna. `index.html` continua sendo o mural da PEC da Blindagem e não mudou de função.
+O Voto Secreto é uma aplicação mobile-first e offline-first pensada para permitir a declaração individual de voto ou rejeição de candidaturas em 2026 com base nas votações nominais do Congresso Nacional como prova. `index.html` permanece como o mural histórico da PEC da Blindagem.
 
-A ideia é uma pokédex: o dex é **regional por padrão** porque a cédula também é — você só vota em candidatura do seu próprio estado. O número na urna é o elemento mais destacado da carta, porque é a única informação que transforma intenção em voto.
+A premissa central é que o voto é secreto na cabine, mas a manifestação de preferência ou recusa é pública e garantida por lei. A aplicação não possui cadastro, servidor de banco de dados ou rastreamento.
 
-Gerar os dados do catálogo:
+### Telas da aplicação
 
-```
-node scripts/fetch-candidatos-2026.mjs
-node scripts/fetch-votacoes-camara.mjs
-node scripts/fetch-votacoes-senado.mjs
-node scripts/build-pokedex.mjs
-```
+- **Onboarding:** seleção regional do estado onde o eleitor vota (a cédula é regional).
+- **Catálogo:** pesquisa instantânea por nome ou número na urna com chip de visor LCD, abas de filtro ("Com histórico" e "Todos"), régua de votações de 8 segmentos nos eixos editoriais e botões de ação individual ("NÃO VOTO" e "VOTO").
+- **Ficha:** visão aprofundada da candidatura, identificação de reeleição ou mandato anterior, número na urna em LCD e detalhamento de votos por eixo temático com links para as atas oficiais da Câmara e do Senado.
+- **Criar post (Hub):** atalhos para os formatos de postagem: "Um candidato", "Duelo", "Lista no radar" e "Pauta", além de acesso ao leitor de QR code.
+- **Composer:** gerador do post em canvas (formatos Cabine e Cédula), com seleção de motivos nominais, oponente ou lista de nomes, atualizando a prévia em tempo real.
+- **Compartilhar (Pronto):** entrega do link curto sem estado, exibição do QR code e botões de exportação direta para WhatsApp, Stories 9:16, download de imagem (1080x1350) e cartela de adesivos A4 para impressão.
+- **Link receiver:** tela acessada por quem abre um link compartilhado (`#/nao/<id>` ou `#/voto/<id>`), exibindo o banner de manifestação individual de eleitor, a imagem do post, a legenda correspondente, a prova nominal com links oficiais e botão de remix ("Fazer o meu").
+- **Radar:** visão analítica das candidaturas no radar de votações contrárias ao eleitor, agrupadas por partido, por pauta ou em ranking decrescente.
+- **Escanear:** leitor de QR code integrado usando `BarcodeDetector` via câmera do dispositivo ou entrada manual de link.
 
-`build-pokedex.mjs` cruza as candidaturas com os deputados **por CPF**, que é chave exata e dispensa casamento por nome. O CPF entra pelo `.cache/tse/cpf-sq.json` (fora do git, escrito por `fetch-candidatos-2026.mjs`) e pelos cadastros da API da Câmara (`.cache/camara/deputados-cpf.json`), e nunca é gravado em `data/`. O resultado são 28 arquivos por unidade eleitoral mais um índice:
+### Formato de links sem estado
 
-| arquivo | conteúdo | tamanho |
-| --- | --- | --- |
-| `data/dex/indice.json` | cargos, partidos, badges, eixos editoriais, lista de UFs | 12 KB (3 KB gzip) |
-| `data/dex/SP.json` | a maior UF, 2.618 candidaturas | 252 KB (66 KB gzip) |
-| `data/dex/AC.json` | a menor, 385 candidaturas | 44 KB (11 KB gzip) |
+Os links gerados (`#/nao/<id>` e `#/voto/<id>`) são completamente sem estado: carregam apenas as decisões do eleitor empacotadas em Base32 Crockford (`ALFABETO = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"`), que são resolvidas em tempo de execução contra o conjunto público de dados:
 
-O service worker pré-carrega só a casca e o índice. Os arquivos por estado entram no cache no primeiro uso, porque o país inteiro são 2 MB e o eleitor precisa de um estado só. As fotos nunca são pré-carregadas.
+| Tipo | Descrição | Campos e bits                                                          | Chars              |
+| ---- | --------- | ---------------------------------------------------------------------- | ------------------ |
+| `C`  | Candidato | modelo(1) + motivos(8) + ref(27) = 36 bits                             | 1+8 (9 chars)      |
+| `D`  | Duelo     | modelo(1) + refNao(27) + refSim(27) = 55 bits                          | 1+11 (12 chars)    |
+| `P`  | Pauta     | modelo(1) + eixos(8) + n(4) + n×ref(27) = 13+27n bits                  | 1+ceil((13+27n)/5) |
+| `L`  | Lista     | modelo(1) + eixos(8) + n(4) + n×ref(27) = 13+27n bits (eixos opcional) | 1+ceil((13+27n)/5) |
 
-### Quem tem ficha, e quem não tem
+Cada referência `ref(sq)` compacta a Unidade Eleitoral (5 bits, 1 a 28) e a sequência do candidato (22 bits), viabilizando identificadores extremamente concisos e sem necessidade de armazenamento centralizado.
 
-Das 20.765 candidaturas, **861 têm histórico de votação** no Congresso entre 2017 e 2026 — 791 na Câmara e 91 no Senado, com 21 que passaram pelas duas casas. São os deputados e senadores em exercício que disputam a reeleição ou outro cargo, mais os que passaram pelo Congresso no período. As outras 19.904 não têm ficha, e isso é a decisão de produto mais importante do catálogo: **ausência de registro nunca vira nota zero**. Quem nunca foi deputado federal nem senador aparece como "Sem histórico no Congresso", que é informação, não demérito. Inventar um número para 96% das candidaturas destruiria a credibilidade do resto.
+### Perfis de candidatura
 
-A mesma regra vale um nível abaixo: quem tem ficha mas não votou numa votação específica recebe "sem registro" naquele eixo, não 0%. Renan Filho (AL) é o caso exemplar: tem 13 participações nominais no Senado no período, mas nenhuma delas cai nas 19 votações curadas, então os eixos dele aparecem em branco.
+O pipeline de dados classifica as candidaturas em três perfis objetivos:
 
-### Os eixos são opinião declarada
+1. **Reeleição (`reeleicao`):** parlamentares que registraram votação nominal na Câmara ou no Senado na legislatura iniciada em 01/02/2023, concorrendo ao mesmo cargo, ou candidatos ao governo estadual que declararam a ocupação `GOVERNADOR`.
+2. **Já teve mandato (`outro`):** candidaturas com histórico de votação no Congresso anterior à legislatura atual ou ocupação política prévia declarada (ministro, prefeito, vereador).
+3. **Estreante (`novo`):** candidaturas sem registro prévio de votação nominal federal nem histórico de mandatos políticos declarados. Ausência de registro não é nota negativa.
 
-`data/curadoria.json` é a camada editorial, e é curta de propósito. Cada eixo declara uma posição e aponta as votações nominais que a sustentam; placares, datas e votos individuais vêm de `data/votacoes-camara.json` e de `data/votacoes-senado.json`, e o build aborta se um id curado não existir lá.
+_Nota sobre os dados do TSE 2026:_ O arquivo do TSE não disponibiliza a coluna `ST_REELEICAO`, de modo que a reeleição para cargos do Executivo baseia-se na ocupação autodeclarada ao tribunal.
 
-- **Blindagem parlamentar** — PEC 3/2021, dois turnos. Votar Sim é votar a favor do privilégio. Discrimina de verdade: minoria de 27,5%, o PT rachou 12 a 51 e o PSDB 6 a 6. **339 candidaturas de 2026 votaram a favor da blindagem.**
-- **Jornada de trabalho** — PEC 221/2019, dois turnos, o veículo do fim da escala 6x1 aprovado em 27/05/2026. Aqui só 21 candidaturas votaram contra, e a maioria delas em Santa Catarina. Com minoria abaixo de 5% o eixo não gradua todo mundo: ele identifica os poucos que se expuseram.
-- **Contexto, sem pontuar** — PL 1087/2025, isenção do IR e tributação de altas rendas, aprovado **493 a 0**. Não existe voto contrário para pontuar. Fica visível e marcado como não pontuável, porque quando todos votam igual o placar não diz nada sobre ninguém.
+### Critério do Radar
 
-A cor de cada voto segue o **significado no eixo**, não o código bruto: o mesmo "Sim" aparece vermelho na blindagem e verde na jornada. Colorir por Sim/Não faria "votou a favor da blindagem" parecer elogio.
+Uma candidatura entra no radar quando acumula 3 ou mais votos contrários aos direitos do eleitor nos eixos avaliados.
 
-A fidelidade partidária aparece como fato, nunca como virtude: "votou com o próprio partido em 96% das 262 votações mensuráveis" (Flávio Bolsonaro, no Senado). Voto independente não é automaticamente bom nem ruim, e o eixo é que dá direção.
+## Conformidade eleitoral
 
-### O que o app faz
+O projeto Voto Secreto foi concebido com rigorosa observância à legislação eleitoral brasileira, em especial a Resolução TSE nº 23.610/2019 (art. 28):
 
-Busca por nome ou número (sem acento, sem caixa), filtro por cargo e por perfil de ocupação, e um recorte de "só quem já votou no Congresso". Cada carta abre uma ficha com a composição da coligação traduzida em "votar aqui também ajuda a eleger", cada votação curada com placar, o voto daquela pessoa e link para a ata oficial — na Câmara ou no Senado, conforme a casa da votação. "Minha lista" guarda candidaturas no `localStorage` e funciona como cola de votação sem sinal nenhum, que é a situação real na fila da seção eleitoral.
-
-Os badges de perfil saem da ocupação declarada ao TSE e cobrem 73,5% das candidaturas. Ocupações sem carga política clara (OUTROS, ENGENHEIRO, ESTUDANTE, DONA DE CASA) ficam sem badge de propósito: um badge só vale se significar algo.
+1. **Manifestação estritamente em primeira pessoa:** Toda linguagem da interface e dos cartazes gerados adota a primeira pessoa (`NÃO VOTO`, `VOTO`, `meu voto não vai pro…`). O modo imperativo (`não vote`, `vote em`) é proibido em todo o projeto.
+2. **Manifestação individual e dados públicos:** O autor de qualquer manifestação é o próprio cidadão no exercício de sua liberdade de expressão. O site apenas renderiza dados públicos e não armazena votos, identidades nem contadores.
+3. **Vedação a termos desonrosos:** Termos desonrosos ou injuriosos são banidos da cópia do produto. A avaliação apoia-se unicamente em registros oficiais de votação nominal.
+4. **Sem impulsionamento ou disparos em massa:** O projeto não utiliza anúncios pagos, pixels de conversão ou ferramentas automatizadas de mensageria.
+5. **Aviso legal para o dia da eleição:** A aplicação alerta explicitamente sobre a vedação legal a disparos e distribuição de panfletagem digital no dia da eleição, data em que apenas a manifestação individual e silenciosa é permitida.
+6. **Garantia constitucional e legal:** A manifestação pacífica e individual do eleitor sobre suas escolhas e rejeições eleitorais é assegurada pelo art. 28 da Resolução TSE nº 23.610/2019.
 
 ## Rodando localmente
 
@@ -291,8 +422,18 @@ Nenhuma das duas páginas funciona abrindo o arquivo direto pelo sistema de arqu
 python3 -m http.server 8000
 ```
 
-O mural da PEC fica em <http://localhost:8000> e o catálogo em <http://localhost:8000/dex.html>.
+O mural da PEC fica em <http://localhost:8000> e o app em <http://localhost:8000/dex.html>.
+
+### Verificações e testes
+
+```bash
+npm test                 # Executa os testes automatizados (tests/share-link.test.mjs)
+npm run lint             # Executa o ESLint em todo o repositório
+npm run format:check     # Verifica conformidade com o Prettier
+npm run check:refs       # Verifica se todos os assets referenciados existem no disco
+npm run check:copy       # Verifica conformidade legal com as regras de cópia de AGENTS.md
+```
 
 ## Atribuição
 
-Dados das votações: [API de Dados Abertos da Câmara dos Deputados](https://dadosabertos.camara.leg.br), termo de reutilização e licenciamento paralelo da Câmara, e [Serviço de Dados Abertos do Senado Federal](https://legis.senado.leg.br/dadosabertos). Dados das candidaturas de 2026: [Portal de Dados Abertos do TSE](https://dadosabertos.tse.jus.br). Ideia e divulgação original: vídeo ["NÃO VOTE neles! A lista dos Deputados que votaram para se BLINDAR"](https://www.youtube.com/watch?v=aDjuRLF4cIo), de Gabriel Salazar.
+Dados das votações: [API de Dados Abertos da Câmara dos Deputados](https://dadosabertos.camara.leg.br), termo de reutilização e licenciamento paralelo da Câmara, e [Serviço de Dados Abertos do Senado Federal](https://legis.senado.leg.br/dadosabertos). Dados das candidaturas de 2026: [Portal de Dados Abertos do TSE](https://dadosabertos.tse.jus.br). Ideia e divulgação original: [vídeo de Gabriel Salazar sobre a PEC da Blindagem](https://www.youtube.com/watch?v=aDjuRLF4cIo).

@@ -17,10 +17,10 @@ A lista do site vem exclusivamente da API de Dados Abertos da Câmara dos Deputa
 
 A narração diz: "366 deputados se envolveram nessa falcatrua votando sim em um ou em todos os processos da votação. A PEC passou por quatro votações." Os registros oficiais mostram que 366 é a união dos votos Sim em três votações nominais:
 
-| Votação | id na API | Sim |
-|---|---|---|
-| 1º turno da PEC 3/2021 (16/09, 21h04) | `2270800-135` | 353 |
-| 2º turno da PEC 3/2021 (16/09, 23h27) | `2270800-160` | 344 |
+| Votação                                                           | id na API     | Sim |
+| ----------------------------------------------------------------- | ------------- | --- |
+| 1º turno da PEC 3/2021 (16/09, 21h04)                             | `2270800-135` | 353 |
+| 2º turno da PEC 3/2021 (16/09, 23h27)                             | `2270800-160` | 344 |
 | Emenda Aglutinativa nº 1, que restabeleceu o voto secreto (17/09) | `2270800-175` | 314 |
 
 - União dos Sim nas três votações acima: **366** — exatamente o número do vídeo. (Somando também o destaque do voto secreto suprimido em 16/09, `2270800-165`, Sim 296, a união vira 367, ou seja, o número publicado corresponde às três.)

@@ -55,12 +55,21 @@ O arquivo segue a mesma estrutura posicional de `data/votacoes-camara.json`:
   },
   "minimoBancadaAferivel": 3,
   "partidos": ["PL", "PT", "PSD", "MDB", "UNIÃO", "..."],
-  "colunasSenador": ["id", "nome", "nomeCompleto", "uf", "participacoes", "votosComMaioriaDoPartido", "votosEmBancadaAferivel"],
-  "senadores": [
-    [5894, "Flávio Bolsonaro", "Flávio Nantes Bolsonaro", "RJ", 1142, 1080, 1100]
+  "colunasSenador": [
+    "id",
+    "nome",
+    "nomeCompleto",
+    "uf",
+    "participacoes",
+    "votosComMaioriaDoPartido",
+    "votosEmBancadaAferivel"
   ],
+  "senadores": [[5894, "Flávio Bolsonaro", "Flávio Nantes Bolsonaro", "RJ", 1142, 1080, 1100]],
   "filiacoes": [
-    [[0, 0], [1, 200]]
+    [
+      [0, 0],
+      [1, 200]
+    ]
   ],
   "colunas": [
     "id",
@@ -81,12 +90,30 @@ O arquivo segue a mesma estrutura posicional de `data/votacoes-camara.json`:
     "votos"
   ],
   "votacoes": [
-    ["SF-6818", "2024-02-20T14:00:00", "PLEN", "PL 2253/2022", true, 62, 2, 0, 0, 1, 65, 0.0312, 0.95, 2, "Votação nominal...", "1110002..."]
+    [
+      "SF-6818",
+      "2024-02-20T14:00:00",
+      "PLEN",
+      "PL 2253/2022",
+      true,
+      62,
+      2,
+      0,
+      0,
+      1,
+      65,
+      0.0312,
+      0.95,
+      2,
+      "Votação nominal...",
+      "1110002..."
+    ]
   ]
 }
 ```
 
 ### Mapeamento do Código de Voto
+
 - `"Sim"` -> `1`
 - `"Não"` / `"Nao"` -> `2`
 - `"Abstenção"` / `"Abstencao"` -> `3`

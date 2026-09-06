@@ -6,12 +6,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const API = "https://dadosabertos.camara.leg.br/api/v2";
 const HEADERS = { accept: "application/json" };
 
-const TURNOS = [
-  { turno: 1, votacaoId: "2270800-135" },
-  { turno: 2, votacaoId: "2270800-160" },
+const ROUNDS = [
+  { round: 1, rollCallId: "2270800-135" },
+  { round: 2, rollCallId: "2270800-160" },
 ];
 
-const VOTO = { "Sim": "Sim", "Não": "Nao", "Abstenção": "Abstencao" };
+const VOTE = { Sim: "Sim", Não: "Nao", Abstenção: "Abstencao" };
 
 async function getJson(url) {
   const res = await fetch(url, { headers: HEADERS });
@@ -21,208 +21,186 @@ async function getJson(url) {
   return res.json();
 }
 
-function normalizeVoto(tipoVoto) {
-  const voto = VOTO[tipoVoto];
-  if (voto === undefined) {
-    throw new Error(`tipoVoto desconhecido: ${JSON.stringify(tipoVoto)}`);
+function normalizeVote(voteType) {
+  const vote = VOTE[voteType];
+  if (vote === undefined) {
+    throw new Error(`tipoVoto desconhecido: ${JSON.stringify(voteType)}`);
   }
-  return voto;
+  return vote;
 }
 
-function contar(votos, valor) {
-  return votos.filter((voto) => voto === valor).length;
+function countVotes(votes, value) {
+  return votes.filter((vote) => vote === value).length;
 }
 
-async function fetchTurno({ turno, votacaoId }) {
-  const votacao = (await getJson(`${API}/votacoes/${votacaoId}`)).dados;
-  if (votacao === undefined) {
-    throw new Error(`votação ${votacaoId} não encontrada na API`);
+async function fetchRound({ round, rollCallId }) {
+  const rollCall = (await getJson(`${API}/votacoes/${rollCallId}`)).dados;
+  if (rollCall === undefined) {
+    throw new Error(`votação ${rollCallId} não encontrada na API`);
   }
-  const registros = (await getJson(`${API}/votacoes/${votacaoId}/votos`)).dados;
-  if (!Array.isArray(registros)) {
-    throw new Error(`resposta inesperada para os votos da votação ${votacaoId}`);
+  const records = (await getJson(`${API}/votacoes/${rollCallId}/votos`)).dados;
+  if (!Array.isArray(records)) {
+    throw new Error(`resposta inesperada para os votos da votação ${rollCallId}`);
   }
-  const votosPorDeputado = new Map();
-  for (const registro of registros) {
-    const id = registro.deputado_.id;
-    if (votosPorDeputado.has(id)) {
-      throw new Error(`deputado ${id} aparece mais de uma vez no turno ${turno}`);
+  const votesByDeputy = new Map();
+  for (const record of records) {
+    const id = record.deputado_.id;
+    if (votesByDeputy.has(id)) {
+      throw new Error(`deputado ${id} aparece mais de uma vez no turno ${round}`);
     }
-    votosPorDeputado.set(id, {
-      voto: normalizeVoto(registro.tipoVoto),
-      deputado_: registro.deputado_,
+    votesByDeputy.set(id, {
+      voto: normalizeVote(record.tipoVoto),
+      deputado_: record.deputado_,
     });
   }
-  const votos = [...votosPorDeputado.values()].map((registro) => registro.voto);
-  const sim = contar(votos, "Sim");
-  const nao = contar(votos, "Nao");
-  const abstencao = contar(votos, "Abstencao");
+  const votes = [...votesByDeputy.values()].map((record) => record.voto);
+  const sim = countVotes(votes, "Sim");
+  const nao = countVotes(votes, "Nao");
+  const abstencao = countVotes(votes, "Abstencao");
   return {
-    turno,
-    registro: {
-      turno,
-      votacaoId,
-      dataHora: votacao.dataHoraRegistro,
-      descricao: votacao.descricao,
+    round,
+    record: {
+      turno: round,
+      votacaoId: rollCallId,
+      dataHora: rollCall.dataHoraRegistro,
+      descricao: rollCall.descricao,
       sim,
       nao,
       abstencao,
       ausente: 513 - (sim + nao + abstencao),
     },
-    votosPorDeputado,
+    votesByDeputy,
   };
 }
 
 function csvEscape(value) {
-  const texto = String(value);
-  if (texto.includes(",") || texto.includes('"')) {
-    return `"${texto.replaceAll('"', '""')}"`;
+  const text = String(value);
+  if (text.includes(",") || text.includes('"')) {
+    return `"${text.replaceAll('"', '""')}"`;
   }
-  return texto;
+  return text;
 }
 
-const [proposicaoBody, ...turnos] = await Promise.all([
+const [billBody, ...rounds] = await Promise.all([
   getJson(`${API}/proposicoes/2270800`),
-  ...TURNOS.map(fetchTurno),
+  ...ROUNDS.map(fetchRound),
 ]);
-const proposicaoApi = proposicaoBody.dados;
-if (proposicaoApi === undefined) {
+const billApi = billBody.dados;
+if (billApi === undefined) {
   throw new Error("proposição 2270800 não encontrada na API");
 }
 
 const ids = new Set();
-for (const { votosPorDeputado } of turnos) {
-  for (const id of votosPorDeputado.keys()) {
+for (const { votesByDeputy } of rounds) {
+  for (const id of votesByDeputy.keys()) {
     ids.add(id);
   }
 }
 
-const porPartido = new Map();
-const deputados = [...ids]
+const byParty = new Map();
+const deputies = [...ids]
   .map((id) => {
-    const t1 = turnos[0].votosPorDeputado.get(id);
-    const t2 = turnos[1].votosPorDeputado.get(id);
-    const identidade = (t1 ?? t2).deputado_;
-    const turno1 = t1 ? t1.voto : "Ausente";
-    const turno2 = t2 ? t2.voto : "Ausente";
+    const t1 = rounds[0].votesByDeputy.get(id);
+    const t2 = rounds[1].votesByDeputy.get(id);
+    const identity = (t1 ?? t2).deputado_;
+    const round1 = t1 ? t1.voto : "Ausente";
+    const round2 = t2 ? t2.voto : "Ausente";
     return {
       id,
-      nome: identidade.nome,
-      partido: identidade.siglaPartido,
-      uf: identidade.siglaUf,
-      urlFoto: identidade.urlFoto,
+      nome: identity.nome,
+      partido: identity.siglaPartido,
+      uf: identity.siglaUf,
+      urlFoto: identity.urlFoto,
       urlPerfil: `https://www.camara.leg.br/deputados/${id}`,
-      email: identidade.email,
-      turno1,
-      turno2,
-      votouSim: turno1 === "Sim" || turno2 === "Sim",
+      email: identity.email,
+      turno1: round1,
+      turno2: round2,
+      votouSim: round1 === "Sim" || round2 === "Sim",
     };
   })
-  .sort(
-    (a, b) =>
-      a.partido.localeCompare(b.partido, "pt-BR") ||
-      a.nome.localeCompare(b.nome, "pt-BR"),
-  );
-for (const deputado of deputados) {
-  if (deputado.votouSim) {
-    porPartido.set(deputado.partido, (porPartido.get(deputado.partido) ?? 0) + 1);
+  .sort((a, b) => a.partido.localeCompare(b.partido, "pt-BR") || a.nome.localeCompare(b.nome, "pt-BR"));
+for (const deputy of deputies) {
+  if (deputy.votouSim) {
+    byParty.set(deputy.partido, (byParty.get(deputy.partido) ?? 0) + 1);
   }
 }
 
-const simEmAlgumTurno = deputados.filter((d) => d.votouSim).length;
-const simNosDoisTurnos = deputados.filter(
-  (d) => d.turno1 === "Sim" && d.turno2 === "Sim",
-).length;
-const ESPERADO = {
-  turno1: { sim: 353, nao: 134, abstencao: 1 },
-  turno2: { sim: 344, nao: 133, abstencao: 0 },
-  totalDeputados: 493,
-  simEmAlgumTurno: 356,
-  simNosDoisTurnos: 341,
+const yesInAnyRound = deputies.filter((d) => d.votouSim).length;
+const yesInBothRounds = deputies.filter((d) => d.turno1 === "Sim" && d.turno2 === "Sim").length;
+
+const EXPECTED = {
+  round1: { sim: 353, nao: 134, abstencao: 1 },
+  round2: { sim: 344, nao: 133, abstencao: 0 },
+  totalDeputies: 493,
+  yesInAnyRound: 356,
+  yesInBothRounds: 341,
 };
 
-function conferir(esperado, obtido, rotulo) {
-  for (const chave of Object.keys(esperado)) {
-    if (esperado[chave] !== obtido[chave]) {
+function verifyVotes(expected, obtained, label) {
+  for (const key of Object.keys(expected)) {
+    if (expected[key] !== obtained[key]) {
       throw new Error(
-        `${rotulo}.${chave}: esperado ${esperado[chave]}, obtido ${obtido[chave]}. ` +
-          "Se a Câmara corrigiu o registro oficial, confirme a mudança, atualize ESPERADO e os totais citados no site.",
+        `${label}.${key}: esperado ${expected[key]}, obtido ${obtained[key]}. ` +
+          "Se a Câmara corrigiu o registro oficial, confirme a mudança, atualize EXPECTED e os totais citados no site.",
       );
     }
   }
 }
 
-conferir(ESPERADO.turno1, turnos[0].registro, "turno 1");
-conferir(ESPERADO.turno2, turnos[1].registro, "turno 2");
-conferir(
+verifyVotes(EXPECTED.round1, rounds[0].record, "turno 1");
+verifyVotes(EXPECTED.round2, rounds[1].record, "turno 2");
+verifyVotes(
   {
-    totalDeputados: ESPERADO.totalDeputados,
-    simEmAlgumTurno: ESPERADO.simEmAlgumTurno,
-    simNosDoisTurnos: ESPERADO.simNosDoisTurnos,
+    totalDeputies: EXPECTED.totalDeputies,
+    yesInAnyRound: EXPECTED.yesInAnyRound,
+    yesInBothRounds: EXPECTED.yesInBothRounds,
   },
-  { totalDeputados: deputados.length, simEmAlgumTurno, simNosDoisTurnos },
+  { totalDeputies: deputies.length, yesInAnyRound, yesInBothRounds },
   "resumo",
 );
 
-const dados = {
+const data = {
   proposicao: {
     id: 2270800,
-    sigla: `${proposicaoApi.siglaTipo} ${proposicaoApi.numero}/${proposicaoApi.ano}`,
+    sigla: `${billApi.siglaTipo} ${billApi.numero}/${billApi.ano}`,
     apelido: "PEC da Blindagem",
-    ementa: proposicaoApi.ementa,
-    urlFicha:
-      "https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800",
+    ementa: billApi.ementa,
+    urlFicha: "https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800",
   },
   fonte: {
     api: API,
     coletadoEm: new Date().toISOString(),
   },
-  votacoes: turnos.map((t) => t.registro),
+  votacoes: rounds.map((r) => r.record),
   resumo: {
-    totalDeputados: deputados.length,
-    simEmAlgumTurno,
-    simNosDoisTurnos,
+    totalDeputados: deputies.length,
+    simEmAlgumTurno: yesInAnyRound,
+    simNosDoisTurnos: yesInBothRounds,
   },
-  deputados,
+  deputados: deputies,
 };
 
 mkdirSync(join(ROOT, "data"), { recursive: true });
-writeFileSync(
-  join(ROOT, "data", "votos-pec-blindagem.json"),
-  `${JSON.stringify(dados, null, 2)}\n`,
-);
+writeFileSync(join(ROOT, "data", "votos-pec-blindagem.json"), `${JSON.stringify(data, null, 2)}\n`);
 
-const cabecalho = "id,nome,partido,uf,turno1,turno2,votou_sim,url_perfil,url_foto";
-const linhas = deputados.map((d) =>
-  [
-    d.id,
-    d.nome,
-    d.partido,
-    d.uf,
-    d.turno1,
-    d.turno2,
-    d.votouSim,
-    d.urlPerfil,
-    d.urlFoto,
-  ]
+const header = "id,nome,partido,uf,turno1,turno2,votou_sim,url_perfil,url_foto";
+const rows = deputies.map((d) =>
+  [d.id, d.nome, d.partido, d.uf, d.turno1, d.turno2, d.votouSim, d.urlPerfil, d.urlFoto]
     .map(csvEscape)
     .join(","),
 );
-writeFileSync(
-  join(ROOT, "data", "votos-pec-blindagem.csv"),
-  `\uFEFF${[cabecalho, ...linhas].join("\n")}\n`,
-);
+writeFileSync(join(ROOT, "data", "votos-pec-blindagem.csv"), `\uFEFF${[header, ...rows].join("\n")}\n`);
 
 console.log("PEC 3/2021 — PEC da Blindagem (Câmara dos Deputados)");
-for (const { registro } of turnos) {
+for (const { record } of rounds) {
   console.log(
-    `Turno ${registro.turno} (${registro.dataHora}): Sim=${registro.sim} Não=${registro.nao} Abstenção=${registro.abstencao} Ausente=${registro.ausente}`,
+    `Turno ${record.turno} (${record.dataHora}): Sim=${record.sim} Não=${record.nao} Abstenção=${record.abstencao} Ausente=${record.ausente}`,
   );
 }
-console.log(`Total de deputados: ${deputados.length}`);
-console.log(`Sim em algum turno: ${simEmAlgumTurno}`);
-console.log(`Sim nos dois turnos: ${simNosDoisTurnos}`);
+console.log(`Total de deputados: ${deputies.length}`);
+console.log(`Sim em algum turno: ${yesInAnyRound}`);
+console.log(`Sim nos dois turnos: ${yesInBothRounds}`);
 console.log("Partidos dos que votaram Sim:");
-for (const [partido, total] of [...porPartido.entries()].sort()) {
-  console.log(`  ${partido}: ${total}`);
+for (const [party, total] of [...byParty.entries()].sort()) {
+  console.log(`  ${party}: ${total}`);
 }

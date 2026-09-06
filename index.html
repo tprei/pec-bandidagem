@@ -1,104 +1,146 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quem votou a favor da PEC da Blindagem — Mural da Vergonha</title>
-  <meta name="description" content="Lista dos deputados federais que votaram Sim na PEC 3/2021 (PEC da Blindagem) na Câmara dos Deputados, com filtros por nome, partido, estado e turno.">
-  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 6.2 3.9 10.4 9 12 5.1-1.6 9-5.8 9-12V5l-9-4z" fill="%231a1512"/><path d="M12 3.2 5 6.2v4.8c0 4.9 3 8.4 7 9.9 4-1.5 7-5 7-9.9V6.2l-7-3z" fill="%23f4efe4"/><path d="M12 5.2 7 7.3v3.7c0 3.7 2.2 6.4 5 7.7V5.2z" fill="%238f1d1d"/></svg>'>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Libre+Franklin:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
-</head>
-<body>
-  <a class="skip-link" href="#lista">Pular para a lista de deputados</a>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quem votou a favor da PEC da Blindagem — votação nominal da Câmara</title>
+    <meta
+      name="description"
+      content="Lista dos deputados federais que votaram Sim na PEC 3/2021 (PEC da Blindagem) na Câmara dos Deputados, com filtros por nome, partido, estado e turno."
+    />
+    <link
+      rel="icon"
+      href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 6.2 3.9 10.4 9 12 5.1-1.6 9-5.8 9-12V5l-9-4z" fill="%231a1512"/><path d="M12 3.2 5 6.2v4.8c0 4.9 3 8.4 7 9.9 4-1.5 7-5 7-9.9V6.2l-7-3z" fill="%23f4efe4"/><path d="M12 5.2 7 7.3v3.7c0 3.7 2.2 6.4 5 7.7V5.2z" fill="%238f1d1d"/></svg>'
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Libre+Franklin:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#list">Pular para a lista de deputados</a>
 
-  <header class="container cabecalho">
-    <div class="kicker-faixa">
-      <p class="kicker">Câmara dos Deputados · PEC 3/2021 · Votação Nominal</p>
-    </div>
-    <h1 class="titulo-poster">Quem votou a favor da <span class="pec-vilao">PEC da Blindagem</span></h1>
-    <p class="lede">Em 16 de setembro de 2025, <strong class="destaque-numeral" id="destaque-numeral">—</strong> deputados federais votaram <strong>Sim</strong> à PEC 3/2021 — proposta que tornaria quase impossível abrir processo criminal contra parlamentares — em pelo menos um dos dois turnos.</p>
-    <div class="cartazes-meta">
-      <p class="referencia carimbo-oficial">
-        <span class="carimbo-oficial__selo">Registro Oficial</span>
-        <a href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800" target="_blank" rel="noopener">PEC 3/2021 na íntegra (Câmara) ↗</a>
+    <header class="container header">
+      <div class="kicker-band">
+        <p class="kicker">Câmara dos Deputados · PEC 3/2021 · Votação Nominal</p>
+      </div>
+      <h1 class="poster-title">Quem votou a favor da <span class="pec-villain">PEC da Blindagem</span></h1>
+      <p class="lede">
+        Em 16 de setembro de 2025, <strong class="destaque-numeral" id="destaque-numeral">—</strong> deputados
+        federais votaram <strong>Sim</strong> à PEC 3/2021 — proposta que tornaria quase impossível abrir
+        processo criminal contra parlamentares — em pelo menos um dos dois turnos.
       </p>
-      <aside class="nota nota--arquivada">
-        <span class="nota__selo" aria-hidden="true">ARQUIVADA</span>
-        <span>Em 24/09/2025, a CCJ do Senado rejeitou e arquivou a proposta.</span>
-      </aside>
-      <p class="referencia carimbo-oficial"><span class="carimbo-oficial__selo">Eleições 2026</span><a href="dex.html"><strong>Catálogo 2026</strong>: candidatos do seu estado e o histórico de votações na Câmara ↗</a></p>
-    </div>
-    <noscript>
-      <p class="sem-js">Para usar os filtros interativos, ative o JavaScript — ou consulte a planilha direta em <a href="data/votos-pec-blindagem.csv">data/votos-pec-blindagem.csv</a>.</p>
-    </noscript>
-  </header>
+      <div class="cartazes-meta">
+        <p class="referencia carimbo-oficial">
+          <span class="carimbo-oficial__selo">Registro Oficial</span>
+          <a
+            href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2270800"
+            target="_blank"
+            rel="noopener"
+            >PEC 3/2021 na íntegra (Câmara) ↗</a
+          >
+        </p>
+        <aside class="nota nota--arquivada">
+          <span class="nota__selo" aria-hidden="true">ARQUIVADA</span>
+          <span>Em 24/09/2025, a CCJ do Senado rejeitou e arquivou a proposta.</span>
+        </aside>
+        <p class="referencia carimbo-oficial">
+          <span class="carimbo-oficial__selo">Eleições 2026</span
+          ><a href="dex.html"
+            ><strong>Catálogo 2026</strong>: candidatos do seu estado e o histórico de votações na Câmara ↗</a
+          >
+        </p>
+      </div>
+      <noscript>
+        <p class="sem-js">
+          Para usar os filtros interativos, ative o JavaScript — ou consulte a planilha direta em
+          <a href="data/votos-pec-blindagem.csv">data/votos-pec-blindagem.csv</a>.
+        </p>
+      </noscript>
+    </header>
 
-  <main class="container conteudo">
-    <section class="estatisticas" id="estatisticas" aria-label="Estatísticas das votações" hidden>
-      <div class="estatistica">
-        <span class="estatistica__numero" id="stat-sim-algum">—</span>
-        <span class="estatistica__rotulo">Sim em algum turno</span>
-      </div>
-      <div class="estatistica estatistica--alerta">
-        <span class="estatistica__numero" id="stat-sim-ambos">—</span>
-        <span class="estatistica__rotulo">Sim nos dois turnos</span>
-      </div>
-      <div class="estatistica">
-        <span class="estatistica__numero" id="stat-data">—</span>
-        <span class="estatistica__rotulo">Data da votação</span>
-      </div>
-    </section>
+    <main class="container content">
+      <section class="stats" id="stats" aria-label="Estatísticas das votações" hidden>
+        <div class="estatistica">
+          <span class="estatistica__numero" id="stat-yes-any">—</span>
+          <span class="estatistica__rotulo">Sim em algum turno</span>
+        </div>
+        <div class="estatistica estatistica--alerta">
+          <span class="estatistica__numero" id="stat-yes-both">—</span>
+          <span class="estatistica__rotulo">Sim nos dois turnos</span>
+        </div>
+        <div class="estatistica">
+          <span class="estatistica__numero" id="stat-date">—</span>
+          <span class="estatistica__rotulo">Data da votação</span>
+        </div>
+      </section>
 
-    <section class="barra" id="barra-filtros" hidden aria-label="Filtros da lista">
-      <div class="controle controle--busca">
-        <label for="busca">Buscar por nome</label>
-        <input type="search" id="busca" autocomplete="off" spellcheck="false" placeholder="Digite o nome do deputado">
-      </div>
-      <div class="controle">
-        <label for="partido">Partido</label>
-        <select id="partido"></select>
-      </div>
-      <div class="controle">
-        <label for="uf">Estado</label>
-        <select id="uf"></select>
-      </div>
-      <div class="controle">
-        <label for="turno">Turno</label>
-        <select id="turno">
-          <option value="qualquer">Sim em algum turno</option>
-          <option value="ambos">Sim nos dois turnos</option>
-          <option value="t1">Sim no 1º turno</option>
-          <option value="t2">Sim no 2º turno</option>
-        </select>
-      </div>
-      <div class="controle">
-        <label for="ordem">Ordenar por</label>
-        <select id="ordem">
-          <option value="partido">Partido</option>
-          <option value="nome">Nome</option>
-          <option value="uf">UF</option>
-        </select>
-      </div>
-      <button type="button" id="limpar" class="botao-limpar">Limpar filtros</button>
-    </section>
+      <section class="filter-bar" id="filter-bar" hidden aria-label="Filtros da lista">
+        <div class="controle controle--busca">
+          <label for="search">Buscar por nome</label>
+          <input
+            type="search"
+            id="search"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Digite o nome do deputado"
+          />
+        </div>
+        <div class="controle">
+          <label for="party">Partido</label>
+          <select id="party"></select>
+        </div>
+        <div class="controle">
+          <label for="state">Estado</label>
+          <select id="state"></select>
+        </div>
+        <div class="controle">
+          <label for="round">Turno</label>
+          <select id="round">
+            <option value="qualquer">Sim em algum turno</option>
+            <option value="ambos">Sim nos dois turnos</option>
+            <option value="t1">Sim no 1º turno</option>
+            <option value="t2">Sim no 2º turno</option>
+          </select>
+        </div>
+        <div class="controle">
+          <label for="sort">Ordenar por</label>
+          <select id="sort">
+            <option value="partido">Partido</option>
+            <option value="nome">Nome</option>
+            <option value="uf">UF</option>
+          </select>
+        </div>
+        <button type="button" id="clear" class="botao-limpar">Limpar filtros</button>
+      </section>
 
-    <nav class="chips" id="chips" hidden aria-label="Resumo por partido"></nav>
-    <p class="legenda" id="legenda" hidden>Vermelho mais intenso = votou a favor nos dois turnos; verde = votou contra.</p>
+      <nav class="chips" id="chips" hidden aria-label="Resumo por partido"></nav>
+      <p class="legend" id="legend" hidden>
+        Vermelho mais intenso = votou a favor nos dois turnos; verde = votou contra.
+      </p>
 
-    <p class="contador" id="contador" role="status" aria-live="polite"></p>
-    <ul class="linhas" id="lista"></ul>
-    <section class="painel-status" id="painel-status" aria-live="polite">
-      <p class="carregando" id="carregando">Carregando os dados das duas votações…</p>
-    </section>
-  </main>
+      <p class="counter" id="counter" role="status" aria-live="polite"></p>
+      <ul class="linhas" id="list"></ul>
+      <section class="status-panel" id="status-panel" aria-live="polite">
+        <p class="loading" id="loading">Carregando os dados das duas votações…</p>
+      </section>
+    </main>
 
-  <footer class="container rodape">
-    <p>Dados públicos obtidos da <a href="https://dadosabertos.camara.leg.br" target="_blank" rel="noopener">API de Dados Abertos da Câmara dos Deputados</a>. Registros nominais das votações de 16/09/2025, conferidos a partir da divulgação feita no <a href="https://www.youtube.com/watch?v=aDjuRLF4cIo" target="_blank" rel="noopener">vídeo “NÃO VOTE neles!”</a>, de Gabriel Salazar.</p>
-  </footer>
+    <footer class="container rodape">
+      <p>
+        Dados públicos obtidos da
+        <a href="https://dadosabertos.camara.leg.br" target="_blank" rel="noopener"
+          >API de Dados Abertos da Câmara dos Deputados</a
+        >. Registros nominais das votações de 16/09/2025, conferidos a partir da divulgação feita no
+        <a href="https://www.youtube.com/watch?v=aDjuRLF4cIo" target="_blank" rel="noopener"
+          >vídeo de Gabriel Salazar sobre a votação</a
+        >, de Gabriel Salazar.
+      </p>
+    </footer>
 
-  <script type="module" src="assets/app.js"></script>
-</body>
+    <script type="module" src="assets/app.js"></script>
+  </body>
 </html>
