@@ -1,48 +1,49 @@
-export const fontes = typeof document !== "undefined" && document.fonts
-  ? Promise.allSettled([
-      document.fonts.load('40px "Anton"'),
-      document.fonts.load('800 20px "Archivo"'),
-      document.fonts.load('600 20px "Archivo"'),
-      document.fonts.load('40px "DSEG7Classic"'),
-    ])
-  : Promise.resolve();
+export const fontsReady =
+  typeof document !== "undefined" && document.fonts
+    ? Promise.allSettled([
+        document.fonts.load('40px "Anton"'),
+        document.fonts.load('800 20px "Archivo"'),
+        document.fonts.load('600 20px "Archivo"'),
+        document.fonts.load('40px "DSEG7Classic"'),
+      ])
+    : Promise.resolve();
 
-export function ajustar(ctx, texto, maxLargura) {
-  if (ctx.measureText(texto).width <= maxLargura) return texto;
-  let cortado = texto;
-  while (cortado.length > 1 && ctx.measureText(`${cortado}…`).width > maxLargura) {
-    cortado = cortado.slice(0, -1).trimEnd();
+export function fitText(ctx, text, maxWidth) {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let truncated = text;
+  while (truncated.length > 1 && ctx.measureText(`${truncated}…`).width > maxWidth) {
+    truncated = truncated.slice(0, -1).trimEnd();
   }
-  return `${cortado}…`;
+  return `${truncated}…`;
 }
 
-export function envolver(ctx, texto, maxLargura, maxLinhas) {
-  const linhas = [];
-  let atual = "";
-  for (const palavra of String(texto).split(/\s+/).filter(Boolean)) {
-    if (atual === "") {
-      atual = palavra;
-    } else if (ctx.measureText(`${atual} ${palavra}`).width <= maxLargura) {
-      atual = `${atual} ${palavra}`;
+export function wrapText(ctx, text, maxWidth, maxLines) {
+  const lines = [];
+  let current = "";
+  for (const word of String(text).split(/\s+/).filter(Boolean)) {
+    if (current === "") {
+      current = word;
+    } else if (ctx.measureText(`${current} ${word}`).width <= maxWidth) {
+      current = `${current} ${word}`;
     } else {
-      linhas.push(atual);
-      atual = palavra;
+      lines.push(current);
+      current = word;
     }
   }
-  if (atual !== "") linhas.push(atual);
-  if (linhas.length > maxLinhas) {
-    linhas.length = maxLinhas;
-    let ultima = linhas[maxLinhas - 1];
-    while (ultima !== "" && ctx.measureText(`${ultima}…`).width > maxLargura) {
-      ultima = ultima.slice(0, -1).trimEnd();
+  if (current !== "") lines.push(current);
+  if (lines.length > maxLines) {
+    lines.length = maxLines;
+    let last = lines[maxLines - 1];
+    while (last !== "" && ctx.measureText(`${last}…`).width > maxWidth) {
+      last = last.slice(0, -1).trimEnd();
     }
-    linhas[maxLinhas - 1] = `${ultima}…`;
+    lines[maxLines - 1] = `${last}…`;
   }
-  return linhas;
+  return lines;
 }
 
-export function retanguloArredondado(ctx, x, y, w, h, raio) {
-  const r = Math.min(raio, w / 2, h / 2);
+export function roundedRect(ctx, x, y, w, h, radius) {
+  const r = Math.min(radius, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -52,28 +53,28 @@ export function retanguloArredondado(ctx, x, y, w, h, raio) {
   ctx.closePath();
 }
 
-export function desenharCapa(ctx, img, x, y, w, h) {
+export function drawCover(ctx, img, x, y, w, h) {
   if (!img) return;
-  const alvo = w / h;
-  const origem = img.naturalWidth / img.naturalHeight;
+  const target = w / h;
+  const source = img.naturalWidth / img.naturalHeight;
   let sw = img.naturalWidth;
   let sh = img.naturalHeight;
   let sx = 0;
   let sy = 0;
-  if (origem > alvo) {
-    sw = img.naturalHeight * alvo;
+  if (source > target) {
+    sw = img.naturalHeight * target;
     sx = (img.naturalWidth - sw) / 2;
   } else {
-    sh = img.naturalWidth / alvo;
+    sh = img.naturalWidth / target;
     sy = (img.naturalHeight - sh) / 2;
   }
   ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 }
 
-const cacheImagens = new Map();
-export function carregarImagem(src) {
+const imageCache = new Map();
+export function loadImage(src) {
   if (!src) return Promise.resolve(null);
-  let p = cacheImagens.get(src);
+  let p = imageCache.get(src);
   if (!p) {
     p = new Promise((resolve) => {
       const img = new Image();
@@ -82,14 +83,14 @@ export function carregarImagem(src) {
       img.onerror = () => resolve(null);
       img.src = src;
     });
-    cacheImagens.set(src, p);
+    imageCache.set(src, p);
   }
   return p;
 }
 
-export function desenharQr(ctx, url, x, y, tamanho) {
+export function drawQr(ctx, url, x, y, size) {
   ctx.fillStyle = "#ffffff";
-  ctx.fillRect(x, y, tamanho, tamanho);
+  ctx.fillRect(x, y, size, size);
   if (typeof window === "undefined" || !window.qrcode) return;
   try {
     const qr = window.qrcode(0, "M");
@@ -97,18 +98,13 @@ export function desenharQr(ctx, url, x, y, tamanho) {
     qr.make();
     const count = qr.getModuleCount();
     const pad = 4;
-    const drawSize = tamanho - pad * 2;
+    const drawSize = size - pad * 2;
     const cellSize = drawSize / count;
     ctx.fillStyle = "#131218";
     for (let r = 0; r < count; r++) {
       for (let c = 0; c < count; c++) {
         if (qr.isDark(r, c)) {
-          ctx.fillRect(
-            x + pad + c * cellSize,
-            y + pad + r * cellSize,
-            cellSize + 0.05,
-            cellSize + 0.05,
-          );
+          ctx.fillRect(x + pad + c * cellSize, y + pad + r * cellSize, cellSize + 0.05, cellSize + 0.05);
         }
       }
     }
@@ -117,7 +113,7 @@ export function desenharQr(ctx, url, x, y, tamanho) {
   }
 }
 
-function desenharPlisse(ctx, x, y, w, h, stripe = 18) {
+function drawPleat(ctx, x, y, w, h, stripe = 18) {
   ctx.save();
   ctx.beginPath();
   ctx.rect(x, y, w, h);
@@ -133,31 +129,31 @@ function desenharPlisse(ctx, x, y, w, h, stripe = 18) {
   ctx.restore();
 }
 
-function desenharLogoCabecalho(ctx, x, y, accent, dark) {
+function drawHeaderLogo(ctx, x, y, accent, dark) {
   ctx.save();
   ctx.font = "15px Anton, sans-serif";
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
   ctx.fillStyle = dark ? "#f4efe3" : "#131218";
   ctx.fillText("VOTO ", x, y);
-  const wVoto = ctx.measureText("VOTO ").width;
-  const xSec = x + wVoto;
-  ctx.fillText("SECRETO", xSec, y);
-  const wSec = ctx.measureText("SECRETO").width;
+  const voteWidth = ctx.measureText("VOTO ").width;
+  const secretX = x + voteWidth;
+  ctx.fillText("SECRETO", secretX, y);
+  const secretWidth = ctx.measureText("SECRETO").width;
 
   ctx.strokeStyle = accent;
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(xSec - 2, y + 8);
-  ctx.lineTo(xSec + wSec + 2, y + 6);
+  ctx.moveTo(secretX - 2, y + 8);
+  ctx.lineTo(secretX + secretWidth + 2, y + 6);
   ctx.stroke();
 
   ctx.font = "15px sans-serif";
-  ctx.fillText("🤭", xSec + wSec + 4, y);
+  ctx.fillText("🤭", secretX + secretWidth + 4, y);
   ctx.restore();
 }
 
-function desenharFaixaNao(ctx, x, y, w, h, texto = "NÃO VOTO", fs = 20) {
+function drawRejectBanner(ctx, x, y, w, h, text = "NÃO VOTO", fs = 20) {
   ctx.save();
   ctx.beginPath();
   ctx.rect(x, y, w, h);
@@ -171,18 +167,18 @@ function desenharFaixaNao(ctx, x, y, w, h, texto = "NÃO VOTO", fs = 20) {
   ctx.font = `${fs}px Anton, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(texto, 0, 1);
+  ctx.fillText(text, 0, 1);
   ctx.restore();
 }
 
-function desenharCheckVerde(ctx, x, y, r = 24, bgBorda = "#15131b") {
+function drawGreenCheck(ctx, x, y, r = 24, bgBorder = "#15131b") {
   ctx.save();
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.fillStyle = "#178a4c";
   ctx.fill();
   ctx.lineWidth = 3;
-  ctx.strokeStyle = bgBorda;
+  ctx.strokeStyle = bgBorder;
   ctx.stroke();
   ctx.fillStyle = "#ffffff";
   ctx.font = `800 ${Math.round(r * 1.15)}px Archivo, sans-serif`;
@@ -192,7 +188,7 @@ function desenharCheckVerde(ctx, x, y, r = 24, bgBorda = "#15131b") {
   ctx.restore();
 }
 
-function desenharRetratoOuMonograma(ctx, img, iniciais, matiz, x, y, w, h, grayscale = false) {
+function drawPortraitOrMonogram(ctx, img, initials, hue, x, y, w, h, grayscale = false) {
   ctx.save();
   ctx.beginPath();
   ctx.rect(x, y, w, h);
@@ -201,99 +197,99 @@ function desenharRetratoOuMonograma(ctx, img, iniciais, matiz, x, y, w, h, grays
     if (grayscale) {
       ctx.filter = "grayscale(1) contrast(1.1)";
     }
-    desenharCapa(ctx, img, x, y, w, h);
+    drawCover(ctx, img, x, y, w, h);
   } else {
-    ctx.fillStyle = `hsl(${matiz ?? 260}, 30%, 42%)`;
+    ctx.fillStyle = `hsl(${hue ?? 260}, 30%, 42%)`;
     ctx.fillRect(x, y, w, h);
     ctx.fillStyle = "#f4efe3";
     ctx.font = `800 ${Math.round(Math.min(w * 0.38, h * 0.28))}px Archivo, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(iniciais || "VS", x + w / 2, y + h / 2);
+    ctx.fillText(initials || "VS", x + w / 2, y + h / 2);
   }
   ctx.restore();
 }
 
-function desenharLcdBox(ctx, numero, x, y, fs = 34, bg = "#0d1710", fg = "#b9f0c9") {
+function drawLcdBox(ctx, number, x, y, fs = 34, bg = "#0d1710", fg = "#b9f0c9") {
   ctx.save();
   ctx.font = `${fs}px DSEG7Classic, monospace`;
-  const m = ctx.measureText(String(numero));
+  const m = ctx.measureText(String(number));
   const padX = 8;
   const padY = 4;
   const w = m.width + padX * 2;
   const h = fs + padY * 2;
   ctx.fillStyle = bg;
-  retanguloArredondado(ctx, x, y, w, h, 4);
+  roundedRect(ctx, x, y, w, h, 4);
   ctx.fill();
   ctx.fillStyle = fg;
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.fillText(String(numero), x + padX, y + padY + 1);
+  ctx.fillText(String(number), x + padX, y + padY + 1);
   ctx.restore();
   return { w, h };
 }
 
-export async function desenharCartao(canvas, post) {
-  await fontes;
+export async function drawCard(canvas, post) {
+  await fontsReady;
   canvas.width = 1080;
   canvas.height = 1350;
   const ctx = canvas.getContext("2d");
   ctx.save();
   ctx.scale(3, 3);
 
-  const modelo = post.modelo ?? "cabine";
-  const postura = post.postura ?? "nao";
-  const tipo = post.tipo ?? "candidato";
-  const isDark = modelo === "cabine";
+  const template = post.template ?? "booth";
+  const stance = post.stance ?? "nao";
+  const type = post.type ?? "candidate";
+  const isDark = template === "booth";
 
   const red = isDark ? "#ff4553" : "#d81e2c";
   const green = isDark ? "#3ad07a" : "#178a4c";
-  const accent = postura === "nao" ? red : green;
+  const accent = stance === "nao" ? red : green;
   const fg = isDark ? "#f4efe3" : "#131218";
   const muted = isDark ? "#a9a3b5" : "#6b6675";
-  const linha = isDark ? "rgba(244,239,227,.18)" : "rgba(19,18,24,.15)";
+  const line = isDark ? "rgba(244,239,227,.18)" : "rgba(19,18,24,.15)";
   const lcdBg = isDark ? "#0d1710" : "#c7d3b8";
   const lcdFg = isDark ? "#b9f0c9" : "#22301f";
 
   if (isDark) {
-    desenharPlisse(ctx, 0, 0, 360, 450, 18);
+    drawPleat(ctx, 0, 0, 360, 450, 18);
   } else {
     ctx.fillStyle = "#f4efe3";
     ctx.fillRect(0, 0, 360, 450);
   }
 
-  desenharLogoCabecalho(ctx, 18, 16, accent, isDark);
+  drawHeaderLogo(ctx, 18, 16, accent, isDark);
   ctx.font = "700 10.5px Archivo, sans-serif";
   ctx.fillStyle = muted;
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
   ctx.fillText(String(post.meta || "").toUpperCase(), 342, 18);
 
-  const imagens = new Map();
-  if (tipo === "candidato" && post.candidato?.fotoSrc) {
-    const img = await carregarImagem(post.candidato.fotoSrc);
-    if (img) imagens.set("candidato", img);
-  } else if (tipo === "duelo") {
-    if (post.duelo?.nao?.fotoSrc) {
-      const img = await carregarImagem(post.duelo.nao.fotoSrc);
-      if (img) imagens.set("nao", img);
+  const images = new Map();
+  if (type === "candidate" && post.candidate?.photoSrc) {
+    const img = await loadImage(post.candidate.photoSrc);
+    if (img) images.set("candidate", img);
+  } else if (type === "duel") {
+    if (post.duel?.rejected?.photoSrc) {
+      const img = await loadImage(post.duel.rejected.photoSrc);
+      if (img) images.set("rejected", img);
     }
-    if (post.duelo?.sim?.fotoSrc) {
-      const img = await carregarImagem(post.duelo.sim.fotoSrc);
-      if (img) imagens.set("sim", img);
+    if (post.duel?.chosen?.photoSrc) {
+      const img = await loadImage(post.duel.chosen.photoSrc);
+      if (img) images.set("chosen", img);
     }
-  } else if (tipo === "pauta" || tipo === "lista") {
-    for (let i = 0; i < (post.grade?.faces?.length ?? 0); i++) {
-      const f = post.grade.faces[i];
-      if (f.fotoSrc) {
-        const img = await carregarImagem(f.fotoSrc);
-        if (img) imagens.set(f.sq ?? f.numero ?? i, img);
+  } else if (type === "issue" || type === "list") {
+    for (let i = 0; i < (post.grid?.faces?.length ?? 0); i++) {
+      const f = post.grid.faces[i];
+      if (f.photoSrc) {
+        const img = await loadImage(f.photoSrc);
+        if (img) images.set(f.sq ?? f.ballotNumber ?? i, img);
       }
     }
   }
 
-  if (tipo === "candidato") {
-    const c = post.candidato || {};
+  if (type === "candidate") {
+    const c = post.candidate || {};
     const fx = 18;
     const fy = 46;
     const fw = 150;
@@ -303,65 +299,55 @@ export async function desenharCartao(canvas, post) {
     ctx.strokeStyle = accent;
     ctx.strokeRect(fx, fy, fw, fh);
 
-    desenharRetratoOuMonograma(
-      ctx,
-      imagens.get("candidato"),
-      c.iniciais,
-      c.matiz,
-      fx,
-      fy,
-      fw,
-      fh,
-      postura === "nao",
-    );
+    drawPortraitOrMonogram(ctx, images.get("candidate"), c.initials, c.hue, fx, fy, fw, fh, stance === "nao");
 
-    if (postura === "nao") {
-      desenharFaixaNao(ctx, fx, fy, fw, fh, "NÃO VOTO", 20);
+    if (stance === "nao") {
+      drawRejectBanner(ctx, fx, fy, fw, fh, "NÃO VOTO", 20);
     } else {
-      desenharCheckVerde(ctx, fx + fw - 4, fy + fh - 4, 24, isDark ? "#15131b" : "#f4efe3");
+      drawGreenCheck(ctx, fx + fw - 4, fy + fh - 4, 24, isDark ? "#15131b" : "#f4efe3");
     }
 
     const dx = 182;
     let dy = 46;
 
-    ctx.font = `${postura === "nao" ? 46 : 60}px Anton, sans-serif`;
+    ctx.font = `${stance === "nao" ? 46 : 60}px Anton, sans-serif`;
     ctx.fillStyle = accent;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillText(postura === "nao" ? "NÃO VOTO" : "VOTO", dx, dy);
-    dy += postura === "nao" ? 44 : 56;
+    ctx.fillText(stance === "nao" ? "NÃO VOTO" : "VOTO", dx, dy);
+    dy += stance === "nao" ? 44 : 56;
 
     ctx.font = "700 9.5px Archivo, sans-serif";
     ctx.fillStyle = muted;
     ctx.fillText("NÚMERO NA URNA", dx, dy);
     dy += 15;
 
-    const lcdDim = desenharLcdBox(ctx, c.numero || "", dx, dy, 34, lcdBg, lcdFg);
+    const lcdDim = drawLcdBox(ctx, c.ballotNumber || "", dx, dy, 34, lcdBg, lcdFg);
     dy += lcdDim.h + 8;
 
     ctx.font = "19px Anton, sans-serif";
     ctx.fillStyle = fg;
-    const nomeLinhas = envolver(ctx, String(c.nome || "").toUpperCase(), 160, 2);
-    for (const nl of nomeLinhas) {
+    const nameLines = wrapText(ctx, String(c.name || "").toUpperCase(), 160, 2);
+    for (const nl of nameLines) {
       ctx.fillText(nl, dx, dy);
       dy += 19;
     }
 
     ctx.font = "600 11.5px Archivo, sans-serif";
     ctx.fillStyle = muted;
-    ctx.fillText(`${c.partido || ""} · ${post.uf || "SP"}`, dx, dy);
+    ctx.fillText(`${c.party || ""} · ${post.state || "SP"}`, dx, dy);
     dy += 18;
 
-    const temFavor = (c.favor?.length ?? 0) > 0;
-    const temContra = (c.contra?.length ?? 0) > 0;
+    const hasInFavor = (c.inFavor?.length ?? 0) > 0;
+    const hasAgainst = (c.against?.length ?? 0) > 0;
 
-    if (temFavor) {
+    if (hasInFavor) {
       ctx.font = "800 8.5px Archivo, sans-serif";
       ctx.fillStyle = muted;
       ctx.fillText("FOI A FAVOR", dx, dy);
       dy += 13;
       let bx = dx;
-      for (const badge of c.favor) {
+      for (const badge of c.inFavor) {
         ctx.font = "800 9px Archivo, sans-serif";
         const bw = ctx.measureText(badge.toUpperCase()).width + 8;
         if (bx + bw > 342) {
@@ -369,7 +355,7 @@ export async function desenharCartao(canvas, post) {
           dy += 18;
         }
         ctx.fillStyle = accent;
-        retanguloArredondado(ctx, bx, dy, bw, 15, 3);
+        roundedRect(ctx, bx, dy, bw, 15, 3);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.fillText(badge.toUpperCase(), bx + 4, dy + 3);
@@ -378,13 +364,13 @@ export async function desenharCartao(canvas, post) {
       dy += 20;
     }
 
-    if (temContra) {
+    if (hasAgainst) {
       ctx.font = "800 8.5px Archivo, sans-serif";
       ctx.fillStyle = muted;
       ctx.fillText("FOI CONTRA", dx, dy);
       dy += 13;
       let bx = dx;
-      for (const badge of c.contra) {
+      for (const badge of c.against) {
         ctx.font = "800 9px Archivo, sans-serif";
         const bw = ctx.measureText(badge.toUpperCase()).width + 8;
         if (bx + bw > 342) {
@@ -392,7 +378,7 @@ export async function desenharCartao(canvas, post) {
           dy += 18;
         }
         ctx.fillStyle = accent;
-        retanguloArredondado(ctx, bx, dy, bw, 15, 3);
+        roundedRect(ctx, bx, dy, bw, 15, 3);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.fillText(badge.toUpperCase(), bx + 4, dy + 3);
@@ -401,15 +387,15 @@ export async function desenharCartao(canvas, post) {
       dy += 20;
     }
 
-    if (!temFavor && !temContra) {
+    if (!hasInFavor && !hasAgainst) {
       ctx.font = "600 9.5px Archivo, sans-serif";
       ctx.fillStyle = muted;
       ctx.fillText("Sem histórico no Congresso nestas votações.", dx, dy);
     }
-  } else if (tipo === "duelo") {
-    const d = post.duelo || {};
-    const dNao = d.nao || {};
-    const dSim = d.sim || {};
+  } else if (type === "duel") {
+    const d = post.duel || {};
+    const dRejected = d.rejected || {};
+    const dChosen = d.chosen || {};
 
     let dy = 42;
     ctx.font = "30px Anton, sans-serif";
@@ -417,9 +403,9 @@ export async function desenharCartao(canvas, post) {
     ctx.textBaseline = "top";
     ctx.fillStyle = red;
     ctx.fillText("ESTE NÃO. ", 18, dy);
-    const wNao = ctx.measureText("ESTE NÃO. ").width;
+    const wReject = ctx.measureText("ESTE NÃO. ").width;
     ctx.fillStyle = green;
-    ctx.fillText("ESTE SIM.", 18 + wNao, dy);
+    ctx.fillText("ESTE SIM.", 18 + wReject, dy);
     dy += 34;
 
     const colW = 156;
@@ -429,39 +415,59 @@ export async function desenharCartao(canvas, post) {
     ctx.lineWidth = 4;
     ctx.strokeStyle = red;
     ctx.strokeRect(col1X, dy, colW, 118);
-    desenharRetratoOuMonograma(ctx, imagens.get("nao"), dNao.iniciais, dNao.matiz, col1X, dy, colW, 118, true);
-    desenharFaixaNao(ctx, col1X, dy, colW, 118, "NÃO", 22);
+    drawPortraitOrMonogram(
+      ctx,
+      images.get("rejected"),
+      dRejected.initials,
+      dRejected.hue,
+      col1X,
+      dy,
+      colW,
+      118,
+      true,
+    );
+    drawRejectBanner(ctx, col1X, dy, colW, 118, "NÃO", 22);
 
     ctx.strokeStyle = green;
     ctx.strokeRect(col2X, dy, colW, 118);
-    desenharRetratoOuMonograma(ctx, imagens.get("sim"), dSim.iniciais, dSim.matiz, col2X, dy, colW, 118, false);
-    desenharCheckVerde(ctx, col2X + colW - 4, dy + 118 - 4, 20, isDark ? "#15131b" : "#f4efe3");
+    drawPortraitOrMonogram(
+      ctx,
+      images.get("chosen"),
+      dChosen.initials,
+      dChosen.hue,
+      col2X,
+      dy,
+      colW,
+      118,
+      false,
+    );
+    drawGreenCheck(ctx, col2X + colW - 4, dy + 118 - 4, 20, isDark ? "#15131b" : "#f4efe3");
 
     dy += 124;
 
-    desenharLcdBox(ctx, dNao.numero || "", col1X, dy, 24, lcdBg, lcdFg);
-    desenharLcdBox(ctx, dSim.numero || "", col2X, dy, 24, lcdBg, lcdFg);
+    drawLcdBox(ctx, dRejected.ballotNumber || "", col1X, dy, 24, lcdBg, lcdFg);
+    drawLcdBox(ctx, dChosen.ballotNumber || "", col2X, dy, 24, lcdBg, lcdFg);
     dy += 34;
 
     ctx.font = "14px Anton, sans-serif";
     ctx.fillStyle = fg;
-    ctx.fillText(ajustar(ctx, String(dNao.nome || "").toUpperCase(), colW), col1X, dy);
-    ctx.fillText(ajustar(ctx, String(dSim.nome || "").toUpperCase(), colW), col2X, dy);
+    ctx.fillText(fitText(ctx, String(dRejected.name || "").toUpperCase(), colW), col1X, dy);
+    ctx.fillText(fitText(ctx, String(dChosen.name || "").toUpperCase(), colW), col2X, dy);
     dy += 16;
 
     ctx.font = "600 10.5px Archivo, sans-serif";
     ctx.fillStyle = muted;
-    ctx.fillText(`${dNao.partido || ""} · ${post.uf || "SP"}`, col1X, dy);
-    ctx.fillText(`${dSim.partido || ""} · ${post.uf || "SP"}`, col2X, dy);
+    ctx.fillText(`${dRejected.party || ""} · ${post.state || "SP"}`, col1X, dy);
+    ctx.fillText(`${dChosen.party || ""} · ${post.state || "SP"}`, col2X, dy);
     dy += 16;
 
-    if (dNao.contra?.length) {
+    if (dRejected.against?.length) {
       let bx = col1X;
-      for (const badge of dNao.contra.slice(0, 3)) {
+      for (const badge of dRejected.against.slice(0, 3)) {
         ctx.font = "800 8.5px Archivo, sans-serif";
         const bw = ctx.measureText(badge.toUpperCase()).width + 8;
         ctx.fillStyle = red;
-        retanguloArredondado(ctx, bx, dy, bw, 15, 3);
+        roundedRect(ctx, bx, dy, bw, 15, 3);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.fillText(badge.toUpperCase(), bx + 4, dy + 3);
@@ -469,43 +475,43 @@ export async function desenharCartao(canvas, post) {
       }
     }
 
-    if (dSim.favor?.length) {
+    if (dChosen.inFavor?.length) {
       let bx = col2X;
-      for (const badge of dSim.favor.slice(0, 3)) {
+      for (const badge of dChosen.inFavor.slice(0, 3)) {
         ctx.font = "800 8.5px Archivo, sans-serif";
         const bw = ctx.measureText(badge.toUpperCase()).width + 8;
         ctx.fillStyle = green;
-        retanguloArredondado(ctx, bx, dy, bw, 15, 3);
+        roundedRect(ctx, bx, dy, bw, 15, 3);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.fillText(badge.toUpperCase(), bx + 4, dy + 3);
         bx += bw + 4;
       }
     }
-  } else if (tipo === "pauta" || tipo === "lista") {
-    const g = post.grade || {};
+  } else if (type === "issue" || type === "list") {
+    const g = post.grid || {};
     const faces = g.faces || [];
-    const nFaces = faces.length;
-    const muitos = nFaces > 6;
-    const faceH = muitos ? 40 : 66;
-    const faceGap = muitos ? 4 : 6;
-    const faixaFs = muitos ? 9 : 11;
-    const lcdFs = muitos ? 12 : 13;
+    const faceCount = faces.length;
+    const many = faceCount > 6;
+    const faceH = many ? 40 : 66;
+    const faceGap = many ? 4 : 6;
+    const bannerFs = many ? 9 : 11;
+    const lcdFs = many ? 12 : 13;
 
     let dy = 44;
     ctx.font = "20px Anton, sans-serif";
     ctx.fillStyle = accent;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    const tituloTexto = g.titulo || "NÃO VOTO EM NENHUM DESTES";
-    let titLinhas = envolver(ctx, tituloTexto, 324, 2);
+    const titleText = g.title || "NÃO VOTO EM NENHUM DESTES";
+    let titleLines = wrapText(ctx, titleText, 324, 2);
     let lineAdvance = 22;
-    if (titLinhas.length > 0 && titLinhas[titLinhas.length - 1].endsWith("…")) {
+    if (titleLines.length > 0 && titleLines[titleLines.length - 1].endsWith("…")) {
       ctx.font = "16px Anton, sans-serif";
-      titLinhas = envolver(ctx, tituloTexto, 324, 3);
+      titleLines = wrapText(ctx, titleText, 324, 3);
       lineAdvance = 18;
     }
-    for (const tl of titLinhas) {
+    for (const tl of titleLines) {
       ctx.fillText(tl, 18, dy);
       dy += lineAdvance;
     }
@@ -514,7 +520,7 @@ export async function desenharCartao(canvas, post) {
     const colW = 104;
     const gapX = 6;
 
-    for (let i = 0; i < nFaces; i++) {
+    for (let i = 0; i < faceCount; i++) {
       const f = faces[i];
       const col = i % 3;
       const row = Math.floor(i / 3);
@@ -525,60 +531,64 @@ export async function desenharCartao(canvas, post) {
       ctx.strokeStyle = accent;
       ctx.strokeRect(fx, fy, colW, faceH);
 
-      desenharRetratoOuMonograma(
+      drawPortraitOrMonogram(
         ctx,
-        imagens.get(f.sq ?? f.numero ?? i),
-        f.iniciais,
-        f.matiz,
+        images.get(f.sq ?? f.ballotNumber ?? i),
+        f.initials,
+        f.hue,
         fx,
         fy,
         colW,
         faceH,
-        postura === "nao",
+        stance === "nao",
       );
 
-      if (postura === "nao") {
-        desenharFaixaNao(ctx, fx, fy, colW, faceH, g.faixa || "CONTRA VOCÊ", faixaFs);
+      if (stance === "nao") {
+        drawRejectBanner(ctx, fx, fy, colW, faceH, g.banner || "CONTRA VOCÊ", bannerFs);
       }
 
       ctx.fillStyle = lcdBg;
-      retanguloArredondado(ctx, fx, fy + faceH + 2, colW, lcdFs + 4, 3);
+      roundedRect(ctx, fx, fy + faceH + 2, colW, lcdFs + 4, 3);
       ctx.fill();
       ctx.font = `${lcdFs}px DSEG7Classic, monospace`;
       ctx.fillStyle = lcdFg;
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
-      ctx.fillText(String(f.numero || ""), fx + colW / 2, fy + faceH + 4);
+      ctx.fillText(String(f.ballotNumber || ""), fx + colW / 2, fy + faceH + 4);
 
       ctx.font = "800 8.5px Archivo, sans-serif";
       ctx.fillStyle = fg;
       ctx.textAlign = "left";
-      const nomeCurto = String(f.nome || "").split(/\s+/).slice(0, 2).join(" ");
-      ctx.fillText(ajustar(ctx, nomeCurto.toUpperCase(), colW), fx, fy + faceH + lcdFs + 8);
+      const shortName = String(f.name || "")
+        .split(/\s+/)
+        .slice(0, 2)
+        .join(" ");
+      ctx.fillText(fitText(ctx, shortName.toUpperCase(), colW), fx, fy + faceH + lcdFs + 8);
     }
 
-    if (g.fonteBadges?.length) {
+    const sourceBadges = g.sourceBadges || g.badges;
+    if (sourceBadges?.length) {
       ctx.font = "800 9px Archivo, sans-serif";
-      const rotulo = (g.fonteRotulo || "Eles apoiaram").toUpperCase();
-      const rotuloW = ctx.measureText(rotulo).width + 8;
+      const label = (g.sourceLabel || g.label || "Eles apoiaram").toUpperCase();
+      const labelW = ctx.measureText(label).width + 8;
 
-      let totalW = 18 + rotuloW;
-      let cabeEmUmaLinha = true;
-      for (const badge of g.fonteBadges) {
+      let totalW = 18 + labelW;
+      let fitsInOneLine = true;
+      for (const badge of sourceBadges) {
         const bw = ctx.measureText(badge.toUpperCase()).width + 8;
         if (totalW + bw > 342) {
-          cabeEmUmaLinha = false;
+          fitsInOneLine = false;
           break;
         }
         totalW += bw + 4;
       }
 
-      let by = cabeEmUmaLinha ? 358 : 338;
+      let by = fitsInOneLine ? 358 : 338;
       ctx.fillStyle = muted;
-      ctx.fillText(rotulo, 18, by);
-      let bx = 18 + rotuloW;
+      ctx.fillText(label, 18, by);
+      let bx = 18 + labelW;
 
-      for (const badge of g.fonteBadges) {
+      for (const badge of sourceBadges) {
         const bw = ctx.measureText(badge.toUpperCase()).width + 8;
         if (bx + bw > 342) {
           if (by === 338) {
@@ -589,7 +599,7 @@ export async function desenharCartao(canvas, post) {
           }
         }
         ctx.fillStyle = accent;
-        retanguloArredondado(ctx, bx, by - 2, bw, 15, 3);
+        roundedRect(ctx, bx, by - 2, bw, 15, 3);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.fillText(badge.toUpperCase(), bx + 4, by + 1);
@@ -598,11 +608,11 @@ export async function desenharCartao(canvas, post) {
     }
   }
 
-  const isGrade = tipo === "pauta" || tipo === "lista";
-  const qrSize = isGrade ? 56 : 66;
+  const isGrid = type === "issue" || type === "list";
+  const qrSize = isGrid ? 56 : 66;
   const footY = 450 - 14 - qrSize;
 
-  ctx.strokeStyle = linha;
+  ctx.strokeStyle = line;
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(18, footY - 8);
@@ -620,19 +630,19 @@ export async function desenharCartao(canvas, post) {
   ctx.fillText("Escaneie e veja a prova: votação nominal do Congresso.", 18, footY + 24);
 
   const qrX = 342 - qrSize;
-  desenharQr(ctx, post.url || `https://${post.link || "votosecreto.com.br"}`, qrX, footY, qrSize);
+  drawQr(ctx, post.url || `https://${post.link || "votosecreto.com.br"}`, qrX, footY, qrSize);
 
   ctx.restore();
 }
 
-export async function gerarCartao(post) {
+export async function renderCard(post) {
   const c = document.createElement("canvas");
-  await desenharCartao(c, post);
+  await drawCard(c, post);
   return new Promise((resolve) => c.toBlob(resolve, "image/jpeg", 0.92));
 }
 
-export async function desenharStory(canvas, post) {
-  await fontes;
+export async function drawStory(canvas, post) {
+  await fontsReady;
   canvas.width = 1080;
   canvas.height = 1920;
   const ctx = canvas.getContext("2d");
@@ -644,38 +654,38 @@ export async function desenharStory(canvas, post) {
   ctx.fillStyle = "#f4efe3";
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  const linhasTitulo = envolver(ctx, post.storyTitulo || "MEU VOTO É SECRETO. 🤭", 960, 3);
+  const titleLines = wrapText(ctx, post.storyTitle || "MEU VOTO É SECRETO. 🤭", 960, 3);
   let ty = 140;
-  for (const lt of linhasTitulo) {
+  for (const lt of titleLines) {
     ctx.fillText(lt, 540, ty);
     ty += 96;
   }
 
   const cardCanvas = document.createElement("canvas");
-  await desenharCartao(cardCanvas, post);
+  await drawCard(cardCanvas, post);
   ctx.drawImage(cardCanvas, 0, 420, 1080, 1350);
 
-  const footerTexto = `Escaneie o QR ou abra ${post.link || "votosecreto.com.br"}`;
+  const footerText = `Escaneie o QR ou abra ${post.link || "votosecreto.com.br"}`;
   let footerFs = 39;
   ctx.font = `700 ${footerFs}px Archivo, sans-serif`;
-  while (footerFs > 16 && ctx.measureText(footerTexto).width > 960) {
+  while (footerFs > 16 && ctx.measureText(footerText).width > 960) {
     footerFs -= 1;
     ctx.font = `700 ${footerFs}px Archivo, sans-serif`;
   }
   ctx.fillStyle = "#a9a3b5";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(ajustar(ctx, footerTexto, 960), 540, 1830);
+  ctx.fillText(fitText(ctx, footerText, 960), 540, 1830);
 }
 
-export async function gerarStory(post) {
+export async function renderStory(post) {
   const canvas = document.createElement("canvas");
-  await desenharStory(canvas, post);
+  await drawStory(canvas, post);
   return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
 }
 
-export async function gerarAdesivos(post) {
-  await fontes;
+export async function renderStickerSheet(post) {
+  await fontsReady;
   const canvas = document.createElement("canvas");
   canvas.width = 1240;
   canvas.height = 1754;
@@ -696,63 +706,62 @@ export async function gerarAdesivos(post) {
   sCtx.save();
   sCtx.scale(1.475, 1.475);
 
-  const postura = post.postura ?? "nao";
-  const corBorda = postura === "nao" ? "#d81e2c" : "#178a4c";
+  const stance = post.stance ?? "nao";
+  const borderColor = stance === "nao" ? "#d81e2c" : "#178a4c";
 
   sCtx.fillStyle = "#f4efe3";
   sCtx.fillRect(0, 0, 240, 240);
 
   sCtx.lineWidth = 3;
-  sCtx.strokeStyle = corBorda;
+  sCtx.strokeStyle = borderColor;
   sCtx.strokeRect(1.5, 1.5, 237, 237);
 
-  let c = post.candidato;
-  if (!c && post.duelo) {
-    c = postura === "nao" ? post.duelo.nao : post.duelo.sim;
-  } else if (!c && post.grade?.faces?.length) {
-    c = post.grade.faces[0];
+  let c = post.candidate;
+  if (!c && post.duel) {
+    c = stance === "nao" ? post.duel.rejected : post.duel.chosen;
+  } else if (!c && post.grid?.faces?.length) {
+    c = post.grid.faces[0];
   }
   c = c || {};
 
-  let imgCand = null;
-  if (c.fotoSrc) imgCand = await carregarImagem(c.fotoSrc);
+  let candidateImg = null;
+  if (c.photoSrc) candidateImg = await loadImage(c.photoSrc);
 
-  desenharRetratoOuMonograma(sCtx, imgCand, c.iniciais, c.matiz, 10, 12, 62, 80, postura === "nao");
-  if (postura === "nao") {
-    desenharFaixaNao(sCtx, 10, 12, 62, 80, "NÃO", 12);
+  drawPortraitOrMonogram(sCtx, candidateImg, c.initials, c.hue, 10, 12, 62, 80, stance === "nao");
+  if (stance === "nao") {
+    drawRejectBanner(sCtx, 10, 12, 62, 80, "NÃO", 12);
   }
 
   sCtx.font = "24px Anton, sans-serif";
-  sCtx.fillStyle = corBorda;
+  sCtx.fillStyle = borderColor;
   sCtx.textAlign = "left";
   sCtx.textBaseline = "top";
-  sCtx.fillText(postura === "nao" ? "NÃO VOTO" : "VOTO", 80, 12);
+  sCtx.fillText(stance === "nao" ? "NÃO VOTO" : "VOTO", 80, 12);
 
-  desenharLcdBox(sCtx, c.numero || "", 80, 40, 16, "#c7d3b8", "#22301f");
+  drawLcdBox(sCtx, c.ballotNumber || "", 80, 40, 16, "#c7d3b8", "#22301f");
 
   sCtx.font = "11.5px Anton, sans-serif";
   sCtx.fillStyle = "#131218";
-  sCtx.fillText(ajustar(sCtx, String(c.nome || "").toUpperCase(), 150), 80, 66);
+  sCtx.fillText(fitText(sCtx, String(c.name || "").toUpperCase(), 150), 80, 66);
 
   sCtx.font = "600 9px Archivo, sans-serif";
   sCtx.fillStyle = "#6b6675";
-  sCtx.fillText(`${c.partido || ""} · ${post.uf || "SP"} · 2026`, 80, 80);
+  sCtx.fillText(`${c.party || ""} · ${post.state || "SP"} · 2026`, 80, 80);
 
-  const contraBadges = (c.contra || []).filter(Boolean);
-  const favorBadges = (c.favor || []).filter(Boolean);
+  const againstBadges = (c.against || []).filter(Boolean);
+  const inFavorBadges = (c.inFavor || []).filter(Boolean);
 
   let ay = 100;
-  if (contraBadges.length) {
+  if (againstBadges.length) {
     sCtx.font = "800 7.5px Archivo, sans-serif";
     sCtx.fillStyle = "#6b6675";
-    sCtx.fillText("FOI CONTRA: " + contraBadges.slice(0, 2).join(", ").toUpperCase(), 10, ay);
+    sCtx.fillText("FOI CONTRA: " + againstBadges.slice(0, 2).join(", ").toUpperCase(), 10, ay);
     ay += 12;
   }
-  if (favorBadges.length) {
+  if (inFavorBadges.length) {
     sCtx.font = "800 7.5px Archivo, sans-serif";
     sCtx.fillStyle = "#6b6675";
-    sCtx.fillText("FOI A FAVOR: " + favorBadges.slice(0, 2).join(", ").toUpperCase(), 10, ay);
-    ay += 12;
+    sCtx.fillText("FOI A FAVOR: " + inFavorBadges.slice(0, 2).join(", ").toUpperCase(), 10, ay);
   }
 
   sCtx.strokeStyle = "rgba(19,18,24,.15)";
@@ -762,7 +771,7 @@ export async function gerarAdesivos(post) {
   sCtx.lineTo(230, 174);
   sCtx.stroke();
 
-  desenharLogoCabecalho(sCtx, 10, 180, corBorda, false);
+  drawHeaderLogo(sCtx, 10, 180, borderColor, false);
 
   sCtx.font = "700 8px ui-monospace, monospace";
   sCtx.fillStyle = "#131218";
@@ -772,7 +781,7 @@ export async function gerarAdesivos(post) {
   sCtx.fillStyle = "#6b6675";
   sCtx.fillText("Votação nominal da Câmara", 10, 214);
 
-  desenharQr(sCtx, post.url || `https://${post.link || "votosecreto.com.br"}`, 176, 178, 54);
+  drawQr(sCtx, post.url || `https://${post.link || "votosecreto.com.br"}`, 176, 178, 54);
 
   sCtx.restore();
 

@@ -1,346 +1,351 @@
-const URL_DADOS = "data/votos-pec-blindagem.json";
+const DATA_URL = "data/votos-pec-blindagem.json";
 
-const PREDICADO_TURNO = {
+const ROUND_PREDICATE = {
   qualquer: (d) => d.votouSim === true,
   ambos: (d) => d.turno1 === "Sim" && d.turno2 === "Sim",
   t1: (d) => d.turno1 === "Sim",
   t2: (d) => d.turno2 === "Sim",
 };
 
-const ROTULO_VOTO = { Sim: "Sim", Nao: "Não", Abstencao: "Abstenção", Ausente: "Ausente" };
+const VOTE_LABEL = { Sim: "Sim", Nao: "Não", Abstencao: "Abstenção", Ausente: "Ausente" };
 
-const CLASSE_VOTO = { Sim: "sim", Nao: "nao", Abstencao: "abstencao", Ausente: "ausente" };
+const VOTE_CLASS = { Sim: "sim", Nao: "nao", Abstencao: "abstencao", Ausente: "ausente" };
 
-const ORDENS = new Set(["partido", "nome", "uf"]);
+const SORT_ORDERS = new Set(["partido", "nome", "uf"]);
 
-const FOTO_PADRAO =
+const DEFAULT_PHOTO =
   "data:image/svg+xml;charset=utf-8," +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 128"><rect width="96" height="128" fill="#e3ddcd"/><circle cx="48" cy="46" r="20" fill="#b4a98f"/><path d="M12 128c4-30 22-42 36-42s32 12 36 42z" fill="#b4a98f"/></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 128"><rect width="96" height="128" fill="#e3ddcd"/><circle cx="48" cy="46" r="20" fill="#b4a98f"/><path d="M12 128c4-30 22-42 36-42s32 12 36 42z" fill="#b4a98f"/></svg>',
   );
 
-const colacao = new Intl.Collator("pt-BR");
+const collator = new Intl.Collator("pt-BR");
 
-const estado = {
-  pronta: false,
-  deputados: [],
-  busca: "",
-  partido: "",
-  uf: "",
-  turno: "qualquer",
-  ordem: "partido",
+const state = {
+  ready: false,
+  deputies: [],
+  search: "",
+  party: "",
+  state: "",
+  round: "qualquer",
+  sort: "partido",
 };
 
-const el = {
-  barra: document.getElementById("barra-filtros"),
+const elements = {
+  filterBar: document.getElementById("filter-bar"),
   chips: document.getElementById("chips"),
-  legenda: document.getElementById("legenda"),
-  contador: document.getElementById("contador"),
-  lista: document.getElementById("lista"),
-  painelStatus: document.getElementById("painel-status"),
-  carregando: document.getElementById("carregando"),
-  busca: document.getElementById("busca"),
-  partido: document.getElementById("partido"),
-  uf: document.getElementById("uf"),
-  turno: document.getElementById("turno"),
-  ordem: document.getElementById("ordem"),
-  limpar: document.getElementById("limpar"),
-  estatisticas: document.getElementById("estatisticas"),
-  statSimAlgum: document.getElementById("stat-sim-algum"),
-  statSimAmbos: document.getElementById("stat-sim-ambos"),
-  statData: document.getElementById("stat-data"),
-  destaqueNumeral: document.getElementById("destaque-numeral"),
+  legend: document.getElementById("legend"),
+  counter: document.getElementById("counter"),
+  list: document.getElementById("list"),
+  statusPanel: document.getElementById("status-panel"),
+  loading: document.getElementById("loading"),
+  search: document.getElementById("search"),
+  party: document.getElementById("party"),
+  state: document.getElementById("state"),
+  round: document.getElementById("round"),
+  sort: document.getElementById("sort"),
+  clear: document.getElementById("clear"),
+  stats: document.getElementById("stats"),
+  statYesAny: document.getElementById("stat-yes-any"),
+  statYesBoth: document.getElementById("stat-yes-both"),
+  statDate: document.getElementById("stat-date"),
+  highlightNumeral: document.getElementById("destaque-numeral"),
 };
 
-function normalizar(texto) {
-  return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+function normalizeText(text) {
+  return text
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
 }
 
-function criarElemento(tag, classe, texto) {
-  const no = document.createElement(tag);
-  if (classe) no.className = classe;
-  if (texto !== undefined) no.textContent = texto;
-  return no;
+function createElement(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
 }
 
-function validarRegistro(d) {
+function validateRecord(d) {
   if (typeof d.nome !== "string" || !d.nome) throw new Error(`deputado sem nome: ${JSON.stringify(d)}`);
   if (typeof d.partido !== "string" || !d.partido) throw new Error(`partido ausente em ${d.nome}`);
   if (typeof d.uf !== "string" || !d.uf) throw new Error(`UF ausente em ${d.nome}`);
-  for (const campo of ["turno1", "turno2"]) {
-    if (!Object.hasOwn(ROTULO_VOTO, d[campo])) {
-      throw new Error(`valor inesperado em ${campo} para ${d.nome}: ${JSON.stringify(d[campo])}`);
+  for (const field of ["turno1", "turno2"]) {
+    if (!Object.hasOwn(VOTE_LABEL, d[field])) {
+      throw new Error(`valor inesperado em ${field} para ${d.nome}: ${JSON.stringify(d[field])}`);
     }
   }
   if (typeof d.votouSim !== "boolean") throw new Error(`votouSim não booleano para ${d.nome}`);
 }
 
-async function carregar() {
-  let resposta;
+async function loadData() {
+  let response;
   try {
-    resposta = await fetch(URL_DADOS);
-  } catch (erroRede) {
-    throw new Error(`falha de rede ao buscar ${URL_DADOS}: ${erroRede.message}`);
+    response = await fetch(DATA_URL);
+  } catch (networkError) {
+    throw new Error(`falha de rede ao buscar ${DATA_URL}: ${networkError.message}`, { cause: networkError });
   }
-  if (!resposta.ok) throw new Error(`resposta HTTP ${resposta.status} ao buscar ${URL_DADOS}`);
-  return resposta.json();
+  if (!response.ok) throw new Error(`resposta HTTP ${response.status} ao buscar ${DATA_URL}`);
+  return response.json();
 }
 
-function universoPorTurno() {
-  return estado.deputados.filter(PREDICADO_TURNO[estado.turno]);
+function filterByRound() {
+  return state.deputies.filter(ROUND_PREDICATE[state.round]);
 }
 
-function passaFiltros(deputado) {
-  if (estado.partido && deputado.partido !== estado.partido) return false;
-  if (estado.uf && deputado.uf !== estado.uf) return false;
-  if (estado.busca && !normalizar(deputado.nome).includes(normalizar(estado.busca))) return false;
+function matchesFilters(deputy) {
+  if (state.party && deputy.partido !== state.party) return false;
+  if (state.state && deputy.uf !== state.state) return false;
+  if (state.search && !normalizeText(deputy.nome).includes(normalizeText(state.search))) return false;
   return true;
 }
 
-function ordenar(lista, contagem) {
-  const porNome = (a, b) => colacao.compare(a.nome, b.nome);
-  const comparadores = {
+function sortDeputies(list, counts) {
+  const byName = (a, b) => collator.compare(a.nome, b.nome);
+  const comparators = {
     partido: (a, b) =>
-      (contagem?.get(b.partido) ?? 0) - (contagem?.get(a.partido) ?? 0) ||
-      colacao.compare(a.partido, b.partido) ||
-      porNome(a, b),
-    nome: porNome,
-    uf: (a, b) => colacao.compare(a.uf, b.uf) || porNome(a, b),
+      (counts?.get(b.partido) ?? 0) - (counts?.get(a.partido) ?? 0) ||
+      collator.compare(a.partido, b.partido) ||
+      byName(a, b),
+    nome: byName,
+    uf: (a, b) => collator.compare(a.uf, b.uf) || byName(a, b),
   };
-  return lista.slice().sort(comparadores[estado.ordem]);
+  return list.slice().sort(comparators[state.sort]);
 }
 
-function definir(campo, valor) {
-  if (estado[campo] === valor) return;
-  estado[campo] = valor;
+function setFilter(field, value) {
+  if (state[field] === value) return;
+  state[field] = value;
   render();
 }
 
-function lerUrl() {
+function readUrl() {
   const params = new URLSearchParams(location.search);
-  const turnoDaUrl = params.get("turno");
-  if (turnoDaUrl && Object.hasOwn(PREDICADO_TURNO, turnoDaUrl)) estado.turno = turnoDaUrl;
-  if (ORDENS.has(params.get("ordem"))) estado.ordem = params.get("ordem");
-  if (params.has("busca")) estado.busca = params.get("busca");
-  if (params.has("partido")) estado.partido = params.get("partido");
-  if (params.has("uf")) estado.uf = params.get("uf").toUpperCase();
+  const roundFromUrl = params.get("turno");
+  if (roundFromUrl && Object.hasOwn(ROUND_PREDICATE, roundFromUrl)) state.round = roundFromUrl;
+  if (SORT_ORDERS.has(params.get("ordem"))) state.sort = params.get("ordem");
+  if (params.has("busca")) state.search = params.get("busca");
+  if (params.has("partido")) state.party = params.get("partido");
+  if (params.has("uf")) state.state = params.get("uf").toUpperCase();
 }
 
-function refletirUrl() {
+function updateUrl() {
   const params = new URLSearchParams();
-  if (estado.busca) params.set("busca", estado.busca);
-  if (estado.partido) params.set("partido", estado.partido);
-  if (estado.uf) params.set("uf", estado.uf);
-  if (estado.turno !== "qualquer") params.set("turno", estado.turno);
-  if (estado.ordem !== "partido") params.set("ordem", estado.ordem);
-  const consulta = params.toString();
-  history.replaceState(null, "", consulta ? `?${consulta}` : location.pathname);
+  if (state.search) params.set("busca", state.search);
+  if (state.party) params.set("partido", state.party);
+  if (state.state) params.set("uf", state.state);
+  if (state.round !== "qualquer") params.set("turno", state.round);
+  if (state.sort !== "partido") params.set("ordem", state.sort);
+  const query = params.toString();
+  history.replaceState(null, "", query ? `?${query}` : location.pathname);
 }
 
-function contagemPorPartido(pool) {
-  const contagem = new Map();
-  for (const deputado of pool) {
-    contagem.set(deputado.partido, (contagem.get(deputado.partido) ?? 0) + 1);
+function countByParty(deputies) {
+  const counts = new Map();
+  for (const deputy of deputies) {
+    counts.set(deputy.partido, (counts.get(deputy.partido) ?? 0) + 1);
   }
-  return contagem;
+  return counts;
 }
 
-function pintarSelectPartidos(contagem) {
-  const fragmento = document.createDocumentFragment();
-  fragmento.append(new Option("Todos os partidos", ""));
-  const partidos = [...contagem.keys()].sort(
-    (a, b) => (contagem.get(b) ?? 0) - (contagem.get(a) ?? 0) || colacao.compare(a, b)
+function renderPartySelect(counts) {
+  const fragment = document.createDocumentFragment();
+  fragment.append(new Option("Todos os partidos", ""));
+  const parties = [...counts.keys()].sort(
+    (a, b) => (counts.get(b) ?? 0) - (counts.get(a) ?? 0) || collator.compare(a, b),
   );
-  for (const partido of partidos) {
-    fragmento.append(new Option(`${partido} (${contagem.get(partido)})`, partido));
+  for (const party of parties) {
+    fragment.append(new Option(`${party} (${counts.get(party)})`, party));
   }
-  el.partido.replaceChildren(fragmento);
+  elements.party.replaceChildren(fragment);
 }
 
-function pintarChips(contagem) {
-  const fragmento = document.createDocumentFragment();
-  const partidos = [...contagem.keys()].sort(
-    (a, b) => (contagem.get(b) ?? 0) - (contagem.get(a) ?? 0) || colacao.compare(a, b)
+function renderChips(counts) {
+  const fragment = document.createDocumentFragment();
+  const parties = [...counts.keys()].sort(
+    (a, b) => (counts.get(b) ?? 0) - (counts.get(a) ?? 0) || collator.compare(a, b),
   );
-  for (const partido of partidos) {
-    const chip = criarElemento("button", "chip", `${partido} ${contagem.get(partido)}`);
+  for (const party of parties) {
+    const chip = createElement("button", "chip", `${party} ${counts.get(party)}`);
     chip.type = "button";
-    chip.setAttribute("aria-pressed", String(partido === estado.partido));
-    chip.addEventListener("click", () => definir("partido", partido === estado.partido ? "" : partido));
-    fragmento.append(chip);
+    chip.setAttribute("aria-pressed", String(party === state.party));
+    chip.addEventListener("click", () => setFilter("party", party === state.party ? "" : party));
+    fragment.append(chip);
   }
-  el.chips.replaceChildren(fragmento);
+  elements.chips.replaceChildren(fragment);
 }
 
-function sincronizarControles() {
-  el.busca.value = estado.busca;
-  el.turno.value = estado.turno;
-  el.ordem.value = estado.ordem;
-  el.uf.value = [...el.uf.options].some((opcao) => opcao.value === estado.uf) ? estado.uf : "";
-  el.partido.value = [...el.partido.options].some((opcao) => opcao.value === estado.partido)
-    ? estado.partido
+function syncControls() {
+  elements.search.value = state.search;
+  elements.round.value = state.round;
+  elements.sort.value = state.sort;
+  elements.state.value = [...elements.state.options].some((option) => option.value === state.state)
+    ? state.state
+    : "";
+  elements.party.value = [...elements.party.options].some((option) => option.value === state.party)
+    ? state.party
     : "";
 }
 
-function badge(rotuloTurno, voto) {
-  const span = criarElemento("span", `badge badge--${CLASSE_VOTO[voto]}`);
-  span.title = `${rotuloTurno} turno: ${ROTULO_VOTO[voto]}`;
+function createBadge(roundLabel, voteValue) {
+  const span = createElement("span", `badge badge--${VOTE_CLASS[voteValue]}`);
+  span.title = `${roundLabel} turno: ${VOTE_LABEL[voteValue]}`;
   span.append(
-    criarElemento("span", "badge__turno", rotuloTurno),
-    criarElemento("span", "badge__voto", ROTULO_VOTO[voto])
+    createElement("span", "badge__turno", roundLabel),
+    createElement("span", "badge__voto", VOTE_LABEL[voteValue]),
   );
   return span;
 }
 
-function pintarLinhas(visiveis) {
-  const fragmento = document.createDocumentFragment();
-  for (const deputado of visiveis) {
-    const nSim = (deputado.turno1 === "Sim" ? 1 : 0) + (deputado.turno2 === "Sim" ? 1 : 0);
-    const classeIntensidade =
-      nSim === 2 ? " deputado--sim-ambos" : nSim === 1 ? " deputado--sim-um" : "";
-    const item = criarElemento("li", `deputado${classeIntensidade}`);
+function renderRows(visible) {
+  const fragment = document.createDocumentFragment();
+  for (const deputy of visible) {
+    const yesCount = (deputy.turno1 === "Sim" ? 1 : 0) + (deputy.turno2 === "Sim" ? 1 : 0);
+    const intensityClass =
+      yesCount === 2 ? " deputado--sim-ambos" : yesCount === 1 ? " deputado--sim-um" : "";
+    const item = createElement("li", `deputado${intensityClass}`);
 
-    const fotoMoldura = criarElemento("div", "foto-moldura");
-    const foto = document.createElement("img");
-    foto.className = "foto";
-    foto.width = 64;
-    foto.height = 64;
-    foto.loading = "lazy";
-    foto.alt = deputado.nome;
-    foto.src = `fotos/${deputado.id}.jpg`;
-    foto.addEventListener("error", () => {
-      foto.src = FOTO_PADRAO;
+    const photoFrame = createElement("div", "foto-moldura");
+    const photo = document.createElement("img");
+    photo.className = "foto";
+    photo.width = 64;
+    photo.height = 64;
+    photo.loading = "lazy";
+    photo.alt = deputy.nome;
+    photo.src = `fotos/${deputy.id}.jpg`;
+    photo.addEventListener("error", () => {
+      photo.src = DEFAULT_PHOTO;
     });
-    fotoMoldura.append(foto);
+    photoFrame.append(photo);
 
-    const info = criarElemento("div", "info");
-    const linkNome = criarElemento("a", "nome", deputado.nome);
-    linkNome.href = deputado.urlPerfil;
-    linkNome.target = "_blank";
-    linkNome.rel = "noopener";
+    const info = createElement("div", "info");
+    const nameLink = createElement("a", "nome", deputy.nome);
+    nameLink.href = deputy.urlPerfil;
+    nameLink.target = "_blank";
+    nameLink.rel = "noopener";
 
-    const detalhe = criarElemento("div", "detalhe");
-    detalhe.append(
-      criarElemento("span", "partido", deputado.partido),
+    const detail = createElement("div", "detalhe");
+    detail.append(
+      createElement("span", "party", deputy.partido),
       document.createTextNode(" · "),
-      criarElemento("span", "uf", deputado.uf)
+      createElement("span", "uf", deputy.uf),
     );
-    info.append(linkNome, detalhe);
+    info.append(nameLink, detail);
 
-    const votos = criarElemento("div", "votos");
-    votos.append(badge("1º", deputado.turno1), badge("2º", deputado.turno2));
+    const voteBadges = createElement("div", "votos");
+    voteBadges.append(createBadge("1º", deputy.turno1), createBadge("2º", deputy.turno2));
 
-    item.append(fotoMoldura, info, votos);
-    fragmento.append(item);
+    item.append(photoFrame, info, voteBadges);
+    fragment.append(item);
   }
-  if (!visiveis.length) {
-    fragmento.append(criarElemento("li", "vazia", "Nenhum deputado encontrado com esses filtros."));
+  if (!visible.length) {
+    fragment.append(createElement("li", "vazia", "Nenhum deputado encontrado com esses filtros."));
   }
-  el.lista.replaceChildren(fragmento);
+  elements.list.replaceChildren(fragment);
 }
 
 function render() {
-  if (!estado.pronta) return;
+  if (!state.ready) return;
 
-  const poolTurno = universoPorTurno();
-  if (estado.partido && !poolTurno.some((d) => d.partido === estado.partido)) estado.partido = "";
-  if (estado.uf && !poolTurno.some((d) => d.uf === estado.uf)) estado.uf = "";
+  const roundPool = filterByRound();
+  if (state.party && !roundPool.some((d) => d.partido === state.party)) state.party = "";
+  if (state.state && !roundPool.some((d) => d.uf === state.state)) state.state = "";
 
-  const contagem = contagemPorPartido(poolTurno);
-  const visiveis = ordenar(poolTurno.filter(passaFiltros), contagem);
+  const counts = countByParty(roundPool);
+  const visible = sortDeputies(roundPool.filter(matchesFilters), counts);
 
-  el.barra.hidden = false;
-  el.chips.hidden = false;
-  if (el.legenda) el.legenda.hidden = false;
-  el.carregando.remove();
+  elements.filterBar.hidden = false;
+  elements.chips.hidden = false;
+  if (elements.legend) elements.legend.hidden = false;
+  elements.loading.remove();
 
-  pintarSelectPartidos(contagem);
-  pintarChips(contagem);
-  sincronizarControles();
+  renderPartySelect(counts);
+  renderChips(counts);
+  syncControls();
 
-  el.contador.replaceChildren(
+  elements.counter.replaceChildren(
     document.createTextNode("Mostrando "),
-    criarElemento("strong", "", String(visiveis.length)),
-    document.createTextNode(` de ${poolTurno.length} deputados`)
+    createElement("strong", "", String(visible.length)),
+    document.createTextNode(` de ${roundPool.length} deputados`),
   );
 
-  pintarLinhas(visiveis);
-  refletirUrl();
+  renderRows(visible);
+  updateUrl();
 }
 
-function mostrarErro(erro) {
-  el.carregando.remove();
+function showError(error) {
+  elements.loading.remove();
 
-  const artigo = criarElemento("article", "erro");
-  artigo.append(criarElemento("h2", "", "Não foi possível carregar os dados"));
-  artigo.append(criarElemento("p", "", `Falha ao ler ${URL_DADOS} (${erro.message}).`));
+  const article = createElement("article", "erro");
+  article.append(createElement("h2", "", "Não foi possível carregar os dados"));
+  article.append(createElement("p", "", `Falha ao ler ${DATA_URL} (${error.message}).`));
 
-  const instrucao = criarElemento("p");
-  instrucao.append(
+  const instruction = createElement("p");
+  instruction.append(
     document.createTextNode("Este site lê o JSON por fetch e precisa ser servido por HTTP: rode "),
-    criarElemento("code", "", "python3 -m http.server 8000"),
+    createElement("code", "", "python3 -m http.server 8000"),
     document.createTextNode(" na raiz do projeto e abra "),
-    criarElemento("code", "", "http://localhost:8000"),
-    document.createTextNode(".")
+    createElement("code", "", "http://localhost:8000"),
+    document.createTextNode("."),
   );
-  artigo.append(instrucao);
+  article.append(instruction);
 
-  el.painelStatus.replaceChildren(artigo);
+  elements.statusPanel.replaceChildren(article);
 }
 
-function preencherSelectUfs() {
-  const ufsOrdenadas = [...new Set(estado.deputados.map((d) => d.uf))].sort(colacao.compare);
-  const fragmento = document.createDocumentFragment();
-  fragmento.append(new Option("Todos os estados", ""));
-  for (const uf of ufsOrdenadas) fragmento.append(new Option(uf, uf));
-  el.uf.replaceChildren(fragmento);
+function populateStateSelect() {
+  const sortedStates = [...new Set(state.deputies.map((d) => d.uf))].sort(collator.compare);
+  const fragment = document.createDocumentFragment();
+  fragment.append(new Option("Todos os estados", ""));
+  for (const uf of sortedStates) fragment.append(new Option(uf, uf));
+  elements.state.replaceChildren(fragment);
 }
 
-function renderEstatisticas(dados) {
-  if (el.destaqueNumeral && dados.resumo?.simEmAlgumTurno) {
-    el.destaqueNumeral.textContent = String(dados.resumo.simEmAlgumTurno);
+function renderStats(data) {
+  if (elements.highlightNumeral && data.resumo?.simEmAlgumTurno) {
+    elements.highlightNumeral.textContent = String(data.resumo.simEmAlgumTurno);
   }
-  if (el.statSimAlgum && dados.resumo?.simEmAlgumTurno) {
-    el.statSimAlgum.textContent = String(dados.resumo.simEmAlgumTurno);
+  if (elements.statYesAny && data.resumo?.simEmAlgumTurno) {
+    elements.statYesAny.textContent = String(data.resumo.simEmAlgumTurno);
   }
-  if (el.statSimAmbos && dados.resumo?.simNosDoisTurnos) {
-    el.statSimAmbos.textContent = String(dados.resumo.simNosDoisTurnos);
+  if (elements.statYesBoth && data.resumo?.simNosDoisTurnos) {
+    elements.statYesBoth.textContent = String(data.resumo.simNosDoisTurnos);
   }
-  if (el.statData) {
-    const rawData = dados.votacoes?.[0]?.data || dados.votacoes?.[0]?.dataHora;
+  if (elements.statDate) {
+    const rawData = data.votacoes?.[0]?.data || data.votacoes?.[0]?.dataHora;
     if (rawData) {
       const p = rawData.slice(0, 10).split("-");
-      el.statData.textContent = p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : rawData;
+      elements.statDate.textContent = p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : rawData;
     }
   }
-  if (el.estatisticas) el.estatisticas.hidden = false;
+  if (elements.stats) elements.stats.hidden = false;
 }
 
-async function iniciar() {
-  lerUrl();
+async function init() {
+  readUrl();
   try {
-    const dados = await carregar();
-    if (!Array.isArray(dados.deputados)) throw new Error(`${URL_DADOS} não contém a lista "deputados"`);
-    dados.deputados.forEach(validarRegistro);
-    estado.deputados = dados.deputados;
-    estado.pronta = true;
-    preencherSelectUfs();
-    renderEstatisticas(dados);
-  } catch (erro) {
-    mostrarErro(erro);
+    const data = await loadData();
+    if (!Array.isArray(data.deputados)) throw new Error(`${DATA_URL} não contém a lista "deputados"`);
+    data.deputados.forEach(validateRecord);
+    state.deputies = data.deputados;
+    state.ready = true;
+    populateStateSelect();
+    renderStats(data);
+  } catch (error) {
+    showError(error);
     return;
   }
   render();
 }
 
-el.busca.addEventListener("input", () => definir("busca", el.busca.value.trim()));
-el.partido.addEventListener("change", () => definir("partido", el.partido.value));
-el.uf.addEventListener("change", () => definir("uf", el.uf.value));
-el.turno.addEventListener("change", () => definir("turno", el.turno.value));
-el.ordem.addEventListener("change", () => definir("ordem", el.ordem.value));
-el.limpar.addEventListener("click", () => {
-  Object.assign(estado, { busca: "", partido: "", uf: "", turno: "qualquer", ordem: "partido" });
+elements.search.addEventListener("input", () => setFilter("search", elements.search.value.trim()));
+elements.party.addEventListener("change", () => setFilter("party", elements.party.value));
+elements.state.addEventListener("change", () => setFilter("state", elements.state.value));
+elements.round.addEventListener("change", () => setFilter("round", elements.round.value));
+elements.sort.addEventListener("change", () => setFilter("sort", elements.sort.value));
+elements.clear.addEventListener("click", () => {
+  Object.assign(state, { search: "", party: "", state: "", round: "qualquer", sort: "partido" });
   render();
 });
 
-iniciar();
+init();

@@ -1,0 +1,7 @@
+data/
+fotos/
+fotos-tse/
+assets/vendor/
+package-lock.json
+.cache/
+node_modules/

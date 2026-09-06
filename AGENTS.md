@@ -26,6 +26,7 @@ Toda alteração de código, texto ou interface deve obedecer às seguintes regr
 ## Código
 
 1. **Sem framework e sem empacotador.** A aplicação roda diretamente nos navegadores modernos via GitHub Pages usando ES Modules nativos e carregamento direto de dependências vendoreadas.
-2. **Renderização de cartazes.** A renderização dos cartazes em imagem (feed, story e adesivos) é unificada em `assets/cartaz.js` via Canvas 2D. Não criar duplicatas em DOM nem usar bibliotecas de captura como `html2canvas`.
-3. **Identificadores em português.** Código, funções e variáveis da aplicação devem utilizar nomenclatura clara em língua portuguesa.
-4. **Testes automatizados.** A biblioteca do codec de links é testada por meio do executor nativo do Node.js (`node --test 'tests/**/*.test.mjs'`).
+2. **Renderização de cartazes.** A renderização dos cartazes em imagem (feed, story e adesivos) é unificada em `assets/poster.js` via Canvas 2D. Não criar duplicatas em DOM nem usar bibliotecas de captura como `html2canvas`.
+3. **Identificadores em inglês.** Código, funções e variáveis usam nomenclatura em inglês; toda cópia de produto permanece em português.
+4. **Testes automatizados.** A biblioteca do codec de links é testada por meio do executor nativo do Node.js (`node --test 'tests/**/*.test.mjs'`, arquivo `tests/share-link.test.mjs`).
+5. **Verificações locais.** Rode `npm run lint`, `npm run format:check`, `npm test`, `npm run check:refs` e `npm run check:copy` antes de abrir PR; nunca silenciar lint com `eslint-disable`.

@@ -36,7 +36,10 @@ body {
     radial-gradient(circle at 50% 0%, rgba(143, 29, 29, 0.035) 0%, transparent 60%),
     linear-gradient(to right, rgba(21, 18, 15, 0.025) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(21, 18, 15, 0.025) 1px, transparent 1px);
-  background-size: 100% 100%, 24px 24px, 24px 24px;
+  background-size:
+    100% 100%,
+    24px 24px,
+    24px 24px;
   color: var(--tinta);
   font-family: var(--fonte-texto);
   font-size: 16px;
@@ -80,13 +83,13 @@ body::before {
   left: 0;
 }
 
-.cabecalho {
+.header {
   padding-top: clamp(2rem, 5vw, 3.5rem);
   padding-bottom: 1.5rem;
   border-bottom: 4px solid var(--tinta);
 }
 
-.kicker-faixa {
+.kicker-band {
   display: inline-block;
   background: var(--tinta);
   padding: 0.25rem 0.75rem;
@@ -103,7 +106,7 @@ body::before {
   color: var(--papel);
 }
 
-.titulo-poster {
+.poster-title {
   font-family: var(--fonte-display);
   font-size: clamp(2.5rem, 6.8vw, 4.8rem);
   line-height: 0.96;
@@ -114,7 +117,7 @@ body::before {
   word-break: break-word;
 }
 
-.pec-vilao {
+.pec-villain {
   display: inline-block;
   background: var(--vermelho);
   color: #ffffff;
@@ -215,11 +218,11 @@ body::before {
   font-weight: 600;
 }
 
-.conteudo {
+.content {
   padding-block: 1.75rem 4rem;
 }
 
-.estatisticas {
+.stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
@@ -263,12 +266,14 @@ body::before {
   color: var(--tinta-fraca);
 }
 
-.barra {
+.filter-bar {
   position: sticky;
   top: 0;
   z-index: 10;
   display: grid;
-  grid-template-columns: minmax(13rem, 1.6fr) minmax(8rem, 1fr) minmax(8.5rem, 1fr) minmax(9.5rem, 1.1fr) minmax(7.5rem, 0.95fr) auto;
+  grid-template-columns:
+    minmax(13rem, 1.6fr) minmax(8rem, 1fr) minmax(8.5rem, 1fr) minmax(9.5rem, 1.1fr)
+    minmax(7.5rem, 0.95fr) auto;
   gap: 0.75rem 1rem;
   align-items: end;
   padding: 1rem 1.25rem;
@@ -323,7 +328,9 @@ body::before {
   padding: 0.45rem 0.9rem;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--vermelho);
-  transition: transform 100ms ease, background-color 100ms ease;
+  transition:
+    transform 100ms ease,
+    background-color 100ms ease;
 }
 
 .botao-limpar:hover {
@@ -365,7 +372,10 @@ body::before {
   cursor: pointer;
   clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
   box-shadow: 2px 2px 0 var(--tinta);
-  transition: transform 100ms ease, background-color 100ms ease, color 100ms ease;
+  transition:
+    transform 100ms ease,
+    background-color 100ms ease,
+    color 100ms ease;
 }
 
 .chip:hover {
@@ -381,7 +391,7 @@ body::before {
   box-shadow: 2px 2px 0 var(--tinta);
 }
 
-.legenda {
+.legend {
   margin: 0 0 0.6rem;
   font-size: 0.82rem;
   font-weight: 600;
@@ -394,7 +404,7 @@ body::before {
   background: rgba(143, 29, 29, 0.04);
 }
 
-.contador {
+.counter {
   margin: 0.5rem 0 0.85rem;
   font-family: var(--fonte-display);
   font-size: 1.15rem;
@@ -404,7 +414,7 @@ body::before {
   font-variant-numeric: tabular-nums;
 }
 
-.contador strong {
+.counter strong {
   color: var(--vermelho);
   font-size: 1.35em;
 }
@@ -453,7 +463,9 @@ body::before {
   border-radius: 50%;
   padding: 3px;
   background: var(--papel-alta);
-  box-shadow: 0 0 0 2px var(--papel), 0 0 0 5px var(--tinta-fraca);
+  box-shadow:
+    0 0 0 2px var(--papel),
+    0 0 0 5px var(--tinta-fraca);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -461,11 +473,15 @@ body::before {
 }
 
 .deputado--sim-ambos .foto-moldura {
-  box-shadow: 0 0 0 2px var(--papel), 0 0 0 5px var(--vermelho);
+  box-shadow:
+    0 0 0 2px var(--papel),
+    0 0 0 5px var(--vermelho);
 }
 
 .deputado--sim-um .foto-moldura {
-  box-shadow: 0 0 0 2px var(--papel), 0 0 0 5px var(--vermelho-medio);
+  box-shadow:
+    0 0 0 2px var(--papel),
+    0 0 0 5px var(--vermelho-medio);
 }
 
 .foto {
@@ -508,7 +524,7 @@ body::before {
   font-weight: 700;
 }
 
-.detalhe .partido {
+.detalhe .party {
   color: var(--tinta);
   background: rgba(21, 18, 15, 0.08);
   padding: 0.12rem 0.45rem;
@@ -611,8 +627,8 @@ body::before {
   border-bottom: 2px solid var(--tinta);
 }
 
-.carregando,
-.painel-status p {
+.loading,
+.status-panel p {
   font-family: var(--fonte-display);
   font-size: 1.25rem;
   letter-spacing: 0.08em;
@@ -676,7 +692,7 @@ body::before {
 }
 
 @media (max-width: 1100px) {
-  .barra {
+  .filter-bar {
     grid-template-columns: repeat(6, 1fr);
   }
 
@@ -686,11 +702,11 @@ body::before {
 }
 
 @media (max-width: 700px) {
-  .cabecalho {
+  .header {
     padding-top: 1.5rem;
   }
 
-  .titulo-poster {
+  .poster-title {
     font-size: 2.35rem;
     line-height: 1;
   }
@@ -700,12 +716,12 @@ body::before {
     align-items: flex-start;
   }
 
-  .estatisticas {
+  .stats {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
 
-  .barra {
+  .filter-bar {
     position: static;
     grid-template-columns: 1fr 1fr;
     padding: 1rem;

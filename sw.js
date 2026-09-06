@@ -1,79 +1,86 @@
-const VERSAO = "voto-v2";
+const CACHE_VERSION = "vote-v3";
 
-const CONCHA = [
+const PRECACHE = [
   "index.html",
   "dex.html",
-  "assets/voto.css",
-  "assets/voto.js",
-  "assets/elo.js",
-  "assets/cartaz.js",
+  "assets/styles.css",
+  "assets/app.js",
+  "assets/vote-app.css",
+  "assets/vote-app.js",
+  "assets/share-link.js",
+  "assets/poster.js",
   "assets/vendor/qrcode.js",
-  "assets/fontes/Anton-Regular.woff2",
-  "assets/fontes/Archivo-400.woff2",
-  "assets/fontes/Archivo-600.woff2",
-  "assets/fontes/Archivo-700.woff2",
-  "assets/fontes/Archivo-800.woff2",
-  "assets/fontes/DSEG7Classic-BoldItalic.woff2",
-  "assets/icone.svg",
-  "assets/icone-192.png",
-  "assets/icone-512.png",
+  "assets/fonts/Anton-Regular.woff2",
+  "assets/fonts/Archivo-400.woff2",
+  "assets/fonts/Archivo-600.woff2",
+  "assets/fonts/Archivo-700.woff2",
+  "assets/fonts/Archivo-800.woff2",
+  "assets/fonts/DSEG7Classic-BoldItalic.woff2",
+  "assets/icon.svg",
+  "assets/icon-192.png",
+  "assets/icon-512.png",
   "manifest.webmanifest",
   "data/dex/indice.json",
   "data/dex/BR.json",
+  "data/votos-pec-blindagem.json",
 ];
 
-const PROPRIOS = [
+const OWN_ASSETS = [
   "index.html",
   "dex.html",
-  "assets/voto.css",
-  "assets/voto.js",
-  "assets/elo.js",
-  "assets/cartaz.js",
+  "assets/styles.css",
+  "assets/app.js",
+  "assets/vote-app.css",
+  "assets/vote-app.js",
+  "assets/share-link.js",
+  "assets/poster.js",
   "assets/vendor/qrcode.js",
-  "assets/fontes/Anton-Regular.woff2",
-  "assets/fontes/Archivo-400.woff2",
-  "assets/fontes/Archivo-600.woff2",
-  "assets/fontes/Archivo-700.woff2",
-  "assets/fontes/Archivo-800.woff2",
-  "assets/fontes/DSEG7Classic-BoldItalic.woff2",
-  "assets/icone.svg",
-  "assets/icone-192.png",
-  "assets/icone-512.png",
+  "assets/fonts/Anton-Regular.woff2",
+  "assets/fonts/Archivo-400.woff2",
+  "assets/fonts/Archivo-600.woff2",
+  "assets/fonts/Archivo-700.woff2",
+  "assets/fonts/Archivo-800.woff2",
+  "assets/fonts/DSEG7Classic-BoldItalic.woff2",
+  "assets/icon.svg",
+  "assets/icon-192.png",
+  "assets/icon-512.png",
   "manifest.webmanifest",
 ];
 
-function absoluta(caminho) {
-  return new URL(caminho, self.registration.scope).pathname;
+function toScopePath(path) {
+  return new URL(path, self.registration.scope).pathname;
 }
 
-function podeGuardar(resposta) {
-  return Boolean(resposta) && resposta.status === 200 && resposta.type === "basic";
+function isCacheable(response) {
+  return Boolean(response) && response.status === 200 && response.type === "basic";
 }
 
-async function guardar(pedido, resposta) {
+async function putInCache(request, response) {
   try {
-    const cache = await caches.open(VERSAO);
-    await cache.put(pedido, resposta);
-  } catch (semEspaco) {
-    console.error(`não foi possível guardar ${pedido.url} no cache: ${semEspaco.message}`);
+    const cache = await caches.open(CACHE_VERSION);
+    await cache.put(request, response);
+  } catch (quotaError) {
+    console.error(`could not cache ${request.url}: ${quotaError.message}`);
   }
 }
 
-async function primeiroDaRede(pedido, evento) {
-  const cache = await caches.open(VERSAO);
-  let daRede = null;
+async function networkFirst(request, event) {
+  const cache = await caches.open(CACHE_VERSION);
+  let fromNetwork = null;
   try {
-    daRede = await fetch(pedido);
-  } catch (semRede) {
-    daRede = null;
+    fromNetwork = await fetch(request);
+  } catch {
+    // Network unreachable
   }
-  if (daRede !== null && daRede.ok) {
-    if (podeGuardar(daRede)) evento.waitUntil(guardar(pedido, daRede.clone()));
-    return daRede;
+  if (fromNetwork !== null && fromNetwork.ok) {
+    if (isCacheable(fromNetwork)) event.waitUntil(putInCache(request, fromNetwork.clone()));
+    return fromNetwork;
   }
-  const salva = await cache.match(absoluta("dex.html"));
-  if (salva !== undefined) return salva;
-  if (daRede !== null) return daRede;
+  const cached = await cache.match(request);
+  if (cached !== undefined) return cached;
+  const shell = await cache.match(toScopePath("dex.html"));
+  if (shell !== undefined) return shell;
+  if (fromNetwork !== null) return fromNetwork;
   return new Response("Sem conexão e sem cópia salva do aplicativo.", {
     status: 503,
     statusText: "Servico indisponivel",
@@ -81,23 +88,23 @@ async function primeiroDaRede(pedido, evento) {
   });
 }
 
-async function revalidando(pedido, evento) {
-  const cache = await caches.open(VERSAO);
-  const salva = await cache.match(pedido);
-  const daRede = fetch(pedido)
-    .then((resposta) => {
-      if (podeGuardar(resposta)) evento.waitUntil(guardar(pedido, resposta.clone()));
-      return resposta;
+async function staleWhileRevalidate(request, event) {
+  const cache = await caches.open(CACHE_VERSION);
+  const cached = await cache.match(request);
+  const fromNetwork = fetch(request)
+    .then((response) => {
+      if (isCacheable(response)) event.waitUntil(putInCache(request, response.clone()));
+      return response;
     })
     .catch(() => null);
 
-  if (salva !== undefined) {
-    evento.waitUntil(daRede);
-    return salva;
+  if (cached !== undefined) {
+    event.waitUntil(fromNetwork);
+    return cached;
   }
 
-  const resposta = await daRede;
-  if (resposta !== null) return resposta;
+  const response = await fromNetwork;
+  if (response !== null) return response;
   return new Response("Sem conexão e sem cópia salva deste arquivo.", {
     status: 503,
     statusText: "Servico indisponivel",
@@ -105,64 +112,66 @@ async function revalidando(pedido, evento) {
   });
 }
 
-async function primeiroDoCache(pedido, evento) {
-  const cache = await caches.open(VERSAO);
-  const salva = await cache.match(pedido);
-  if (salva !== undefined) return salva;
-  const resposta = await fetch(pedido);
-  if (podeGuardar(resposta)) evento.waitUntil(guardar(pedido, resposta.clone()));
-  return resposta;
+async function cacheFirst(request, event) {
+  const cache = await caches.open(CACHE_VERSION);
+  const cached = await cache.match(request);
+  if (cached !== undefined) return cached;
+  const response = await fetch(request);
+  if (isCacheable(response)) event.waitUntil(putInCache(request, response.clone()));
+  return response;
 }
 
-self.addEventListener("install", (evento) => {
-  evento.waitUntil(
+self.addEventListener("install", (event) => {
+  event.waitUntil(
     caches
-      .open(VERSAO)
-      .then((cache) => cache.addAll(CONCHA.map((caminho) => absoluta(caminho))))
+      .open(CACHE_VERSION)
+      .then((cache) => cache.addAll(PRECACHE.map((path) => toScopePath(path))))
       .then(() => self.skipWaiting()),
   );
 });
 
-self.addEventListener("activate", (evento) => {
-  evento.waitUntil(
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
     caches
       .keys()
-      .then((nomes) => Promise.all(nomes.filter((nome) => nome !== VERSAO).map((nome) => caches.delete(nome))))
+      .then((names) =>
+        Promise.all(names.filter((name) => name !== CACHE_VERSION).map((name) => caches.delete(name))),
+      )
       .then(() => self.clients.claim()),
   );
 });
 
-self.addEventListener("fetch", (evento) => {
-  const pedido = evento.request;
-  if (pedido.method !== "GET") return;
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+  if (request.method !== "GET") return;
 
-  const url = new URL(pedido.url);
+  const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (pedido.mode === "navigate") {
+  if (request.mode === "navigate") {
     const p = url.pathname;
     if (
-      p === absoluta("dex.html") ||
-      p === absoluta("index.html") ||
-      p === absoluta("") ||
-      p === absoluta("/")
+      p === toScopePath("dex.html") ||
+      p === toScopePath("index.html") ||
+      p === toScopePath("") ||
+      p === toScopePath("/")
     ) {
-      evento.respondWith(primeiroDaRede(pedido, evento));
+      event.respondWith(networkFirst(request, event));
     }
     return;
   }
 
-  if (url.pathname.startsWith(absoluta("fotos/")) || url.pathname.startsWith(absoluta("fotos-tse/"))) {
-    evento.respondWith(primeiroDoCache(pedido, evento));
+  if (url.pathname.startsWith(toScopePath("fotos/")) || url.pathname.startsWith(toScopePath("fotos-tse/"))) {
+    event.respondWith(cacheFirst(request, event));
     return;
   }
 
-  if (url.pathname.startsWith(absoluta("data/dex/"))) {
-    evento.respondWith(revalidando(pedido, evento));
+  if (url.pathname.startsWith(toScopePath("data/dex/"))) {
+    event.respondWith(staleWhileRevalidate(request, event));
     return;
   }
 
-  if (PROPRIOS.some((caminho) => url.pathname === absoluta(caminho))) {
-    evento.respondWith(revalidando(pedido, evento));
+  if (OWN_ASSETS.some((path) => url.pathname === toScopePath(path))) {
+    event.respondWith(staleWhileRevalidate(request, event));
   }
 });
